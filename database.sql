@@ -99,16 +99,34 @@ CREATE TABLE `TrainingFeedback`(
     `member_id` BIGINT NOT NULL,
     `result` VARCHAR(255) NOT NULL
 );
+
+ALTER TABLE Trainers MODIFY user_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE
     `Trainers` ADD CONSTRAINT `trainers_user_id_foreign` FOREIGN KEY(`user_id`) REFERENCES `Users`(`user_id`);
+    
+ALTER TABLE TrainingFeedback MODIFY trainer_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE
     `TrainingFeedback` ADD CONSTRAINT `trainingfeedback_trainer_id_foreign` FOREIGN KEY(`trainer_id`) REFERENCES `Trainers`(`trainer_id`);
+
+ALTER TABLE TrainingFeedback MODIFY member_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE
     `TrainingFeedback` ADD CONSTRAINT `trainingfeedback_member_id_foreign` FOREIGN KEY(`member_id`) REFERENCES `Members`(`member_id`);
+    
 ALTER TABLE
     `Attendance` ADD CONSTRAINT `attendance_attendance_id_foreign` FOREIGN KEY(`attendance_id`) REFERENCES `Members`(`member_id`);
+    
+ALTER TABLE Membership MODIFY package_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE
     `Membership` ADD CONSTRAINT `membership_package_id_foreign` FOREIGN KEY(`package_id`) REFERENCES `MembershipPackage`(`package_id`);
+-- Các cột liên kết đến khóa chính là BIGINT UNSIGNED, nên cần sửa về cùng kiểu
+ALTER TABLE MaintenanceRequest MODIFY receptionist_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE Equipments MODIFY room_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE TrainerAssignment MODIFY member_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE TrainerAssignment MODIFY trainer_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE Admins MODIFY user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE Receptionists MODIFY user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE Members MODIFY user_id BIGINT UNSIGNED NOT NULL;
+
 ALTER TABLE
     `MaintenanceRequest` ADD CONSTRAINT `maintenancerequest_receptionist_id_foreign` FOREIGN KEY(`receptionist_id`) REFERENCES `Receptionists`(`receptionist_id`);
 ALTER TABLE
@@ -125,6 +143,10 @@ ALTER TABLE
     `TrainerAssignment` ADD CONSTRAINT `trainerassignment_trainer_id_foreign` FOREIGN KEY(`trainer_id`) REFERENCES `Trainers`(`trainer_id`);
 ALTER TABLE
     `Membership` ADD CONSTRAINT `membership_membership_id_foreign` FOREIGN KEY(`membership_id`) REFERENCES `Members`(`member_id`);
+    
+ALTER TABLE Feedback MODIFY member_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE MaintenanceRequest MODIFY equipment_id BIGINT UNSIGNED NOT NULL;
+
 ALTER TABLE
     `Feedback` ADD CONSTRAINT `feedback_member_id_foreign` FOREIGN KEY(`member_id`) REFERENCES `Members`(`member_id`);
 ALTER TABLE
