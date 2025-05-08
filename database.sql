@@ -2,52 +2,46 @@ CREATE TABLE `Equipments`(
     `equipment_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `equipment_name` VARCHAR(255) NOT NULL,
     `quantity` BIGINT NOT NULL,
-    `manufacturer` BIGINT NOT NULL,
+    `manufacturer` VARCHAR(255) NOT NULL,
     `room_id` BIGINT NOT NULL
 );
 CREATE TABLE `Rooms`(
     `room_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `branch_id` BIGINT NOT NULL,
     `room_name` VARCHAR(255) NOT NULL,
     `room_type` VARCHAR(255) NOT NULL,
     `status` VARCHAR(255) NOT NULL
 );
 CREATE TABLE `Users`(
     `user_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `user_name` BIGINT NOT NULL,
-    `password` BIGINT NOT NULL,
-    `email` BIGINT NOT NULL,
-    `phone` BIGINT NOT NULL,
-    `role` BIGINT NOT NULL,
-    `created_at` BIGINT NOT NULL
+    `user_name` VARCHAR(255) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `phone` VARCHAR(255) NOT NULL,
+    `role` VARCHAR(255) NOT NULL,
+    `created_at` TIMESTAMP NOT NULL,
+    `fullname` VARCHAR(255) NOT NULL
 );
 CREATE TABLE `Trainers`(
     `trainer_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` BIGINT NOT NULL,
-    `branch_id` BIGINT NOT NULL,
-    `fullname` VARCHAR(255) NOT NULL,
     `specialty` VARCHAR(255) NOT NULL,
     `salary` DOUBLE NOT NULL,
     `hire_date` TIMESTAMP NOT NULL
 );
 CREATE TABLE `Admins`(
     `admin_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL,
-    `fullname` VARCHAR(255) NOT NULL
+    `user_id` BIGINT NOT NULL
 );
 CREATE TABLE `Receptionists`(
     `receptionist_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` BIGINT NOT NULL,
-    `branch_id` BIGINT NOT NULL,
-    `fullname` VARCHAR(255) NOT NULL,
     `salary` BIGINT NOT NULL,
     `hire_date` DATE NOT NULL
 );
 CREATE TABLE `Members`(
     `member_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` BIGINT NOT NULL,
-    `fullname` BIGINT NOT NULL,
-    `address` BIGINT NOT NULL,
+    `address` VARCHAR(255) NOT NULL,
     `date_of_birth` DATE NOT NULL,
     `register_date` DATE NOT NULL
 );
@@ -99,34 +93,22 @@ CREATE TABLE `TrainingFeedback`(
     `member_id` BIGINT NOT NULL,
     `result` VARCHAR(255) NOT NULL
 );
-
-ALTER TABLE Trainers MODIFY user_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE
     `Trainers` ADD CONSTRAINT `trainers_user_id_foreign` FOREIGN KEY(`user_id`) REFERENCES `Users`(`user_id`);
-    
-ALTER TABLE TrainingFeedback MODIFY trainer_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE
     `TrainingFeedback` ADD CONSTRAINT `trainingfeedback_trainer_id_foreign` FOREIGN KEY(`trainer_id`) REFERENCES `Trainers`(`trainer_id`);
-
-ALTER TABLE TrainingFeedback MODIFY member_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE
     `TrainingFeedback` ADD CONSTRAINT `trainingfeedback_member_id_foreign` FOREIGN KEY(`member_id`) REFERENCES `Members`(`member_id`);
     
-ALTER TABLE
-    `Attendance` ADD CONSTRAINT `attendance_attendance_id_foreign` FOREIGN KEY(`attendance_id`) REFERENCES `Members`(`member_id`);
-    
-ALTER TABLE Membership MODIFY package_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `Membership`
+ADD CONSTRAINT `membership_member_id_foreign`
+FOREIGN KEY(`member_id`) REFERENCES `Members`(`member_id`)
+ON DELETE CASCADE;
+
 ALTER TABLE
     `Membership` ADD CONSTRAINT `membership_package_id_foreign` FOREIGN KEY(`package_id`) REFERENCES `MembershipPackage`(`package_id`);
--- Các cột liên kết đến khóa chính là BIGINT UNSIGNED, nên cần sửa về cùng kiểu
-ALTER TABLE MaintenanceRequest MODIFY receptionist_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE Equipments MODIFY room_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE TrainerAssignment MODIFY member_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE TrainerAssignment MODIFY trainer_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE Admins MODIFY user_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE Receptionists MODIFY user_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE Members MODIFY user_id BIGINT UNSIGNED NOT NULL;
-
+ALTER TABLE
+    `Attendance` ADD CONSTRAINT `attendance_member_id_foreign` FOREIGN KEY(`member_id`) REFERENCES `Members`(`member_id`);
 ALTER TABLE
     `MaintenanceRequest` ADD CONSTRAINT `maintenancerequest_receptionist_id_foreign` FOREIGN KEY(`receptionist_id`) REFERENCES `Receptionists`(`receptionist_id`);
 ALTER TABLE
@@ -141,12 +123,6 @@ ALTER TABLE
     `Members` ADD CONSTRAINT `members_user_id_foreign` FOREIGN KEY(`user_id`) REFERENCES `Users`(`user_id`);
 ALTER TABLE
     `TrainerAssignment` ADD CONSTRAINT `trainerassignment_trainer_id_foreign` FOREIGN KEY(`trainer_id`) REFERENCES `Trainers`(`trainer_id`);
-ALTER TABLE
-    `Membership` ADD CONSTRAINT `membership_membership_id_foreign` FOREIGN KEY(`membership_id`) REFERENCES `Members`(`member_id`);
-    
-ALTER TABLE Feedback MODIFY member_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE MaintenanceRequest MODIFY equipment_id BIGINT UNSIGNED NOT NULL;
-
 ALTER TABLE
     `Feedback` ADD CONSTRAINT `feedback_member_id_foreign` FOREIGN KEY(`member_id`) REFERENCES `Members`(`member_id`);
 ALTER TABLE
