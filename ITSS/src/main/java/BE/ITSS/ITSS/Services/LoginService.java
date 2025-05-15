@@ -14,8 +14,8 @@ public class LoginService {
     private UserRepository userRepository;
     
 
-    public LoginResponse login(String userName, String password) {
-        User user = userRepository.findByUserName(userName)
+    public LoginResponse login(String email, String password) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!user.getPassword().equals(password)) {

@@ -3,19 +3,20 @@ package BE.ITSS.ITSS.DTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LoginRequest {
-    @JsonProperty("user_name")
-    private String user_name;
+//    @JsonProperty("user_name")
+//    private String user_name;
+    private String email;
     private String password;
 
     // Getters and Setters
 
 
-    public String getUser_name() {
-        return user_name;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
