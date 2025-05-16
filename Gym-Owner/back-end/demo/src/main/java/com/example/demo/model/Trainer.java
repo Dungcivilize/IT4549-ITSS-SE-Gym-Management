@@ -1,5 +1,10 @@
 package com.example.demo.model;
 
+import jakarta.persistence.*;
+import java.util.List;
+import java.sql.Timestamp;
+
+
 @Entity
 @Table(name = "Trainers")
 public class Trainer {
