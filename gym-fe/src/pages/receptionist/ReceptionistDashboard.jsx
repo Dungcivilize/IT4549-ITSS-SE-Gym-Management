@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function ReceptionistDashboard() {
-  const receptionistId = Number(localStorage.getItem('receptionistId')) || 1;
   const navigate = useNavigate();
 
   const [stats, setStats] = useState({
@@ -11,96 +10,122 @@ export default function ReceptionistDashboard() {
     todayCheckIns: 0,
   });
 
-  const [requests, setRequests] = useState([]);
-  const [equipmentId, setEquipmentId] = useState('');
-  const [notes, setNotes] = useState('');
-  const [message, setMessage] = useState('');
-
   useEffect(() => {
-    fetch('http://localhost:8080/api/receptionist/stats')
+    fetch('http://localhost:8080/api/receptionists/stats')
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(console.error);
   }, []);
 
-  useEffect(() => {
-    fetch(`http://localhost:8080/api/maintenance-requests/receptionist/${receptionistId}`)
-      .then(res => res.json())
-      .then(setRequests)
-      .catch(console.error);
-  }, [receptionistId]);
-
-  const handleCreateRequest = () => {
-    fetch('http://localhost:8080/api/maintenance-requests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        equipment: { equipmentId: Number(equipmentId) },
-        receptionist: { receptionistId },
-        requestDate: new Date().toISOString().split('T')[0],
-        status: 'Pending',
-        notes,
-      }),
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Tạo yêu cầu thất bại');
-        return res.json();
-      })
-      .then(newRequest => {
-        setRequests(prev => [...prev, newRequest]);
-        setMessage('Tạo yêu cầu thành công');
-        setEquipmentId('');
-        setNotes('');
-      })
-      .catch(err => setMessage(err.message));
-  };
-
   return (
-    <div>
-      <h1>Receptionist Dashboard</h1>
+    <div 
+      style={{ 
+        width: '100%',
+        maxWidth: '800px', 
+        margin: '40px auto',
+        padding: '20px', 
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Receptionist Dashboard</h1>
 
-      {/* Điều hướng sang các trang khác */}
-      <div style={{ marginBottom: '20px' }}>
-        <button onClick={() => navigate('/receptionist/members')}>Quản lý thành viên</button>
-        <button onClick={() => navigate('/receptionist/maintenance-requests')} style={{ marginLeft: '10px' }}>
+      {/*nút Quản lý thành viên */}
+      <button
+        onClick={() => navigate('/receptionist/members')}
+        style={{
+          padding: '12px 20px',
+          borderRadius: '8px',
+          fontSize: '16px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          border: '1px solid #667eea',
+          backgroundColor: '#667eea',
+          color: 'white',
+          minWidth: '200px',
+          boxSizing: 'border-box',
+          marginBottom: '20px',
+          ...buttonStyle,
+        }}
+      >
+        Quản lý thành viên
+      </button>
+
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        gap: '15px', 
+        marginBottom: '40px',
+        flexWrap: 'wrap',
+        width: '100%',
+        alignItems: 'center',
+      }}>
+        <button
+          onClick={() => navigate('/receptionist/checkin-checkout')}
+          style={buttonStyle}
+        >
+          Check-in / Check-out
+        </button>
+        <button
+          onClick={() => navigate('/receptionist/maintenance-requests')}
+          style={buttonStyle}
+        >
           Quản lý yêu cầu bảo trì
         </button>
       </div>
 
-      {/* Thống kê */}
-      <ul>
-        <li>Số thành viên: {stats.membersCount}</li>
-        <li>Số yêu cầu bảo trì: {stats.maintenanceRequestsCount}</li>
-        <li>Số check-in hôm nay: {stats.todayCheckIns}</li>
-      </ul>
+      {/* Stats cards */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '25px',
+        flexWrap: 'wrap',
+        width: '100%',
+      }}>
+        <StatCard title="Số thành viên" value={stats.membersCount} />
+        <StatCard title="Yêu cầu bảo trì" value={stats.maintenanceRequestsCount} />
+        <StatCard title="Check-in hôm nay" value={stats.todayCheckIns} />
+      </div>
+    </div>
+  );
+}
 
-      {/* Form tạo yêu cầu bảo trì */}
-      <h2>Tạo yêu cầu bảo trì mới</h2>
-      <input
-        type="number"
-        placeholder="Equipment ID"
-        value={equipmentId}
-        onChange={e => setEquipmentId(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Ghi chú"
-        value={notes}
-        onChange={e => setNotes(e.target.value)}
-      />
-      <button onClick={handleCreateRequest}>Gửi yêu cầu</button>
+const buttonStyle = {
+  backgroundColor: '#667eea',
+  border: 'none',
+  padding: '12px 20px',
+  borderRadius: '8px',
+  color: 'white',
+  cursor: 'pointer',
+  fontSize: '16px',
+  fontWeight: '600',
+  boxShadow: '0 4px 8px rgba(102, 126, 234, 0.4)',
+  transition: 'background-color 0.3s ease',
+  minWidth: '200px', 
+  textAlign: 'center',
+};
 
-      {message && <p>{message}</p>}
-
-      {/* Danh sách yêu cầu */}
-      <h2>Danh sách yêu cầu bảo trì của bạn</h2>
-      <ul>
-        {requests.map(r => (
-          <li key={r.requestId}>
-            Thiết bị: {r.equipment?.equipmentId}, Trạng thái: {r.status}, Ghi chú: {r.notes}
-          </li>
-        ))}
-      </ul>
+function StatCard({ title, value }) {
+  return (
+    <div style={{
+      minWidth: '180px',
+      padding: '20px 30px',
+      backgroundColor: '#f5f7ff',
+      borderRadius: '12px',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+      textAlign: 'center',
+      userSelect: 'none',
+      flex: '1',
+      maxWidth: '220px',
+    }}>
+      <div style={{ fontSize: '22px', fontWeight: '700', color: '#333' }}>{value}</div>
+      <div style={{ marginTop: '8px', fontSize: '16px', color: '#666' }}>{title}</div>
     </div>
   );
 }
