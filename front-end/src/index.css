@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  scroll-behavior: smooth;
+}
+
+.section {
+  min-height: 100vh;
+  padding: 80px 20px 40px;
+  box-sizing: border-box;
+}
+
+.home {
+  background-color: #f0f8ff;
+  text-align: center;
+}
+
+.about {
+  background-color: #ffffff;
+  text-align: center;
+}
+
+.package {
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.trainer {
+  background-color: #ffffff;
+  text-align: center;
+}

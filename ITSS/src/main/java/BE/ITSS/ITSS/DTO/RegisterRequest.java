@@ -1,5 +1,7 @@
 package BE.ITSS.ITSS.DTO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Date;
 
 public class RegisterRequest {
@@ -7,6 +9,7 @@ public class RegisterRequest {
     private String fullname;
     private String phone;
     private String address;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
 
     // Getters & setters
