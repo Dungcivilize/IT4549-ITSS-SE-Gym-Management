@@ -5,7 +5,7 @@ import MemberForm from '../components/receptionist/MemberForm';
 export default function Member() {
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
-  const [reload, setReload] = useState(false); // trigger reload sau khi thêm/sửa/xóa
+  const [reload, setReload] = useState(false); 
 
   useEffect(() => {
     fetch('http://localhost:8080/api/receptionist/members')
