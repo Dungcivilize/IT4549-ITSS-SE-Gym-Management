@@ -4,6 +4,8 @@ import ReceptionistDashboard from './pages/receptionist/ReceptionistDashboard';
 import Member from './pages/receptionist/Member';
 import CheckInCheckOut from './pages/receptionist/CheckInCheckOut';
 import MaintenanceRequests from './pages/receptionist/MaintenanceRequests';
+import EquipmentList from './pages/receptionist/EquipmentList';
+import MembershipActions from './pages/receptionist/MembershipActions';
 
 function App() {
   return (
@@ -20,6 +22,10 @@ function App() {
         <Route path="/receptionist/checkin-checkout" element={<CheckInCheckOut />} />
 
         <Route path="/receptionist/maintenance-requests" element={<MaintenanceRequests />} />
+
+        <Route path="/receptionist/equipments" element={<EquipmentList />} />
+
+        <Route path="/receptionist/memberships" element={<MembershipActions />} />
 
         {/* Mặc định redirect tới login */}
         <Route path="*" element={<Login />} />

@@ -37,25 +37,44 @@ export default function ReceptionistDashboard() {
       <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Receptionist Dashboard</h1>
 
       {/*nút Quản lý thành viên */}
-      <button
-        onClick={() => navigate('/receptionist/members')}
-        style={{
-          padding: '12px 20px',
-          borderRadius: '8px',
-          fontSize: '16px',
-          fontWeight: '600',
-          cursor: 'pointer',
-          border: '1px solid #667eea',
-          backgroundColor: '#667eea',
-          color: 'white',
-          minWidth: '200px',
-          boxSizing: 'border-box',
-          marginBottom: '20px',
-          ...buttonStyle,
-        }}
-      >
-        Quản lý thành viên
-      </button>
+      <div style={{ display: 'flex', gap: '20px' }}>
+        <button
+          onClick={() => navigate('/receptionist/members')}
+          style={{
+            padding: '12px 20px',
+            borderRadius: '8px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            border: '1px solid #667eea',
+            backgroundColor: '#667eea',
+            color: 'white',
+            minWidth: '200px',
+            boxSizing: 'border-box',
+            marginBottom: '20px',
+          }}
+        >
+          Quản lý thành viên
+        </button>
+        <button
+          onClick={() => navigate('/receptionist/memberships')}
+          style={{
+            padding: '12px 20px',
+            borderRadius: '8px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            border: '1px solid #667eea',
+            backgroundColor: '#667eea',
+            color: 'white',
+            minWidth: '200px',
+            boxSizing: 'border-box',
+            marginBottom: '20px',
+          }}
+        >
+          Quản lý gói tập
+        </button>
+      </div>
 
       <div style={{ 
         display: 'flex', 
@@ -66,6 +85,12 @@ export default function ReceptionistDashboard() {
         width: '100%',
         alignItems: 'center',
       }}>
+        <button
+          onClick={() => navigate('/receptionist/equipments')}
+          style={buttonStyle}
+        >
+          Danh sách thiết bị
+        </button>
         <button
           onClick={() => navigate('/receptionist/checkin-checkout')}
           style={buttonStyle}
