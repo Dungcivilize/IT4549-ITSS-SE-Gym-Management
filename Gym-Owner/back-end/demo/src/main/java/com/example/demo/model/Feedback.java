@@ -3,7 +3,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Feedback")
+@Table(name = "feedback")
 public class Feedback {
 
     @Id

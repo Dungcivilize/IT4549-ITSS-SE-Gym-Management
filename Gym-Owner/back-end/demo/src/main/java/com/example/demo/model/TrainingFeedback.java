@@ -2,7 +2,7 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 @Entity
-@Table(name = "TrainingFeedback")
+@Table(name = "trainingfeedback")
 public class TrainingFeedback {
 
     @Id
