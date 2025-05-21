@@ -642,3 +642,12 @@ nav {
     text-align: center;
   }
 }
+
+/* MemberHomePage.module.css hoặc member-specific.css */
+.pageWrapper {
+  background-image: url("../img/GymMemberBackGround.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: 100vh;
+}

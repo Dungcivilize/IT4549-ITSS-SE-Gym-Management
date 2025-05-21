@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import MemberHomePage from "./components/MemberHomePage";
+import PackageList from "./components/PackageList"; // ✅ import
 
 // Bảo vệ route yêu cầu đăng nhập
 const ProtectedRoute = ({ children }) => {
@@ -47,10 +48,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/packages"
+          element={
+            <ProtectedRoute>
+              <PackageList />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
 }
-
 
 export default App;
