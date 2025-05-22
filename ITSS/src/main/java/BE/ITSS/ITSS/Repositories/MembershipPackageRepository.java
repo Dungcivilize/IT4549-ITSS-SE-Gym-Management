@@ -1,6 +1,7 @@
 package BE.ITSS.ITSS.Repositories;
 
 import BE.ITSS.ITSS.Models.MembershipPackage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
@@ -11,5 +12,6 @@ public interface MembershipPackageRepository extends JpaRepository<MembershipPac
 
     @Query(value = "SELECT * FROM MembershipPackage WHERE package_id = :id", nativeQuery = true)
     Optional<MembershipPackage> findByIdNative(@Param("id") Long id);
+
 }
 

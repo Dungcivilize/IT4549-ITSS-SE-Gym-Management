@@ -10,7 +10,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import MemberHomePage from "./components/MemberHomePage";
-import PackageList from "./components/PackageList"; 
+import PackageList from "./components/PackageList";
+import PaymentPage from "./components/PaymentModal";
 import MemberProfile from "./pages/MemberProfile";
 import ChangePassword from "./pages/ChangePassword";
 import Feedback from "./pages/Feedback";
@@ -52,6 +53,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/packages"
           element={
@@ -60,7 +62,25 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/member-profile" element={<MemberProfile />} />
+
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute>
+              <PaymentPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/member-profile"
+          element={
+            <ProtectedRoute>
+              <MemberProfile />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/change-password"
           element={
@@ -69,6 +89,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/feedback"
           element={
@@ -77,6 +98,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/promotion"
           element={

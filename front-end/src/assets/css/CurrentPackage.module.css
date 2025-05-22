@@ -1,0 +1,51 @@
+.container {
+  padding: 2rem;
+  color: white;
+}
+
+.loading {
+  padding: 2rem;
+  color: white;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  background: #2a2a2a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  align-items: center; /* ✅ giúp căn giữa chiều dọc */
+}
+
+.leftInfo {
+  flex: 1;
+}
+
+.rightActions {
+  display: flex;
+  gap: 10px;
+  align-items: center; /* ✅ Căn giữa chiều dọc */
+  height: 100%;
+}
+
+.actionButton {
+  padding: 0.9rem 1.6rem; /* 👉 tăng padding */
+  background-color: #ffc107;
+  border: none;
+  border-radius: 8px; /* 👉 bo góc to hơn một chút */
+  color: black;
+  font-size: 1rem; /* 👉 chữ to hơn */
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); /* 👉 đổ bóng nhẹ cho nổi bật */
+  transition: transform 0.2s ease;
+}
+
+.actionButton:hover {
+  transform: scale(1.05); /* 👉 hiệu ứng phóng nhẹ khi hover */
+}
+
+.flexSpacer {
+  width: 12px; /* Để giữ khoảng cách cân đối nếu cần */
+}
