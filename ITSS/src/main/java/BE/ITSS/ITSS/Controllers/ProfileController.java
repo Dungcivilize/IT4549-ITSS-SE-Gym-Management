@@ -63,5 +63,11 @@ public class ProfileController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/members/user/{userId}")
+    public ResponseEntity<Long> getMemberIdByUserId(@PathVariable Long userId) {
+        Long memberId = memberRepository.findMemberIdByUserId(userId);
+        return ResponseEntity.ok(memberId);
+    }
+
 }
 

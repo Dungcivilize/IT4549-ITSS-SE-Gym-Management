@@ -11,5 +11,8 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
 
     List<Membership> findByMemberId(Long memberId);
 
+    // Trả về danh sách tất cả các lần đăng ký gói đó của member
+
+
 
 }
