@@ -10,7 +10,11 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import MemberHomePage from "./components/MemberHomePage";
-import PackageList from "./components/PackageList"; // ✅ import
+import PackageList from "./components/PackageList"; 
+import MemberProfile from "./pages/MemberProfile";
+import ChangePassword from "./pages/ChangePassword";
+import Feedback from "./pages/Feedback";
+import Promotion from "./pages/Promotion";
 
 // Bảo vệ route yêu cầu đăng nhập
 const ProtectedRoute = ({ children }) => {
@@ -53,6 +57,31 @@ function App() {
           element={
             <ProtectedRoute>
               <PackageList />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/member-profile" element={<MemberProfile />} />
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute>
+              <ChangePassword />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/feedback"
+          element={
+            <ProtectedRoute>
+              <Feedback />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/promotion"
+          element={
+            <ProtectedRoute>
+              <Promotion />
             </ProtectedRoute>
           }
         />

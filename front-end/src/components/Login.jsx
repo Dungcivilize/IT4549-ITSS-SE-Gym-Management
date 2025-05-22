@@ -33,6 +33,7 @@ function Login() {
         userName: response.data.user_name,
         role: response.data.role,
         fullname: response.data.fullname,
+        memberId: response.data.member_id,
       };
 
       // Lưu vào localStorage

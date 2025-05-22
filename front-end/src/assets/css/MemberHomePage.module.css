@@ -645,9 +645,63 @@ nav {
 
 /* MemberHomePage.module.css hoặc member-specific.css */
 .pageWrapper {
-  background-image: url("../img/GymMemberBackGround.jpg");
+
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   min-height: 100vh;
+}
+
+.user__info {
+  position: relative;
+  margin-right: 1rem;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1000;
+  margin-top: 0.5rem;
+}
+
+.dropdown__item {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.dropdown__item:hover {
+  background-color: #f5f5f5;
+  color: #007bff;
+}
+
+.profileBox {
+  background: #232323;
+  color: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 2rem auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  font-size: 1.1rem;
+}
+
+.profileItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+}
+
+.profileItemIcon {
+  font-size: 1.2rem;
+  color: #f9ac54;
+  min-width: 24px;
 }

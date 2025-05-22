@@ -6,15 +6,17 @@ public class LoginResponse {
     private String user_name;
     private String role;
     private String fullname;
+    private Long member_id;
     // Thêm các trường khác nếu cần
 
     // Constructor
-    public LoginResponse(String message, Long user_id, String user_name, String role, String fullname) {
+    public LoginResponse(String message, Long user_id, String user_name, String role, String fullname, Long member_id) {
         this.message = message;
         this.user_id = user_id;
         this.user_name = user_name;
         this.role = role;
         this.fullname = fullname;
+        this.member_id = member_id;
     }
 
     public String getMessage() {
@@ -55,5 +57,13 @@ public class LoginResponse {
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    public Long getMember_id() {
+        return member_id;
+    }
+
+    public void setMember_id(Long member_id) {
+        this.member_id = member_id;
     }
 }
