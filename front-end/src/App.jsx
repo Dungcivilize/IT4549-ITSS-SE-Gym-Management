@@ -11,6 +11,7 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import MemberHomePage from "./components/MemberHomePage";
 import PackageList from "./components/PackageList"; // ✅ import
+import PaymentPage from "./components/PaymentModal"; // ✅ import
 
 // Bảo vệ route yêu cầu đăng nhập
 const ProtectedRoute = ({ children }) => {
@@ -22,7 +23,6 @@ const ProtectedRoute = ({ children }) => {
 
   return children;
 };
-
 function App() {
   return (
     <Router>
@@ -48,11 +48,21 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/packages"
           element={
             <ProtectedRoute>
               <PackageList />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute>
+              <PaymentPage />
             </ProtectedRoute>
           }
         />

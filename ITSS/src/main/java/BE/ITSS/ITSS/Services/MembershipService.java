@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,9 @@ public class MembershipService {
 
     @Autowired
     private MembershipRepository membershipRepository;
+
+    @Autowired
+    private MembershipPackageRepository membershipPackageRepository;
 
     /**
      *
@@ -72,6 +76,7 @@ public class MembershipService {
             if (pack == null) continue;
 
             RegisteredPackageResponse res = new RegisteredPackageResponse();
+            res.setPackageId(pack.getPackageId());
             res.setPackageName(pack.getPackageName());
             res.setStartDate(m.getStartDate());
             res.setEndDate(m.getEndDate());
@@ -154,10 +159,20 @@ public class MembershipService {
             throw new RuntimeException("Chỉ có thể gia hạn gói đã thanh toán.");
         }
 
-        m.setPaymentStatus("Yêu cầu gia hạn");
+        MembershipPackage pack = membershipPackageRepository.findById(m.getPackageId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin gói tập"));
+
+        Long duration = pack.getDuration();
+        LocalDate currentEnd = m.getEndDate().toLocalDate();
+        LocalDate newEndDate = currentEnd.plusDays(duration);
+
+        m.setEndDate(Date.valueOf(newEndDate));
+        m.setPaymentStatus("Chờ xác nhận"); // ⬅️ Trạng thái mới để chờ thanh toán lại
         m.setPaymentNote("Yêu cầu gia hạn: " + request.getPaymentNote());
 
         membershipRepository.save(m);
     }
+
+
 
 }

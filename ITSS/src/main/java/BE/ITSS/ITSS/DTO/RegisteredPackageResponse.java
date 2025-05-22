@@ -3,6 +3,7 @@ package BE.ITSS.ITSS.DTO;
 import java.sql.Date;
 
 public class RegisteredPackageResponse {
+    private Long packageId;
     private String packageName;
     private Date startDate;
     private Date endDate;
@@ -57,5 +58,11 @@ public class RegisteredPackageResponse {
 
     public void setRemainingDays(Long remainingDays) {
         this.remainingDays = remainingDays;
+    }
+    public Long getPackageId() {
+        return packageId;
+    }
+    public void setPackageId(Long packageId) {
+        this.packageId = packageId;
     }
 }
