@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import StaffManagement from './components/StaffManagement';
+import GymRooms from './pages/GymRooms';
+
 
 const App = () => {
   const [selectedPage, setSelectedPage] = useState('Dashboard');
@@ -12,6 +14,8 @@ const App = () => {
         return <Dashboard />;
         case 'Staff Management':
             return <StaffManagement />;
+      case 'Gym Rooms':
+        return <GymRooms />; // Thêm dòng này
       default:
         return <div style={{ padding: '20px' }}>Coming Soon...</div>;
     }
