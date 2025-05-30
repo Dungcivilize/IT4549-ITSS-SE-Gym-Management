@@ -6,8 +6,7 @@ const Sidebar = ({ onSelectPage, selectedPage }) => {
     'Staff Management',
     'Gym Rooms',
     'Equipment',
-    'Revenue',
-    'Staff Feedback',
+    'Package Management',
     'Logout'
   ];
 
