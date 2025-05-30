@@ -22,11 +22,15 @@ function StaffManagement() {
   }, []);
 
   // Filter staffs theo searchTerm
-  const filteredStaffs = staffs.filter((staff) =>
-    staff.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    staff.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    staff.role.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredStaffs = staffs.filter(staff => {
+  const userName = staff.userName ? staff.userName.toLowerCase() : "";
+  const email = staff.email ? staff.email.toLowerCase() : "";
+  const role = staff.role ? staff.role.toLowerCase() : "";
+  const term = searchTerm.toLowerCase();
+
+  return userName.includes(term) || email.includes(term) || role.includes(term);
+});
+
 
   // Handle change khi edit
   const handleChange = (e) => {
@@ -104,7 +108,7 @@ function StaffManagement() {
   };
 
   return (
-    <div>
+    <div style={{ padding: '20px' }}>
       <h2>Quản lý nhân sự</h2>
 
       <h3>Thêm nhân sự mới</h3>
@@ -156,7 +160,8 @@ function StaffManagement() {
       />
 
       <h3>Danh sách nhân sự</h3>
-      <table border="1" cellPadding="8">
+      <div style={{ maxHeight: "490px", overflowY: "auto" }}>
+      <table border="1" cellPadding="8" style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th>ID</th>
@@ -248,6 +253,7 @@ function StaffManagement() {
         </tbody>
       </table>
     </div>
+  </div>
   );
 }
 

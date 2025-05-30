@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import StaffManagement from './components/StaffManagement';
-import GymRooms from './pages/GymRooms';
+import GymRooms from './components/GymRooms';
+import EquipmentPage from './components/EquipmentPage';
+import MembershipPackagePage from './components/MembershipPackagePage';
+
 
 
 const App = () => {
@@ -15,7 +18,11 @@ const App = () => {
         case 'Staff Management':
             return <StaffManagement />;
       case 'Gym Rooms':
-        return <GymRooms />; // Thêm dòng này
+        return <GymRooms />;
+      case 'Equipment':
+        return <EquipmentPage/>;
+      case 'Package Management':
+        return <MembershipPackagePage/>;
       default:
         return <div style={{ padding: '20px' }}>Coming Soon...</div>;
     }
