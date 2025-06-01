@@ -9,5 +9,5 @@ import ITSS.Backend.entity.Feedback;
 
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
-
+    List<Feedback> findByMemberUserId(Long memberId);
 } 
