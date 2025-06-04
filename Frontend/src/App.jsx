@@ -9,6 +9,7 @@ import MemberHomePage from './pages/MemberPages/MemberHomePage';
 import MemberProfile from './pages/MemberPages/MemberProfile';
 import ChangePassword from './pages/MemberPages/ChangePassword';
 import Feedback from './pages/MemberPages/Feedback';
+import AdminDashboard from './pages/AdminPages/AdminDashboard';
 function App() {
   return (
     <Router>
@@ -24,7 +25,8 @@ function App() {
           <Route path="/feedback" element={<Feedback />} />
           {/* Receptionist Routes */}
           {/* Thêm các routes cho Receptionist sau khi có components */}
-
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           {/* Default Route */}
           <Route path="/" element={<MemberDashBoard />} />
         </Routes>

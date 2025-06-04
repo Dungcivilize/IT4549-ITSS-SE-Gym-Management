@@ -30,8 +30,13 @@ function Login() {
       // Lưu toàn bộ thông tin user vào localStorage
       localStorage.setItem('user', JSON.stringify(response.data));
 
-      // Điều hướng dựa vào role
-      navigate('/member/home');
+      // Lấy role từ response
+      if (response.data.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/member/home');
+      }
+      
     } catch (err) {
       setError('Email hoặc mật khẩu không đúng');
     }

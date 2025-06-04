@@ -9,6 +9,6 @@ import ITSS.Backend.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUserName(String userName);
     User findByEmail(String email);
-
+    long countByRole(String role);
     boolean existsByEmail(String email);
 }
