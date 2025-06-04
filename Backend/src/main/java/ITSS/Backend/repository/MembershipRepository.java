@@ -11,9 +11,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import ITSS.Backend.entity.Membership;
+import java.util.List;
 
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
+    @Query("SELECT MONTH(m.startDate) as month, SUM(m.membershipPackage.price) as total " +
+           "FROM Membership m " +
+           "WHERE m.paymentStatus = ITSS.Backend.entity.Membership.PaymentStatus.Paid " +
+           "AND YEAR(m.startDate) = :year " +
+           "GROUP BY MONTH(m.startDate)")
+    List<Object[]> getMonthlyRevenue(@Param("year") int year);
 
     @Query("SELECT m FROM Membership m WHERE YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
     List<Membership> findByStartDateInMonth(@Param("year") int year, @Param("month") int month);

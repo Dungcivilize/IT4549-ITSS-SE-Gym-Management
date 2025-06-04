@@ -9,13 +9,13 @@ import MemberHomePage from './pages/MemberPages/MemberHomePage';
 import MemberProfile from './pages/MemberPages/MemberProfile';
 import ChangePassword from './pages/MemberPages/ChangePassword';
 import Feedback from './pages/MemberPages/Feedback';
+import AdminDashboard from './pages/AdminPages/AdminDashboard';
 import ReceptionistDashboard from "./pages/ReceptionistPages/ReceptionistDashboard";
 import EquipmentStatistics from "./pages/ReceptionistPages/EquipmentStatistics";
 import RevenueStatistics from './pages/ReceptionistPages/RevenueStatistics';
 import ReceptionistProfile from "./pages/ReceptionistPages/ReceptionistProfile";
 import MembershipApproval from "./pages/ReceptionistPages/MembershipApproval";
 import RegisterPackage from "./pages/MemberPages/RegisterPackage";
-
 function App() {
   return (
     <Router>
@@ -37,6 +37,8 @@ function App() {
             <Route path="membership-approval" element={<MembershipApproval />} />
           </Route>
           {/* Thêm các routes cho Receptionist sau khi có components */}
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/packages" element={<RegisterPackage />} />
           {/* Default Route */}
           <Route path="/" element={<MemberDashBoard />} />
