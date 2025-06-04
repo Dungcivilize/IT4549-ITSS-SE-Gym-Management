@@ -126,7 +126,7 @@ const EquipmentStatistics = () => {
                             {eq.status}
                           </span>
                         </td>
-                        <td className="eqs-text-center">{eq.count}</td>
+                        <td className="eqs-text-center">{eq.quantity}</td>
                       </tr>
                     ))}
                   </tbody>

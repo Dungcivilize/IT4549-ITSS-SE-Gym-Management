@@ -11,5 +11,5 @@ public class EquipmentStatisticsWithStatusDTO {
     private String equipmentName;
     private String status;
     private String notes;
-    private Long count;
+    private Long quantity;
 }

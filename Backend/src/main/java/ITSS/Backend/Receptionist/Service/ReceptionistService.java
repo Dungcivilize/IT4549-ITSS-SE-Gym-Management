@@ -69,7 +69,7 @@ public class ReceptionistService {
                         (String) obj[2], // equipment name
                         (String) obj[3], // status
                         (String) obj[4], // notes
-                        (Long) obj[5]    // count
+                        (Long) obj[5]    // quantity
                 ))
                 .collect(Collectors.toList());
     }
