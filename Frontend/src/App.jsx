@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 
 // Import các components
+
 import MemberDashBoard from "./pages/MemberPages/Home";
 import Login from "./pages/MemberPages/Login";
 import Register from "./pages/MemberPages/Register";
@@ -14,6 +15,12 @@ import RegisterPackage from "./pages/MemberPages/RegisterPackage";
 import TrainerHome from './pages/TrainerPages/TrainerHome';
 import TrainerMembersList from './pages/TrainerPages/TrainerMembersList';
 import TrainerProfileEdit from './pages/TrainerPages/TrainerProfileEdit';
+import AdminDashboard from './pages/AdminPages/AdminDashboard';
+import ReceptionistDashboard from "./pages/ReceptionistPages/ReceptionistDashboard";
+import EquipmentStatistics from "./pages/ReceptionistPages/EquipmentStatistics";
+import RevenueStatistics from './pages/ReceptionistPages/RevenueStatistics';
+import ReceptionistProfile from "./pages/ReceptionistPages/ReceptionistProfile";
+import MembershipApproval from "./pages/ReceptionistPages/MembershipApproval";
 
 function App() {
   return (
@@ -30,7 +37,15 @@ function App() {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/schedule" element={<SchedulePage />} />
           {/* Receptionist Routes */}
+          <Route path="/receptionist" element={<ReceptionistDashboard />}>
+            <Route path="profile" element={<ReceptionistProfile />} />
+            <Route path="revenue" element={<RevenueStatistics />} />
+            <Route path="equipment" element={<EquipmentStatistics />} />
+            <Route path="membership-approval" element={<MembershipApproval />} />
+          </Route>
           {/* Thêm các routes cho Receptionist sau khi có components */}
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/packages" element={<RegisterPackage />} />
           {/* Default Route */}
           <Route path="/" element={<MemberDashBoard />} />

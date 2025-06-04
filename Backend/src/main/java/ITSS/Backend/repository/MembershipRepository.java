@@ -11,35 +11,28 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import ITSS.Backend.entity.Membership;
+import java.util.List;
 
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
-    @Query("SELECT m FROM Membership m WHERE m.member.id = :userId AND CURRENT_DATE BETWEEN m.startDate AND m.endDate")
-    Optional<Membership> findCurrentMembershipByUserId(@Param("userId") Long userId);
+    @Query("SELECT MONTH(m.startDate) as month, SUM(m.membershipPackage.price) as total " +
+           "FROM Membership m " +
+           "WHERE m.paymentStatus = ITSS.Backend.entity.Membership.PaymentStatus.Paid " +
+           "AND YEAR(m.startDate) = :year " +
+           "GROUP BY MONTH(m.startDate)")
+    List<Object[]> getMonthlyRevenue(@Param("year") int year);
 
-    @Query("SELECT m FROM Membership m WHERE CURRENT_DATE BETWEEN m.startDate AND m.endDate")
-    List<Membership> findAllCurrentMemberships();
+    @Query("SELECT m FROM Membership m WHERE YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
+    List<Membership> findByStartDateInMonth(@Param("year") int year, @Param("month") int month);
 
-    @Query("""
-    SELECT new ITSS.Backend.Member.DTO.TrainerPackageSummaryResponse(
-        t.userId, t.fullname, p.packageId, p.packageName, COUNT(m)
-    )
-    FROM MembershipPackage p
-    JOIN p.trainers t
-    LEFT JOIN Membership m ON m.trainer.userId = t.userId AND m.membershipPackage.packageId = p.packageId
-    GROUP BY t.userId, t.fullname, p.packageId, p.packageName
-""")
-    List<TrainerPackageSummaryResponse> findTrainerPackageSummaries();
+    @Query("SELECT COUNT(DISTINCT m.member.userId) FROM Membership m WHERE YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
+    long countDistinctMembersByStartDateInMonth(@Param("year") int year, @Param("month") int month);
 
-    Optional<Membership> findByMemberUserIdAndMembershipPackagePackageIdAndPaymentStatus(
-            Long memberId, Long packageId, Membership.PaymentStatus status
-    );
-
-    Optional<Membership> findByMemberUserIdAndMembershipPackagePackageId(Long memberId, Long packageId);
-
-    long countByTrainerAndPaymentStatus(User trainer, Membership.PaymentStatus status);
-
-    boolean existsByMember_UserIdAndPaymentStatusIn(Long userId, List<Membership.PaymentStatus> statuses);
+    @Query("SELECT COUNT(DISTINCT m.member.userId) FROM Membership m WHERE m.paymentStatus = 'Paid' AND YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
+    long countDistinctPaidMembersByStartDateInMonth(@Param("year") int year, @Param("month") int month);
 
     List<Membership> findByTrainerUserId(Long trainerId);
+
+    List<Membership> findByPaymentStatus(Membership.PaymentStatus paymentStatus);
+
 } 
