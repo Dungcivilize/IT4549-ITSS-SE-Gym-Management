@@ -79,6 +79,13 @@ CREATE TABLE `Feedback` (
     FOREIGN KEY (`member_id`) REFERENCES `Users`(`user_id`)
 );
 
+ALTER TABLE `Feedback`
+ADD COLUMN `room_id` BIGINT UNSIGNED;
+
+ALTER TABLE `Feedback`
+ADD CONSTRAINT `fk_feedback_room`
+FOREIGN KEY (`room_id`) REFERENCES `Rooms`(`room_id`);
+
 -- Bảng điểm danh
 CREATE TABLE `Attendance` (
     `attendance_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -236,24 +243,24 @@ VALUES
 (8, 30), (8, 21), (8, 22);
 
 
-INSERT INTO Feedback (member_id, feedback_text, feedback_date)
+INSERT INTO Feedback (member_id, feedback_text, feedback_date, room_id)
 VALUES 
-(3, 'Phòng tập rộng rãi, máy móc hiện đại.', '2025-03-12'),
-(3, 'Nhân viên rất nhiệt tình và thân thiện.', '2025-05-08'),
+(3, 'Phòng tập rộng rãi, máy móc hiện đại.', '2025-03-12', 1),
+(3, 'Nhân viên rất nhiệt tình và thân thiện.', '2025-05-08', 2),
 
-(7, 'Huấn luyện viên hướng dẫn rất chi tiết.', '2025-04-20'),
+(7, 'Huấn luyện viên hướng dẫn rất chi tiết.', '2025-04-20', 3),
 
-(11, 'Giá cả hợp lý, không gian sạch sẽ.', '2025-01-25'),
-(11, 'Tôi rất hài lòng với dịch vụ tại đây.', '2025-06-01'),
+(11, 'Giá cả hợp lý, không gian sạch sẽ.', '2025-01-25', 4),
+(11, 'Tôi rất hài lòng với dịch vụ tại đây.', '2025-06-01', 5),
 
-(14, 'Môi trường tập luyện chuyên nghiệp.', '2025-02-17'),
+(14, 'Môi trường tập luyện chuyên nghiệp.', '2025-02-17', 1),
 
-(16, 'Ứng dụng đặt lịch hơi khó sử dụng.', '2025-04-03'),
-(16, 'Tuy nhiên chất lượng huấn luyện thì rất tốt.', '2025-04-10'),
+(16, 'Ứng dụng đặt lịch hơi khó sử dụng.', '2025-04-03', 2),
+(16, 'Tuy nhiên chất lượng huấn luyện thì rất tốt.', '2025-04-10', 3),
 
-(18, 'Có nhiều lớp học phù hợp với nhu cầu.', '2025-05-22'),
+(18, 'Có nhiều lớp học phù hợp với nhu cầu.', '2025-05-22', 4),
 
-(20, 'Tôi sẽ giới thiệu phòng tập này cho bạn bè.', '2025-06-01');
+(20, 'Tôi sẽ giới thiệu phòng tập này cho bạn bè.', '2025-06-01', 5);
 
 INSERT INTO Attendance (member_id, checkin_date)
 VALUES
