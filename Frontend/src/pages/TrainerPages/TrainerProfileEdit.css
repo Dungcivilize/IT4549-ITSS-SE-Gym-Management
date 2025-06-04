@@ -1,0 +1,95 @@
+.trainer-profile-edit-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: var(--primary-color-light);
+  color: var(--text-light);
+  border-radius: 8px;
+  box-shadow: 0 0 12px var(--shadow-color);
+  font-family: Arial, sans-serif;
+}
+
+.trainer-profile-edit-title {
+  color: var(--secondary-color);
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.trainer-profile-edit-message {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: 600;
+}
+
+.trainer-profile-edit-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.trainer-profile-edit-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.trainer-profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.trainer-profile-edit-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trainer-profile-edit-label {
+  flex: 0 0 140px; /* cố định rộng label */
+  font-weight: 600;
+  color: var(--secondary-color);
+}
+
+.trainer-profile-edit-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--input-border-color);
+  border-radius: 5px;
+  background-color: var(--primary-color-extra-light);
+  color: var(--white);
+  transition: border-color var(--transition-3s);
+  font-size: 16px;
+}
+
+.trainer-profile-edit-input:focus {
+  border-color: var(--secondary-color);
+  outline: none;
+}
+
+.trainer-profile-edit-button {
+  align-self: center;
+  padding: 10px 30px;
+  background-color: var(--secondary-color);
+  border: none;
+  border-radius: 25px;
+  color: var(--white);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color var(--transition-3s);
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.trainer-profile-edit-button:hover {
+  background-color: var(--secondary-color-dark);
+}
+
+.trainer-profile-edit-loading {
+  text-align: center;
+  color: var(--text-light);
+  padding: 20px;
+  font-size: 18px;
+}

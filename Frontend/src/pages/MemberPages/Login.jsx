@@ -27,12 +27,14 @@ function Login() {
         formData
       );
 
-      // Lưu toàn bộ thông tin user vào localStorage
+      // Lưu thông tin user vào localStorage
       localStorage.setItem('user', JSON.stringify(response.data));
 
     const role = response.data.role;
     if (role === 'receptionist') {
       navigate('/receptionist/revenue');
+    } else if (role === 'trainer') {
+      navigate('/trainer/home'); 
     } else if (role === 'member') {
       navigate('/member/home'); 
     } else if (role === 'admin') {
@@ -45,6 +47,7 @@ function Login() {
       setError('Email hoặc mật khẩu không đúng');
     }
   };
+
 
   return (
     <>

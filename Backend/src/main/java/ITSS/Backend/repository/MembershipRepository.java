@@ -31,5 +31,8 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
     @Query("SELECT COUNT(DISTINCT m.member.userId) FROM Membership m WHERE m.paymentStatus = 'Paid' AND YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
     long countDistinctPaidMembersByStartDateInMonth(@Param("year") int year, @Param("month") int month);
 
+    List<Membership> findByTrainerUserId(Long trainerId);
+
     List<Membership> findByPaymentStatus(Membership.PaymentStatus paymentStatus);
+
 } 
