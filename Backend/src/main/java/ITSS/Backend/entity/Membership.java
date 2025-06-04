@@ -46,6 +46,7 @@ public class Membership {
     private PaymentStatus paymentStatus;
 
     public enum PaymentStatus {
-        Paid, Unpaid
+        Paid, Unpaid, Processing
     }
+
 } 
