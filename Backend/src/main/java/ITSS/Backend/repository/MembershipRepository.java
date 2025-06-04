@@ -14,31 +14,15 @@ import ITSS.Backend.entity.Membership;
 
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
-    @Query("SELECT m FROM Membership m WHERE m.member.id = :userId AND CURRENT_DATE BETWEEN m.startDate AND m.endDate")
-    Optional<Membership> findCurrentMembershipByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT m FROM Membership m WHERE CURRENT_DATE BETWEEN m.startDate AND m.endDate")
-    List<Membership> findAllCurrentMemberships();
+    @Query("SELECT m FROM Membership m WHERE YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
+    List<Membership> findByStartDateInMonth(@Param("year") int year, @Param("month") int month);
 
-    @Query("""
-    SELECT new ITSS.Backend.Member.DTO.TrainerPackageSummaryResponse(
-        t.userId, t.fullname, p.packageId, p.packageName, COUNT(m)
-    )
-    FROM MembershipPackage p
-    JOIN p.trainers t
-    LEFT JOIN Membership m ON m.trainer.userId = t.userId AND m.membershipPackage.packageId = p.packageId
-    GROUP BY t.userId, t.fullname, p.packageId, p.packageName
-""")
-    List<TrainerPackageSummaryResponse> findTrainerPackageSummaries();
+    @Query("SELECT COUNT(DISTINCT m.member.userId) FROM Membership m WHERE YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
+    long countDistinctMembersByStartDateInMonth(@Param("year") int year, @Param("month") int month);
 
-    Optional<Membership> findByMemberUserIdAndMembershipPackagePackageIdAndPaymentStatus(
-            Long memberId, Long packageId, Membership.PaymentStatus status
-    );
+    @Query("SELECT COUNT(DISTINCT m.member.userId) FROM Membership m WHERE m.paymentStatus = 'Paid' AND YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
+    long countDistinctPaidMembersByStartDateInMonth(@Param("year") int year, @Param("month") int month);
 
-    Optional<Membership> findByMemberUserIdAndMembershipPackagePackageId(Long memberId, Long packageId);
-
-    long countByTrainerAndPaymentStatus(User trainer, Membership.PaymentStatus status);
-
-    boolean existsByMember_UserIdAndPaymentStatusIn(Long userId, List<Membership.PaymentStatus> statuses);
-
+    List<Membership> findByPaymentStatus(Membership.PaymentStatus paymentStatus);
 } 
