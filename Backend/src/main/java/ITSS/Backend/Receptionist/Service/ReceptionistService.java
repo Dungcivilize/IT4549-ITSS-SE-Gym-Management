@@ -1,13 +1,12 @@
 package ITSS.Backend.Receptionist.Service;
 
-import ITSS.Backend.Receptionist.DTO.AnnualRevenueStatisticsDTO;
-import ITSS.Backend.Receptionist.DTO.EquipmentStatisticsWithStatusDTO;
-import ITSS.Backend.Receptionist.DTO.EquipmentUpdateDTO;
-import ITSS.Backend.Receptionist.DTO.RevenueStatisticsDTO;
+import ITSS.Backend.Receptionist.DTO.*;
 import ITSS.Backend.entity.Equipment;
 import ITSS.Backend.entity.Membership;
+import ITSS.Backend.entity.User;
 import ITSS.Backend.repository.EquipmentRepository;
 import ITSS.Backend.repository.MembershipRepository;
+import ITSS.Backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ReceptionistService {
-
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private EquipmentRepository equipmentRepository;
     private final MembershipRepository membershipRepository;
@@ -86,5 +86,67 @@ public class ReceptionistService {
         return equipmentRepository.save(equipment);
     }
 
+    public ReceptionistProfileDTO getReceptionistProfileByUsername(String username) throws Exception {
+        Optional<User> userOpt = userRepository.findByUserName(username);
+        if (userOpt.isEmpty() || !userOpt.get().getRole().equalsIgnoreCase("receptionist")) {
+            throw new Exception("Không tìm thấy receptionist phù hợp");
+        }
+        User user = userOpt.get();
+        return mapToDTO(user);
+    }
+
+
+    public User updateReceptionistProfile(String username, ReceptionistProfileUpdateDTO dto) throws Exception {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new Exception("Không tìm thấy receptionist phù hợp"));
+        if (!user.getRole().equalsIgnoreCase("receptionist")) {
+            throw new Exception("Không phải receptionist");
+        }
+
+        user.setFullname(dto.getFullname());
+        user.setAddress(dto.getAddress());
+        user.setPhone(dto.getPhone());
+        user.setEmail(dto.getEmail());
+        user.setDateOfBirth(dto.getDateOfBirth());
+
+        return userRepository.save(user);
+    }
+
+    private ReceptionistProfileDTO mapToDTO(User user) {
+        return new ReceptionistProfileDTO(
+                user.getUserId(),
+                user.getUserName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getFullname(),
+                user.getAddress(),
+                user.getDateOfBirth()
+        );
+    }
+
+    public List<MembershipApprovalDTO> getPendingMembershipApprovals() {
+        List<Membership> pendingMemberships = membershipRepository.findByPaymentStatus(Membership.PaymentStatus.Processing);
+
+        return pendingMemberships.stream().map(m -> new MembershipApprovalDTO(
+                m.getMembershipId(),
+                m.getMember().getUserId(),
+                m.getMember().getFullname(),
+                m.getMembershipPackage().getPackageName(),
+                m.getPaymentStatus().name(),
+                m.getStartDate()
+        )).collect(Collectors.toList());
+    }
+
+    public void approveMembership(Long membershipId) throws Exception {
+        Membership membership = membershipRepository.findById(membershipId)
+                .orElseThrow(() -> new Exception("Không tìm thấy membership với ID: " + membershipId));
+
+        if (membership.getPaymentStatus() != Membership.PaymentStatus.Processing) {
+            throw new Exception("Gói này không đang ở trạng thái xử lý.");
+        }
+
+        membership.setPaymentStatus(Membership.PaymentStatus.Paid);
+        membershipRepository.save(membership);
+    }
 
 }

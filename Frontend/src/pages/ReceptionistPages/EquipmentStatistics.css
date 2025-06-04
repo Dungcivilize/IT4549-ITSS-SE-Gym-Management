@@ -1,188 +1,205 @@
-/* EquipmentStatistics.css */
-
-.container {
-  padding: 2rem;
-  max-width: 1280px;
+/* eqs-container tổng */
+.eqs-container {
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  color: #333;
+/* eqs-title chính */
+.eqs-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #fff; /* đổi sang màu trắng cho nổi trên nền cam */
   text-align: center;
 }
 
-.grid-container {
+/* eqs-grid-container các phòng */
+.eqs-grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 24px;
 }
 
-.card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 1em;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  background-color: white;
-  transition: transform 0.2s, box-shadow 0.2s;
+/* eqs-card phòng */
+.eqs-card {
+  background: #fefefe; /* giữ trắng để nội dung rõ */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15); /* tăng độ đậm cho nổi bật */
+  padding: 20px;
+  transition: box-shadow 0.2s ease-in-out;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+.eqs-card:hover {
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.25);
 }
 
-.room-title {
-  font-size: 1.125rem;
+/* eqs-room-title phòng */
+.eqs-room-title {
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: #444;
+  margin-bottom: 16px;
+  color: #f97316; /* giữ màu cam nổi bật */
+  border-bottom: 2px solid #f97316;
+  padding-bottom: 6px;
 }
 
-.equipment-table {
+/* eqs-equipment-table */
+.eqs-equipment-table {
   width: 100%;
-  font-size: 0.875rem;
   border-collapse: collapse;
+  font-size: 0.95rem;
+  color: #4b5563; /* màu xám sáng, dễ đọc trên nền trắng */
 }
 
-.equipment-table th {
-  background-color: #f3f4f6;
-  border: 1px solid #ddd;
-  padding: 0.5rem 0.75rem;
+.eqs-equipment-table th, .eqs-equipment-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #d1d5db; /* màu xám nhạt */
+}
+
+.eqs-equipment-table thead th {
+  background-color: #fef3c7; /* vàng nhạt nhẹ, hài hòa với cam */
   text-align: left;
   font-weight: 600;
+  color: #92400e; /* màu nâu cam đậm */
 }
 
-.equipment-table td {
-  border: 1px solid #ddd;
-  padding: 0.5rem 0.75rem;
-}
-
-.equipment-row {
-  transition: background-color 0.2s;
-  cursor: pointer;
-}
-
-.equipment-row:hover {
-  background-color: #f9fafb;
-}
-
-.equipment-name {
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.text-center {
+.eqs-text-center {
   text-align: center;
 }
 
-.status-badge {
+/* eqs-equipment-row dòng thiết bị */
+.eqs-equipment-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.eqs-equipment-row:hover {
+  background-color: #fcd34d; /* vàng cam nổi bật hơn cho hover */
+}
+
+/* eqs-equipment-name tên thiết bị */
+.eqs-equipment-name {
+  font-weight: 600;
+  color: #b45309; /* cam đậm */
+}
+
+/* eqs-status-badge badge trạng thái */
+.eqs-status-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
+  padding: 4px 12px;
   border-radius: 9999px;
   color: white;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.85rem;
+  background-color: #f97316; /* giữ màu cam */
+  box-shadow: 0 0 6px #fb923caa; /* glow nhẹ cam */
 }
 
-.tooltip-content {
-  background-color: #111827 !important;
-  color: white !important;
-  font-size: 0.75rem !important;
-  padding: 0.5rem !important;
-  border-radius: 0.375rem !important;
-  max-width: 200px !important;
+/* eqs-tooltip-content tooltip nội dung */
+.eqs-tooltip-content {
+  background-color: #f97316; /* đổi sang cam sáng */
+  color: #1f2937; /* màu chữ tối */
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  max-width: 220px;
+  word-wrap: break-word;
+  box-shadow: 0 0 8px #f9731688;
 }
 
-/* Modal styles */
-.modal-overlay {
+/* eqs-modal-overlay modal nền mờ */
+.eqs-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  background: rgba(249, 115, 22, 0.5); /* nền mờ cam */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 1000;
 }
 
-.modal-content {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 1.5rem;
-  width: 24rem;
-  max-width: 100%;
+/* eqs-modal-content nội dung modal */
+.eqs-modal-content {
+  background: white;
+  border-radius: 10px;
+  padding: 24px 30px;
+  width: 450px; /* rộng hơn */
+  max-height: 80vh; /* tối đa cao 80% viewport height */
+  overflow-y: auto; /* bật scroll nếu nội dung cao hơn */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #111827;
+/* eqs-modal-title tiêu đề modal */
+.eqs-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #b45309; /* cam đậm */
 }
 
-.modal-subtitle {
-  margin-bottom: 1rem;
-  color: #6b7280;
+/* eqs-modal-subtitle phụ đề modal */
+.eqs-modal-subtitle {
+  font-size: 1rem;
+  color: #c2410c; /* cam đỏ */
+  margin-bottom: 16px;
 }
 
-.notes-textarea {
+/* eqs-notes-textarea textarea ghi chú */
+.eqs-notes-textarea {
   width: 100%;
-  border: 1px solid #d1d5db;
-  border-radius: 0.25rem;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  resize: none;
-  font-size: 0.875rem;
-  font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.notes-textarea:focus {
+  min-height: 120px; /* cao hơn */
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  resize: vertical;
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  transition: border-color 0.2s ease-in-out;
 }
 
-.modal-actions {
+.eqs-notes-textarea:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 6px #f97316aa;
+}
+
+/* eqs-modal-actions nút modal */
+.eqs-modal-actions {
+  margin-top: 20px;
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 12px;
 }
 
-.cancel-button {
-  padding: 0.5rem 1rem;
-  background-color: #e5e7eb;
-  border-radius: 0.25rem;
+.eqs-cancel-button,
+.eqs-save-button {
+  padding: 8px 18px;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
-.cancel-button:hover {
-  background-color: #d1d5db;
+.eqs-cancel-button {
+  background-color: #fcd34d; /* vàng cam nhạt */
+  color: #92400e;
 }
 
-.save-button {
-  padding: 0.5rem 1rem;
-  background-color: #3b82f6;
+.eqs-cancel-button:hover {
+  background-color: #fbbf24; /* vàng đậm */
+}
+
+.eqs-save-button {
+  background-color: #f97316;
   color: white;
-  border-radius: 0.25rem;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
 }
 
-.save-button:hover {
-  background-color: #2563eb;
+.eqs-save-button:hover {
+  background-color: #ea580c;
 }

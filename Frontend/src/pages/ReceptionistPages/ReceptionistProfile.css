@@ -1,0 +1,172 @@
+.receptionist-profile-container {
+  max-width: 600px;
+  margin: 40px auto;
+  text-align: left;
+  padding: 30px 40px;
+  background: rgba(15, 15, 15, 0.85);
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(249, 115, 22, 0.4);
+  font-family: "Poppins", sans-serif;
+  color: var(--text-color);
+  user-select: none;
+}
+
+.receptionist-profile-container h2 {
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--highlight-color);
+  text-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+  letter-spacing: 0.08em;
+}
+
+.receptionist-profile-info {
+  font-size: 1.1rem;
+  margin-bottom: 28px;
+  line-height: 1.5;
+  border-bottom: 1.5px solid rgba(249, 115, 22, 0.25);
+  padding-bottom: 18px;
+}
+
+.receptionist-profile-info strong {
+  color: var(--text-highlight);
+  width: 120px;
+  display: inline-block;
+}
+
+.receptionist-profile-field {
+  margin-bottom: 20px;
+}
+
+.receptionist-profile-field label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-highlight);
+  margin-bottom: 6px;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+}
+
+.receptionist-profile-field input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: 1.8px solid rgba(249, 115, 22, 0.3);
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: "Poppins", sans-serif;
+}
+
+.receptionist-profile-field input::placeholder {
+  color: rgba(243, 244, 246, 0.6);
+}
+
+.receptionist-profile-field input:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+  box-shadow: 0 0 12px var(--highlight-color);
+}
+
+.receptionist-profile-message-error {
+  color: #f87171;
+  font-weight: 600;
+  text-align: center;
+  margin: 12px 0 8px 0;
+  user-select: text;
+}
+
+.receptionist-profile-message-success {
+  color: #a3e635;
+  font-weight: 600;
+  text-align: center;
+  margin: 12px 0 8px 0;
+  user-select: text;
+}
+
+.receptionist-profile-button-group {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.receptionist-profile-button {
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 14px 36px;
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
+}
+
+.receptionist-profile-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.receptionist-profile-save-btn {
+  background-color: var(--highlight-color);
+  color: var(--primary-color);
+  box-shadow: 0 0 14px var(--highlight-color);
+}
+
+.receptionist-profile-save-btn:hover:not(:disabled) {
+  background-color: #d15800;
+  box-shadow: 0 0 18px #d15800;
+}
+
+.receptionist-profile-cancel-btn {
+  background-color: var(--text-highlight);
+  color: var(--primary-color);
+  box-shadow: 0 0 14px var(--text-highlight);
+}
+
+.receptionist-profile-cancel-btn:hover:not(:disabled) {
+  background-color: #b07a04;
+  box-shadow: 0 0 18px #b07a04;
+}
+
+.receptionist-profile-edit-btn {
+  background-color: var(--highlight-color);
+  color: var(--primary-color);
+  display: block;
+  margin: 40px auto 0 auto;
+  padding: 16px 48px;
+  border-radius: 18px;
+  box-shadow: 0 0 20px var(--highlight-color);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+}
+
+.receptionist-profile-edit-btn:hover {
+  background-color: #d15800;
+  box-shadow: 0 0 24px #d15800;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .receptionist-profile-container {
+    margin: 20px;
+    padding: 25px 20px;
+  }
+
+  .receptionist-profile-button-group {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .receptionist-profile-button {
+    width: 100%;
+    padding: 14px 0;
+  }
+}
