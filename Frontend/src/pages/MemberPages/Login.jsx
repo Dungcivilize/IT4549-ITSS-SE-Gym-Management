@@ -30,13 +30,17 @@ function Login() {
       // Lưu toàn bộ thông tin user vào localStorage
       localStorage.setItem('user', JSON.stringify(response.data));
 
-      // Lấy role từ response
-      if (response.data.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/member/home');
-      }
-      
+    const role = response.data.role;
+    if (role === 'receptionist') {
+      navigate('/receptionist/revenue');
+    } else if (role === 'member') {
+      navigate('/member/home'); 
+    } else if (role === 'admin') {
+      navigate('/admin/dashboard'); 
+    } else {
+      // Mặc định hoặc thông báo lỗi
+      navigate('/');
+    }
     } catch (err) {
       setError('Email hoặc mật khẩu không đúng');
     }
