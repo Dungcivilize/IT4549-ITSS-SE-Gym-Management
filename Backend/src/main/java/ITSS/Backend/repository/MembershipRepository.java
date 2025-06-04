@@ -41,4 +41,5 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
 
     boolean existsByMember_UserIdAndPaymentStatusIn(Long userId, List<Membership.PaymentStatus> statuses);
 
+    List<Membership> findByTrainerUserId(Long trainerId);
 } 

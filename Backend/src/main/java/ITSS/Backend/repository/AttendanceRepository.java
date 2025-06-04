@@ -24,4 +24,5 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT a.checkinDate FROM Attendance a WHERE a.member.id = :memberId AND FUNCTION('DATE_FORMAT', a.checkinDate, '%Y-%m') = :month ORDER BY a.checkinDate")
     List<LocalDateTime> findByMemberIdAndMonth(@Param("memberId") Long memberId, @Param("month") String month);
 
+    List<Attendance> findByMember_UserId(Long memberId);
 } 

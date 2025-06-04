@@ -1,0 +1,54 @@
+.trainer-members-container {
+  background-color: var(--primary-color-light);
+  color: var(--text-light);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: var(--max-width);
+  margin: auto;
+  box-shadow: 0 0 10px var(--shadow-color);
+}
+
+.trainer-members-title {
+  text-align: center;
+  color: var(--secondary-color);
+  margin-bottom: 20px;
+}
+
+.trainer-members-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--primary-color-extra-light);
+}
+
+.trainer-members-table th,
+.trainer-members-table td {
+  border: 1px solid var(--input-border-color);
+  padding: 10px;
+  text-align: left;
+}
+
+.trainer-members-table th {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+.trainer-members-button {
+  background-color: var(--secondary-color);
+  color: var(--white);
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color var(--transition-3s);
+}
+
+.trainer-members-button:hover {
+  background-color: var(--secondary-color-dark);
+}
+
+.trainer-members-subtitle {
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--white);
+}

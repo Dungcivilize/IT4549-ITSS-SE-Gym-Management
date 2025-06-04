@@ -27,15 +27,27 @@ function Login() {
         formData
       );
 
-      // Lưu toàn bộ thông tin user vào localStorage
+      // Lưu thông tin user vào localStorage
       localStorage.setItem('user', JSON.stringify(response.data));
 
+      // Lấy role từ response (giả sử response.data.role)
+      const role = response.data.role;
+
       // Điều hướng dựa vào role
-      navigate('/member/home');
+      if (role === 'trainer') {
+        navigate('/trainer/home'); // Trang dành cho Trainer
+      } else if (role === 'member') {
+        navigate('/member/home');  // Trang dành cho Member
+      } else if (role === 'admin') {
+        navigate('/admin/dashboard'); // Trang dành cho Admin
+      } else {
+        navigate('/'); // Mặc định về trang chủ
+      }
     } catch (err) {
       setError('Email hoặc mật khẩu không đúng');
     }
   };
+
 
   return (
     <>
