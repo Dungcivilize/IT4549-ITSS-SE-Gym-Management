@@ -1,7 +1,10 @@
 package ITSS.Backend.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import ITSS.Backend.Member.DTO.TrainerPackageSummaryResponse;
+import ITSS.Backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +14,7 @@ import ITSS.Backend.entity.Membership;
 
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
+
     @Query("SELECT m FROM Membership m WHERE YEAR(m.startDate) = :year AND MONTH(m.startDate) = :month")
     List<Membership> findByStartDateInMonth(@Param("year") int year, @Param("month") int month);
 

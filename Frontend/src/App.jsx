@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "./App.css";
 
 // Import các components
 import MemberDashBoard from './pages/MemberPages/Home';
@@ -14,6 +14,8 @@ import EquipmentStatistics from "./pages/ReceptionistPages/EquipmentStatistics";
 import RevenueStatistics from './pages/ReceptionistPages/RevenueStatistics';
 import ReceptionistProfile from "./pages/ReceptionistPages/ReceptionistProfile";
 import MembershipApproval from "./pages/ReceptionistPages/MembershipApproval";
+import RegisterPackage from "./pages/MemberPages/RegisterPackage";
+
 function App() {
   return (
     <Router>
@@ -35,7 +37,7 @@ function App() {
             <Route path="membership-approval" element={<MembershipApproval />} />
           </Route>
           {/* Thêm các routes cho Receptionist sau khi có components */}
-
+          <Route path="/packages" element={<RegisterPackage />} />
           {/* Default Route */}
           <Route path="/" element={<MemberDashBoard />} />
         </Routes>

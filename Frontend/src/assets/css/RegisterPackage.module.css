@@ -1,0 +1,170 @@
+.container {
+  padding: 2rem;
+  color: white;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1.2rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #2d2d2d;
+  color: white;
+  cursor: pointer;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  border: 1px solid #555;
+}
+
+.table tr:hover {
+  background-color: #3e3e3e;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background-color: #1e1e1e;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 450px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.details {
+  text-align: left;
+  width: 100%;
+}
+
+.closeBtn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #ff7043;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  position: relative;
+  background: #222;
+  color: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.closeIcon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+}
+
+.image {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.details {
+  text-align: left;
+}
+
+.description {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #ccc;
+}
+
+.registerBtn {
+  margin-top: 1.5rem;
+  background-color: #f97316;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.ptDropdown {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ptDropdown label {
+  font-weight: 500;
+  color: #fcd34d; /* màu vàng nhấn */
+}
+
+.ptDropdown select {
+  padding: 0.5rem 0.75rem;
+  background-color: #2d2d2d;
+  color: white;
+  border: 1px solid #666;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.ptDropdown select:hover {
+  border-color: #f97316;
+}
+
+.ptDropdown select:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.4);
+}
+
+.ptDropdown {
+  margin-top: 1rem;
+  color: #fcd34d;
+  font-weight: 500;
+}
