@@ -49,4 +49,7 @@ public class Membership {
         Paid, Unpaid, Processing
     }
 
+    @Column(name = "pt_meeting_days_left")
+    private Long ptMeetingDaysLeft;
+
 } 

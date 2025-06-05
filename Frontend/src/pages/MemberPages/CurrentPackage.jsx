@@ -90,6 +90,14 @@ const CurrentPackage = ({ memberId }) => {
           <p>
             <strong>Trạng thái thanh toán:</strong> {data.paymentStatus}
           </p>
+          <p
+            style={{
+              color: data.ptMeetingDaysLeft === 0 ? "red" : "inherit",
+              fontWeight: "bold",
+            }}
+          >
+            <strong>Số buổi PT còn lại:</strong> {data.ptMeetingDaysLeft}
+          </p>
         </div>
 
         <div className={styles.right}>

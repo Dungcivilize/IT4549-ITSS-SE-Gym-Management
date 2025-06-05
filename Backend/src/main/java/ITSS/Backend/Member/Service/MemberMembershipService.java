@@ -30,6 +30,7 @@ public class MemberMembershipService {
             dto.setEndDate(m.getEndDate());
             dto.setPaymentStatus(m.getPaymentStatus().toString());
             dto.setPackageId(m.getMembershipPackage().getPackageId());
+            dto.setPtMeetingDaysLeft(m.getPtMeetingDaysLeft());
             return dto;
         });
     }
@@ -148,18 +149,19 @@ public void registerMembership(RegisterMembershipRequest req) {
     public boolean cancelMembership(PayMembershipRequest req) {
         Optional<Membership> membershipOpt = membershipRepository
                 .findByMemberUserIdAndMembershipPackagePackageIdAndPaymentStatus(
-                        req.getMemberId(), req.getPackageId(), Membership.PaymentStatus.Paid
+                        req.getMemberId(),
+                        req.getPackageId(),
+                        Membership.PaymentStatus.Paid // hoặc Unpaid tuỳ logic của cậu
                 );
 
         if (membershipOpt.isPresent()) {
-            Membership membership = membershipOpt.get();
-            membership.setPaymentStatus(Membership.PaymentStatus.Unpaid);
-            membershipRepository.save(membership);
+            membershipRepository.delete(membershipOpt.get()); // ❌ XOÁ HẲN
             return true;
         } else {
             return false;
         }
     }
+
 
     public boolean extendMembership(PayMembershipRequest req) {
         Optional<Membership> membershipOpt = membershipRepository
