@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import ITSS.Backend.Member.DTO.FeedbackMemberResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ITSS.Backend.Member.DTO.FeedbackMemberResponse;
 import ITSS.Backend.Member.DTO.FeedbackRequest;
-import ITSS.Backend.Member.DTO.FeedbackRoomResponse;
 import ITSS.Backend.entity.Feedback;
-import ITSS.Backend.entity.Room;
 import ITSS.Backend.entity.User;
 import ITSS.Backend.repository.FeedbackRepository;
-import ITSS.Backend.repository.RoomRepository;
 import ITSS.Backend.repository.UserRepository;
 
 @RestController
@@ -39,15 +36,14 @@ public class FeedbackController {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private RoomRepository roomRepository;
 
     // 🟢 Create
     @PostMapping
     public ResponseEntity<?> createFeedback(@RequestBody FeedbackRequest request) {
-        logger.info("Received feedback request: memberId={}, feedbackText={}",
+        logger.info("Received feedback request: memberId={}, feedbackText={}, rating={}",
                 request.getMemberId(),
-                request.getFeedbackText());
+                request.getFeedbackText(),
+                request.getRating());
 
         if (request.getFeedbackText() == null || request.getFeedbackText().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Nội dung feedback không được để trống");
@@ -58,16 +54,20 @@ public class FeedbackController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy thành viên");
         }
 
-        Optional<Room> roomOpt = roomRepository.findById(request.getRoomId());
-        if (!roomOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy phòng");
-        }
-
         Feedback feedback = new Feedback();
         feedback.setMember(memberOpt.get());
         feedback.setFeedbackText(request.getFeedbackText().trim());
-        feedback.setRoom(roomOpt.get());
         feedback.setFeedbackDate(LocalDate.now());
+        
+        // Set rating - nếu không có thì dùng default 5
+        if (request.getRating() != null) {
+            if (request.getRating() < 1 || request.getRating() > 5) {
+                return ResponseEntity.badRequest().body("Rating phải từ 1 đến 5");
+            }
+            feedback.setRating(request.getRating());
+        } else {
+            feedback.setRating(5); // Default value
+        }
 
         try {
             feedbackRepository.save(feedback);
@@ -86,26 +86,26 @@ public class FeedbackController {
         List<FeedbackMemberResponse> response = feedbacks.stream()
                 .map(fb -> new FeedbackMemberResponse(
                         fb.getFeedbackId(),
-                        fb.getRoom().getRoomId(),
-                        fb.getRoom().getRoomName(),
                         fb.getFeedbackText(),
                         fb.getFeedbackDate(),
-                        fb.getMember().getUserName()
+                        fb.getMember().getUserName(),
+                        fb.getRating()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
 
-    // 🔵 Read tất cả feedback của 1 room
-    @GetMapping("/room/{roomId}")
-    public ResponseEntity<?> getFeedbacksByRoom(@PathVariable Long roomId) {
-        List<Feedback> feedbacks = feedbackRepository.findByRoomRoomId(roomId);
-        List<FeedbackRoomResponse> response = feedbacks.stream()
-                .map(feedback -> new FeedbackRoomResponse(
+    // 🔵 Read tất cả feedback
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllFeedbacks() {
+        List<Feedback> feedbacks = feedbackRepository.findAll();
+        List<FeedbackMemberResponse> response = feedbacks.stream()
+                .map(feedback -> new FeedbackMemberResponse(
                         feedback.getFeedbackId(),
-                        feedback.getMember().getUserName(),
                         feedback.getFeedbackText(),
-                        feedback.getFeedbackDate()
+                        feedback.getFeedbackDate(),
+                        feedback.getMember().getUserName(),
+                        feedback.getRating()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
@@ -133,6 +133,15 @@ public class FeedbackController {
         }
 
         feedback.setFeedbackText(request.getFeedbackText().trim());
+        
+        // Cập nhật rating nếu có
+        if (request.getRating() != null) {
+            if (request.getRating() < 1 || request.getRating() > 5) {
+                return ResponseEntity.badRequest().body("Rating phải từ 1 đến 5");
+            }
+            feedback.setRating(request.getRating());
+        }
+
         feedbackRepository.save(feedback);
 
         return ResponseEntity.ok("Feedback đã được cập nhật");

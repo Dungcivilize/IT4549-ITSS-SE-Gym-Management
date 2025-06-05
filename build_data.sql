@@ -71,20 +71,14 @@ CREATE TABLE `Membership` (
 );
 
 -- Bảng feedback
-CREATE TABLE `Feedback` (
-    `feedback_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `member_id` BIGINT unsigned NOT NULL,
-    `feedback_text` TEXT NOT NULL,
-    `feedback_date` DATE NOT NULL,
-    FOREIGN KEY (`member_id`) REFERENCES `Users`(`user_id`)
+CREATE TABLE Feedback (
+    feedback_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    member_id BIGINT UNSIGNED NOT NULL,
+    feedback_text TEXT NOT NULL,
+    feedback_date DATE NOT NULL,
+    rating INT DEFAULT 5 CHECK (rating >= 1 AND rating <= 5),
+    FOREIGN KEY (member_id) REFERENCES Users(user_id)
 );
-
-ALTER TABLE `Feedback`
-ADD COLUMN `room_id` BIGINT UNSIGNED;
-
-ALTER TABLE `Feedback`
-ADD CONSTRAINT `fk_feedback_room`
-FOREIGN KEY (`room_id`) REFERENCES `Rooms`(`room_id`);
 
 -- Bảng điểm danh
 CREATE TABLE `Attendance` (
@@ -243,24 +237,18 @@ VALUES
 (8, 30), (8, 21), (8, 22);
 
 
-INSERT INTO Feedback (member_id, feedback_text, feedback_date, room_id)
-VALUES 
-(3, 'Phòng tập rộng rãi, máy móc hiện đại.', '2025-03-12', 1),
-(3, 'Nhân viên rất nhiệt tình và thân thiện.', '2025-05-08', 2),
+INSERT INTO Feedback (member_id, feedback_text, feedback_date, rating) VALUES
+(1, 'Trang thiết bị hiện đại, phòng tập sạch sẽ.', '2025-06-01', 5),
+(2, 'Huấn luyện viên tận tâm, nhưng hơi đông người vào giờ cao điểm.', '2025-06-02', 4),
+(3, 'Âm nhạc tạo động lực, không gian thoáng đãng.', '2025-06-03', 5),
+(4, 'Lễ tân không thân thiện, cần cải thiện.', '2025-06-03', 2),
+(5, 'App đặt lịch dễ dùng, rất tiện lợi.', '2025-06-04', 4),
+(6, 'Giá cả hợp lý, dịch vụ xứng đáng.', '2025-06-04', 5),
+(7, 'Thiếu hướng dẫn cụ thể cho người mới.', '2025-06-05', 3),
+(8, 'Rất hài lòng với phòng xông hơi và locker sạch sẽ.', '2025-06-05', 5),
+(9, 'PT rất chuyên nghiệp và nhiệt tình.', '2025-06-06', 5),
+(10, 'Cần nâng cấp máy chạy bộ, vài cái bị hỏng.', '2025-06-06', 3);
 
-(7, 'Huấn luyện viên hướng dẫn rất chi tiết.', '2025-04-20', 3),
-
-(11, 'Giá cả hợp lý, không gian sạch sẽ.', '2025-01-25', 4),
-(11, 'Tôi rất hài lòng với dịch vụ tại đây.', '2025-06-01', 5),
-
-(14, 'Môi trường tập luyện chuyên nghiệp.', '2025-02-17', 1),
-
-(16, 'Ứng dụng đặt lịch hơi khó sử dụng.', '2025-04-03', 2),
-(16, 'Tuy nhiên chất lượng huấn luyện thì rất tốt.', '2025-04-10', 3),
-
-(18, 'Có nhiều lớp học phù hợp với nhu cầu.', '2025-05-22', 4),
-
-(20, 'Tôi sẽ giới thiệu phòng tập này cho bạn bè.', '2025-06-01', 5);
 
 INSERT INTO Attendance (member_id, checkin_date)
 VALUES

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getUser, getUserId } from '../../utils/auth';
 import './TrainerProfileEdit.css';
 
 export default function TrainerProfileEdit() {
@@ -13,8 +14,8 @@ export default function TrainerProfileEdit() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  const trainerId = user?.user_id;
+  const user = getUser();
+  const trainerId = getUserId();
 
   useEffect(() => {
     if (!user) {
