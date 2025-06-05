@@ -30,7 +30,7 @@ export default function GymRooms() {
   }, []);
 
   const fetchRooms = async () => {
-    const res = await axios.get("http://localhost:8080/api/rooms");
+    const res = await axios.get("http://localhost:8080/api/admin/rooms");
     setRooms(res.data);
   };
 
@@ -50,10 +50,10 @@ export default function GymRooms() {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:8080/api/rooms/${editingId}`, form);
+        await axios.put(`http://localhost:8080/api/admin/rooms/${editingId}`, form);
         window.alert("Room updated successfully!");
       } else {
-        await axios.post("http://localhost:8080/api/rooms", form);
+        await axios.post("http://localhost:8080/api/admin/rooms", form);
         window.alert("Room created successfully!");
       }
       setForm(emptyRoom);
@@ -69,7 +69,7 @@ export default function GymRooms() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this room?")) {
       try {
-        await axios.delete(`http://localhost:8080/api/rooms/${id}`);
+        await axios.delete(`http://localhost:8080/api/admin/rooms/${id}`);
         window.alert("Room deleted successfully!");
         fetchRooms();
       } catch (error) {

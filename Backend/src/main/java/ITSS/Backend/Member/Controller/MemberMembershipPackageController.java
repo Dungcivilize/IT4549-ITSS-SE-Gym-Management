@@ -1,6 +1,6 @@
 package ITSS.Backend.Member.Controller;
 
-import ITSS.Backend.Member.Service.MembershipPackageService;
+import ITSS.Backend.Member.Service.MemberMembershipPackageService;
 import ITSS.Backend.entity.Membership;
 import ITSS.Backend.entity.MembershipPackage;
 import ITSS.Backend.entity.User;
@@ -14,28 +14,27 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/packages")
 @RequiredArgsConstructor
-public class MembershipPackageController {
+public class MemberMembershipPackageController {
 
-    private final MembershipPackageService membershipPackageService;
+    private final MemberMembershipPackageService memberMembershipPackageService;
     private final MembershipPackageRepository membershipPackageRepository;
     private final MembershipRepository membershipRepository;
 
     @GetMapping
     public ResponseEntity<?> getAllPackages() {
-        return ResponseEntity.ok(membershipPackageService.getAllPackages());
+        return ResponseEntity.ok(memberMembershipPackageService.getAllPackages());
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPackageDetail(@PathVariable Long id) {
-        return membershipPackageService.getPackageById(id)
+        return memberMembershipPackageService.getPackageById(id)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy gói tập"));
     }

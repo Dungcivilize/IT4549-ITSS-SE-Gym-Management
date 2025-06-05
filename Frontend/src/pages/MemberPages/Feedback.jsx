@@ -23,7 +23,7 @@ const Feedback = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/api/rooms");
+        const res = await axios.get("http://localhost:8080/api/member/rooms");
         setRooms(res.data);
         if (res.data.length > 0) {
           setSelectedRoom(res.data[0].roomId);

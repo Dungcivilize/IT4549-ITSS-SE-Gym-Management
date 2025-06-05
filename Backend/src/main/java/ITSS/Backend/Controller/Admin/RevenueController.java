@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class RevenueController {
 
     @Autowired
-    private MembershipService membershipService;
+    private AdminMembershipService adminMembershipService;
 
     @GetMapping("/month")
     public Map<Integer, Double> getMonthlyRevenue(@RequestParam int year) {
-        return membershipService.getMonthlyRevenue(year);
+        return adminMembershipService.getMonthlyRevenue(year);
     }
 }

@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class MembershipService {
+public class MemberMembershipService {
 
     private final MembershipRepository membershipRepository;
     private final MembershipPackageRepository membershipPackageRepository;

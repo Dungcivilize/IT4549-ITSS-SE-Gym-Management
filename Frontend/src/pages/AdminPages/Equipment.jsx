@@ -109,7 +109,7 @@ const Equipment = () => {
   const [showForm, setShowForm] = useState(false);
 
   const API_BASE = "http://localhost:8080/api/equipments";
-  const ROOMS_API = "http://localhost:8080/api/rooms";
+  const ROOMS_API = "http://localhost:8080/api/admin/rooms";
 
   // Lấy danh sách thiết bị
   const fetchEquipments = () => {

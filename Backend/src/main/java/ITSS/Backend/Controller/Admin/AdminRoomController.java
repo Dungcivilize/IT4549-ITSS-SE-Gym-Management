@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rooms")
-public class RoomController {
+@RequestMapping("/api/admin/rooms")
+public class AdminRoomController {
 
     @Autowired
     private RoomService roomService;

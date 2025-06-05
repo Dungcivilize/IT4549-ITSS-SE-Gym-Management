@@ -6,15 +6,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import ITSS.Backend.DTO.Admin.MembershipPackageDTO;
-import ITSS.Backend.Service.Admin.MembershipPackageService;
+import ITSS.Backend.Service.Admin.AdminMembershipPackageService;
 
 @RestController
 @RequestMapping("/api/membership-packages")
-public class MembershipPackageController {
+public class AdminMembershipPackageController {
 
-    private final MembershipPackageService packageService;
+    private final AdminMembershipPackageService packageService;
 
-    public MembershipPackageController(MembershipPackageService packageService) {
+    public AdminMembershipPackageController(AdminMembershipPackageService packageService) {
         this.packageService = packageService;
     }
 

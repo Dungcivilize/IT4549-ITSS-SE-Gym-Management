@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import ITSS.Backend.repository.MembershipRepository;
 
 @Service
-public class MembershipService {
+public class AdminMembershipService {
 
     @Autowired
     private MembershipRepository membershipRepository;

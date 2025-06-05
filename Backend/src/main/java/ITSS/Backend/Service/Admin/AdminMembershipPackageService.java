@@ -12,12 +12,12 @@ import ITSS.Backend.repository.MembershipPackageRepository;
 import ITSS.Backend.repository.UserRepository;
 
 @Service
-public class MembershipPackageService {
+public class AdminMembershipPackageService {
 
     private final MembershipPackageRepository packageRepo;
     private final UserRepository userRepo;
 
-    public MembershipPackageService(MembershipPackageRepository packageRepo, UserRepository userRepo) {
+    public AdminMembershipPackageService(MembershipPackageRepository packageRepo, UserRepository userRepo) {
         this.packageRepo = packageRepo;
         this.userRepo = userRepo;
     }
