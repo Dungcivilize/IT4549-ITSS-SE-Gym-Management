@@ -11,26 +11,80 @@ const RegisterPackage = () => {
   const [trainers, setTrainers] = useState([]);
   const [selectedTrainerId, setSelectedTrainerId] = useState("");
   const [registering, setRegistering] = useState(false);
+  const [loadingTrainers, setLoadingTrainers] = useState(false);
+  const [trainerError, setTrainerError] = useState("");
+  const [currentMembership, setCurrentMembership] = useState(null);
+  const [checkingMembership, setCheckingMembership] = useState(false);
 
   useEffect(() => {
+    // Load packages
     axios
-      .get("http://localhost:8080/api/membership-packages")
+      .get("http://localhost:8080/api/packages")
       .then((res) => setPackages(res.data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Lỗi khi lấy danh sách gói tập:", err));
+
+    // Check current membership
+    const currentUserId = getUserId();
+    if (currentUserId) {
+      setCheckingMembership(true);
+      axios
+        .get(`http://localhost:8080/api/memberships/current/${currentUserId}`)
+        .then((res) => {
+          setCurrentMembership(res.data);
+          console.log("Membership hiện tại:", res.data);
+        })
+        .catch((err) => {
+          // 404 là OK - có nghĩa là chưa có membership
+          if (err.response?.status !== 404) {
+            console.error("Lỗi khi check membership:", err);
+          }
+          setCurrentMembership(null);
+        })
+        .finally(() => setCheckingMembership(false));
+    }
   }, []);
 
   const handleCardClick = (pkg) => {
     setSelectedPackage(pkg);
     setShowModal(true);
     setSelectedTrainerId(""); // reset PT đã chọn
+    setTrainerError(""); // reset lỗi trainer
 
     if (pkg.pt) {
+      setLoadingTrainers(true);
+      console.log(`Đang lấy danh sách trainer cho packageId: ${pkg.packageId}`);
+      
       axios
-        .get(`http://localhost:8080/api/membership-packages/${pkg.packageId}/trainers`)
-        .then((res) => setTrainers(res.data))
+        .get(`http://localhost:8080/api/packages/${pkg.packageId}/trainers`)
+        .then((res) => {
+          console.log("Danh sách trainer nhận được:", res.data);
+          setTrainers(res.data);
+          setTrainerError("");
+        })
         .catch((err) => {
-          console.error("Lỗi khi lấy danh sách huấn luyện viên:", err);
+          console.error("Chi tiết lỗi khi lấy danh sách huấn luyện viên:", {
+            message: err.message,
+            status: err.response?.status,
+            statusText: err.response?.statusText,
+            data: err.response?.data,
+            url: err.config?.url
+          });
+          
+          let errorMessage = "Không thể tải danh sách huấn luyện viên";
+          
+          if (err.response?.status === 404) {
+            errorMessage = "Không tìm thấy huấn luyện viên cho gói này";
+          } else if (err.response?.status === 500) {
+            errorMessage = "Lỗi máy chủ, vui lòng thử lại sau";
+          } else if (!err.response) {
+            errorMessage = "Không thể kết nối đến máy chủ";
+          }
+          
+          setTrainerError(errorMessage);
           setTrainers([]);
+        })
+        .finally(() => {
+          setLoadingTrainers(false);
         });
     } else {
       setTrainers([]);
@@ -51,25 +105,95 @@ const RegisterPackage = () => {
       return;
     }
 
+    // Validation chi tiết trước khi gửi
+    if (!selectedPackage.packageId) {
+      alert("❌ Lỗi: Không tìm thấy ID gói tập!");
+      return;
+    }
+
+    if (selectedPackage.pt && selectedTrainerId && isNaN(Number(selectedTrainerId))) {
+      alert("❌ Lỗi: ID huấn luyện viên không hợp lệ!");
+      return;
+    }
+
+    if (isNaN(Number(currentUserId))) {
+      alert("❌ Lỗi: ID người dùng không hợp lệ!");
+      return;
+    }
+
+        // Tạo payload khớp với RegisterMembershipRequest DTO
     const payload = {
-      memberId: Number(currentUserId), // Chuyển sang số
-      trainerId: selectedPackage.pt ? Number(selectedTrainerId) || null : null, // Chuyển sang số
-      packageId: Number(selectedPackage.packageId), // Chuyển sang số
+      memberId: Number(currentUserId),
+      packageId: Number(selectedPackage.packageId)
     };
 
-    console.log("Payload gửi đến backend:", payload); // Debug log
+    // Chỉ thêm trainerId nếu gói có PT và đã chọn trainer
+    if (selectedPackage.pt && selectedTrainerId) {
+      payload.trainerId = Number(selectedTrainerId);
+    }
+
+    console.log("📦 Selected package:", selectedPackage);
+    console.log("👤 User ID:", currentUserId);
+    console.log("🏋️ Trainer ID:", selectedTrainerId);
+    console.log("📤 Payload gửi đến backend:", payload);
 
     setRegistering(true);
 
     axios
-      .post("http://localhost:8080/api/memberships/register", payload)
-      .then(() => {
+      .post("http://localhost:8080/api/memberships/register", payload, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then((response) => {
+        console.log("✅ Đăng ký thành công:", response.data);
         alert("✅ Bạn đã đăng ký gói tập thành công!");
         setShowModal(false);
+        // Refresh membership status
+        const currentUserId = getUserId();
+        if (currentUserId) {
+          axios
+            .get(`http://localhost:8080/api/memberships/current/${currentUserId}`)
+            .then((res) => setCurrentMembership(res.data))
+            .catch(() => setCurrentMembership(null));
+        }
       })
       .catch((err) => {
-        console.error("Chi tiết lỗi:", err.response?.data || err.message);
-        const errorMessage = err.response?.data || "Đăng ký thất bại. Vui lòng thử lại sau.";
+        console.error("❌ Chi tiết lỗi đăng ký:", {
+          message: err.message,
+          status: err.response?.status,
+          statusText: err.response?.statusText,
+          data: err.response?.data,
+          payload: payload
+        });
+        
+        let errorMessage = "Đăng ký thất bại. Vui lòng thử lại sau.";
+        
+        // Xử lý các lỗi cụ thể từ backend
+        const errorData = err.response?.data;
+        const errorStatus = err.response?.status;
+        
+        if (errorStatus === 500) {
+          if (typeof errorData === 'string' && errorData.includes('gói tập hiện tại')) {
+            errorMessage = "⚠️ Bạn đã có gói tập hiện tại. Không thể đăng ký thêm gói mới!\n\n" +
+                          "Vui lòng hoàn thành hoặc hủy gói tập hiện tại trước khi đăng ký gói mới.";
+          } else if (typeof errorData === 'string' && errorData.includes('must not be null')) {
+            errorMessage = "⚠️ Thiếu thông tin cần thiết!\n\n" +
+                          "Vui lòng kiểm tra:\n" +
+                          "- Bạn đã đăng nhập chưa?\n" +
+                          "- Đã chọn gói tập hợp lệ chưa?\n" +
+                          "- Đã chọn huấn luyện viên (nếu cần) chưa?";
+          } else {
+            errorMessage = "Lỗi máy chủ nội bộ. Vui lòng thử lại sau hoặc liên hệ admin.";
+          }
+        } else if (errorStatus === 400) {
+          errorMessage = "Dữ liệu gửi lên không đúng định dạng. Vui lòng thử lại.";
+        } else if (errorStatus === 404) {
+          errorMessage = "Không tìm thấy gói tập hoặc huấn luyện viên được chọn.";
+        } else if (errorData) {
+          errorMessage = errorData;
+        }
+        
         alert(`❌ ${errorMessage}`);
       })
       .finally(() => setRegistering(false));
@@ -178,7 +302,6 @@ const RegisterPackage = () => {
       position: 'absolute',
       top: '1rem',
       right: '1rem',
-      backgroundColor: selectedPackage?.pt ? '#10b981' : '#6b7280',
       color: '#ffffff',
       padding: '0.5rem 1rem',
       borderRadius: '20px',
@@ -271,6 +394,37 @@ const RegisterPackage = () => {
       borderRadius: '10px',
       border: '1px solid rgba(249, 172, 84, 0.2)'
     },
+    errorMessage: {
+      color: '#ef4444',
+      lineHeight: '1.6',
+      marginBottom: '1.5rem',
+      padding: '1rem',
+      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+      borderRadius: '10px',
+      border: '1px solid rgba(239, 68, 68, 0.2)',
+      textAlign: 'center'
+    },
+    loadingMessage: {
+      color: '#f9ac54',
+      lineHeight: '1.6',
+      marginBottom: '1.5rem',
+      padding: '1rem',
+      backgroundColor: 'rgba(249, 172, 84, 0.1)',
+      borderRadius: '10px',
+      border: '1px solid rgba(249, 172, 84, 0.2)',
+      textAlign: 'center'
+    },
+    warningMessage: {
+      color: '#f59e0b',
+      lineHeight: '1.6',
+      marginBottom: '2rem',
+      padding: '1.5rem',
+      backgroundColor: 'rgba(245, 158, 11, 0.1)',
+      borderRadius: '10px',
+      border: '1px solid rgba(245, 158, 11, 0.3)',
+      textAlign: 'center',
+      fontSize: '1.1rem'
+    },
     registerBtn: {
       width: '100%',
       padding: '1rem 2rem',
@@ -296,8 +450,24 @@ const RegisterPackage = () => {
           Từ cơ bản đến nâng cao, với hoặc không có huấn luyện viên cá nhân.
         </p>
 
+        {checkingMembership && (
+          <div style={pageStyles.loadingMessage}>
+            🔄 Đang kiểm tra gói tập hiện tại...
+          </div>
+        )}
+
+        {currentMembership && (
+          <div style={pageStyles.warningMessage}>
+            ⚠️ <strong>Thông báo:</strong> Bạn đã có gói tập hiện tại: <strong>{currentMembership.packageName}</strong>
+            <br />
+            Trạng thái: <strong>{currentMembership.paymentStatus}</strong>
+            <br />
+            <small>Bạn cần hoàn thành hoặc hủy gói này trước khi đăng ký gói mới.</small>
+          </div>
+        )}
+
         <div style={pageStyles.cardGrid}>
-            {packages.map((pkg) => (
+          {packages.map((pkg) => (
             <div
               key={pkg.packageId}
               style={pageStyles.card}
@@ -353,7 +523,7 @@ const RegisterPackage = () => {
                 </li>
               </ul>
             </div>
-            ))}
+          ))}
         </div>
 
         {showModal && selectedPackage && (
@@ -390,19 +560,32 @@ const RegisterPackage = () => {
                 </div>
               </div>
 
-                {selectedPackage.pt ? (
-                  trainers.length > 0 ? (
-                  <div style={pageStyles.dropdown}>
-                    <label style={pageStyles.dropdownLabel} htmlFor="trainer">
-                      Chọn huấn luyện viên:
-                    </label>
+              {selectedPackage.pt && (
+                <>
+                  {loadingTrainers && (
+                    <div style={pageStyles.loadingMessage}>
+                      🔄 Đang tải danh sách huấn luyện viên...
+                    </div>
+                  )}
+                  
+                  {trainerError && (
+                    <div style={pageStyles.errorMessage}>
+                      ❌ {trainerError}
+                    </div>
+                  )}
+                  
+                  {!loadingTrainers && !trainerError && trainers.length > 0 && (
+                    <div style={pageStyles.dropdown}>
+                      <label style={pageStyles.dropdownLabel} htmlFor="trainer">
+                        Chọn huấn luyện viên:
+                      </label>
                       <select
                         id="trainer"
-                      style={pageStyles.select}
+                        style={pageStyles.select}
                         value={selectedTrainerId}
                         onChange={(e) => setSelectedTrainerId(e.target.value)}
-                      onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
-                      onBlur={(e) => e.target.style.borderColor = '#35373b'}
+                        onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
+                        onBlur={(e) => e.target.style.borderColor = '#35373b'}
                       >
                         <option value="">-- Chọn PT --</option>
                         {trainers.map((t) => (
@@ -412,33 +595,55 @@ const RegisterPackage = () => {
                         ))}
                       </select>
                     </div>
-                  ) : (
-                  <p style={pageStyles.description}>
-                    Không tìm thấy huấn luyện viên phù hợp cho gói này.
-                    </p>
-                  )
-                ) : (
-                <p style={pageStyles.description}>
+                  )}
+                  
+                  {!loadingTrainers && !trainerError && trainers.length === 0 && (
+                    <div style={pageStyles.description}>
+                      Không tìm thấy huấn luyện viên phù hợp cho gói này.
+                    </div>
+                  )}
+                </>
+              )}
+
+              {!selectedPackage.pt && (
+                <div style={pageStyles.description}>
                   Gói tập hiện tại không bao gồm dịch vụ huấn luyện viên cá nhân.
-                  </p>
-                )}
+                </div>
+              )}
 
               <div style={pageStyles.description}>
                 Gói tập <strong>{selectedPackage.packageName}</strong> phù hợp cho những người
-                  muốn duy trì thể lực bền vững và nâng cao sức khỏe toàn diện
+                muốn duy trì thể lực bền vững và nâng cao sức khỏe toàn diện
                 trong {selectedPackage.duration} ngày. Với các thiết bị hiện đại và
                 không gian tập luyện chuyên nghiệp.
               </div>
 
-                <button
-                style={pageStyles.registerBtn}
-                  onClick={handleRegister}
-                  disabled={registering}
-                onMouseOver={(e) => !registering && (e.target.style.backgroundColor = '#d79447')}
-                onMouseOut={(e) => !registering && (e.target.style.backgroundColor = '#f9ac54')}
-                >
-                {registering ? "Đang xử lý..." : "Đăng ký ngay"}
-                </button>
+              <button
+                style={{
+                  ...pageStyles.registerBtn,
+                  backgroundColor: (registering || currentMembership) ? '#6b7280' : '#f9ac54',
+                  cursor: (registering || currentMembership) ? 'not-allowed' : 'pointer'
+                }}
+                onClick={handleRegister}
+                disabled={registering || currentMembership}
+                onMouseOver={(e) => {
+                  if (!registering && !currentMembership) {
+                    e.target.style.backgroundColor = '#d79447';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!registering && !currentMembership) {
+                    e.target.style.backgroundColor = '#f9ac54';
+                  }
+                }}
+              >
+                {registering 
+                  ? "Đang xử lý..." 
+                  : currentMembership 
+                    ? "Bạn đã có gói tập" 
+                    : "Đăng ký ngay"
+                }
+              </button>
             </div>
           </div>
         )}

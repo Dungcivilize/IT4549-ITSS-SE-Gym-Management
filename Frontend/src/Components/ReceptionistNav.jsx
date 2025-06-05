@@ -88,10 +88,10 @@ const ReceptionistNav = () => {
   return (
     <nav style={navStyles.container}>
       <div style={navStyles.leftSection}>
-        {navItems.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
+      {navItems.map((item) => (
+        <Link
+          key={item.to}
+          to={item.to}
             style={{
               ...navStyles.link,
               ...(isActive(item.to) ? navStyles.activeLink : {})
@@ -108,10 +108,10 @@ const ReceptionistNav = () => {
                 e.target.style.color = '#f3f4f6';
               }
             }}
-          >
-            {item.text}
-          </Link>
-        ))}
+        >
+          {item.text}
+        </Link>
+      ))}
       </div>
 
       <div style={navStyles.rightSection}>
