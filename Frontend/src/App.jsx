@@ -33,39 +33,39 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Router>
+    <Router>
         <div style={appStyles.app}>
-          <Routes>
-            {/* Member Routes */}
-            <Route path="/homepage" element={<MemberDashBoard />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/member/home" element={<MemberHomePage />} />
-            <Route path="/member/profile" element={<MemberProfile />} />
-            <Route path="/member/change-password" element={<ChangePassword />} />
-            <Route path="/feedback" element={<Feedback />} />
-            <Route path="/schedule" element={<SchedulePage />} />
+        <Routes>
+          {/* Member Routes */}
+          <Route path="/homepage" element={<MemberDashBoard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/member/home" element={<MemberHomePage />} />
+          <Route path="/member/profile" element={<MemberProfile />} />
+          <Route path="/member/change-password" element={<ChangePassword />} />
+          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/schedule" element={<SchedulePage />} />
             <Route path="/packages" element={<RegisterPackage />} />
-            {/* Receptionist Routes */}
-            <Route path="/receptionist" element={<ReceptionistDashboard />}>
-              <Route path="profile" element={<ReceptionistProfile />} />
-              <Route path="revenue" element={<RevenueStatistics />} />
-              <Route path="equipment" element={<EquipmentStatistics />} />
-              <Route path="membership-approval" element={<MembershipApproval />} />
-            </Route>
-            {/* Admin Routes */}
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          {/* Receptionist Routes */}
+          <Route path="/receptionist" element={<ReceptionistDashboard />}>
+            <Route path="profile" element={<ReceptionistProfile />} />
+            <Route path="revenue" element={<RevenueStatistics />} />
+            <Route path="equipment" element={<EquipmentStatistics />} />
+            <Route path="membership-approval" element={<MembershipApproval />} />
+          </Route>
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
             {/* Trainer Routes */}
-            <Route path="/trainer/home" element={<TrainerHome />}>
+          <Route path="/trainer/home" element={<TrainerHome />}>
               <Route index element={<div style={{ color: '#fff', padding: '2rem' }}>Welcome Trainer Home</div>} />
-              <Route path="members" element={<TrainerMembersList />} />
-              <Route path="profile/edit" element={<TrainerProfileEdit />} />
-            </Route>
+            <Route path="members" element={<TrainerMembersList />} />
+            <Route path="profile/edit" element={<TrainerProfileEdit />} />
+          </Route>
             {/* Default Route */}
             <Route path="/" element={<MemberDashBoard />} />
-          </Routes>
-        </div>
-      </Router>
+        </Routes>
+      </div>
+    </Router>
     </ErrorBoundary>
   );
 }
