@@ -40,10 +40,12 @@ CREATE TABLE `Equipments` (
 CREATE TABLE `MembershipPackage` (
     `package_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `package_name` VARCHAR(255) NOT NULL,
-    `duration` BIGINT NOT NULL, -- đơn vị: ngày/tháng?
+    `duration` BIGINT NOT NULL, -- Thời gian gói tập tính bằng ngày
+    `max_pt_meeting_days` BIGINT DEFAULT 0, -- Số buổi tập tối đa với huấn luyện viên cá nhân ( nếu có )
     `price` DOUBLE NOT NULL,
-    `package_type` VARCHAR(255) NOT NULL,
-    `PT` BOOLEAN NOT NULL
+    `PT` BOOLEAN NOT NULL,
+    `description` TEXT NULL,
+    `discount` DOUBLE DEFAULT 0.0
 );
 
 -- Gán huấn luyện viên cho gói tập
@@ -63,7 +65,8 @@ CREATE TABLE `Membership` (
     `package_id` BIGINT unsigned NOT NULL,
     `start_date` DATE NOT NULL,
     `end_date` DATE NOT NULL,
-    `payment_status` ENUM('Paid', 'Unpaid') NOT NULL,
+    `payment_status` ENUM('Paid', 'Unpaid', 'Processing') NOT NULL,
+    `pt_meeting_days_left` BIGINT DEFAULT 0, -- Số buổi tập còn lại với huấn luyện viên cá nhân
     FOREIGN KEY (`member_id`) REFERENCES `Users`(`user_id`),
     FOREIGN KEY (`trainer_id`) REFERENCES `Users`(`user_id`),
     FOREIGN KEY (`package_id`) REFERENCES `MembershipPackage`(`package_id`),
@@ -76,6 +79,7 @@ CREATE TABLE `Feedback` (
     `member_id` BIGINT unsigned NOT NULL,
     `feedback_text` TEXT NOT NULL,
     `feedback_date` DATE NOT NULL,
+    `rating` INT CHECK (rating >= 1 AND rating <= 5) DEFAULT 5,
     FOREIGN KEY (`member_id`) REFERENCES `Users`(`user_id`)
 );
 
@@ -84,5 +88,15 @@ CREATE TABLE `Attendance` (
     `attendance_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `member_id` BIGINT unsigned NOT NULL,
     `checkin_date` TIMESTAMP NOT NULL,
+    `feedback` TEXT NULL,
     FOREIGN KEY (`member_id`) REFERENCES `Users`(`user_id`)
+);
+
+-- Bảng lưu bill đã thanh toán
+CREATE TABLE `Accepted_bill` ( 
+    `bill_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `membership_id` BIGINT UNSIGNED NOT NULL,
+    `amount` DOUBLE NOT NULL,
+    `payment_date` TIMESTAMP NOT NULL,
+    FOREIGN KEY (`membership_id`) REFERENCES `Membership`(`membership_id`)
 );
