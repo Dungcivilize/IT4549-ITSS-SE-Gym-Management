@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getUser, getUserName } from '../../utils/auth';
+import { getUser, getUserUsername } from '../../utils/auth';
 import './ReceptionistProfile.css';
 
 export default function ReceptionistProfile() {
@@ -19,7 +19,7 @@ export default function ReceptionistProfile() {
       return;
     }
 
-    const currentUsername = getUserName();
+    const currentUsername = getUserUsername();
     setUsername(currentUsername);
 
     fetch(`http://localhost:8080/api/receptionist/profile?username=${currentUsername}`, {

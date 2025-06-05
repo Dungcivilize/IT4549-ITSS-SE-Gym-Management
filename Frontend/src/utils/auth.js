@@ -35,6 +35,11 @@ export const getUserName = () => {
   return user?.fullname || 'Người dùng';
 };
 
+export const getUserUsername = () => {
+  const user = getUser();
+  return user?.user_name || null;
+};
+
 export const getUserId = () => {
   const user = getUser();
   return user?.user_id || null;
