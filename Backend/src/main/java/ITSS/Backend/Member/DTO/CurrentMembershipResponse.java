@@ -11,4 +11,5 @@ public class CurrentMembershipResponse {
     private LocalDate endDate;
     private String paymentStatus;
     private Long packageId; // ✅ thêm dòng này
+    private Long ptMeetingDaysLeft;
 }

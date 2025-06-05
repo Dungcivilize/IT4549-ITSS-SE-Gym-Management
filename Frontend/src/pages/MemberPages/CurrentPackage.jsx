@@ -403,6 +403,14 @@ const CurrentPackage = ({ memberId }) => {
           <p style={styles.infoItem}>
             <strong>Trạng thái thanh toán:</strong> {data.paymentStatus}
           </p>
+          <p
+            style={{
+              color: data.ptMeetingDaysLeft === 0 ? "red" : "inherit",
+              fontWeight: "bold",
+            }}
+          >
+            <strong>Số buổi PT còn lại:</strong> {data.ptMeetingDaysLeft}
+          </p>
         </div>
 
         <div style={styles.right}>
