@@ -4,6 +4,89 @@ import MemberNavbar from '../../Components/MemberNavbar';
 import { getUser, getUserId } from '../../utils/auth';
 import Loading from '../../Components/Loading';
 
+// Component hiển thị và chọn rating sao
+const StarRating = ({ rating, onRatingChange, readonly = false, size = 24 }) => {
+  const [hoverRating, setHoverRating] = useState(0);
+
+  const handleStarClick = (starValue) => {
+    if (!readonly && onRatingChange) {
+      onRatingChange(starValue);
+    }
+  };
+
+  const handleStarHover = (starValue) => {
+    if (!readonly) {
+      setHoverRating(starValue);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!readonly) {
+      setHoverRating(0);
+    }
+  };
+
+  // Nếu readonly, chỉ hiển thị đúng số sao theo rating
+  if (readonly) {
+    return (
+      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+        {Array.from({ length: rating || 0 }, (_, index) => (
+          <span
+            key={index}
+            style={{
+              fontSize: `${size}px`,
+              color: '#f9ac54',
+              userSelect: 'none'
+            }}
+          >
+            ⭐
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  // Nếu không readonly, hiển thị 5 sao với interaction
+  return (
+    <div 
+      style={{ 
+        display: 'flex', 
+        gap: '4px', 
+        alignItems: 'center',
+        cursor: 'pointer'
+      }}
+      onMouseLeave={handleMouseLeave}
+    >
+      {[1, 2, 3, 4, 5].map((star) => {
+        const isActive = hoverRating ? star <= hoverRating : star <= rating;
+        return (
+          <span
+            key={star}
+            style={{
+              fontSize: `${size}px`,
+              color: isActive ? '#f9ac54' : '#4a5568',
+              transition: 'color 0.2s ease',
+              cursor: 'pointer',
+              userSelect: 'none'
+            }}
+            onClick={() => handleStarClick(star)}
+            onMouseEnter={() => handleStarHover(star)}
+          >
+            ⭐
+          </span>
+        );
+      })}
+      <span style={{ 
+        marginLeft: '8px', 
+        color: '#d1d5db', 
+        fontSize: '14px' 
+      }}>
+        ({rating || hoverRating || 0}/5)
+      </span>
+    </div>
+  );
+};
+
 const Feedback = () => {
   const user = getUser() || {};
   const user_id = getUserId();
@@ -36,48 +119,44 @@ const Feedback = () => {
       </div>
     );
   }
-  const [rooms, setRooms] = useState([]);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [feedbacks, setFeedbacks] = useState([]);
-  const [feedbackText, setFeedbackText] = useState("");
+
+  const [allFeedbacks, setAllFeedbacks] = useState([]);
+  const [displayedFeedbacks, setDisplayedFeedbacks] = useState([]);
+  const [showAllFeedbacks, setShowAllFeedbacks] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [rating, setRating] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [editingId, setEditingId] = useState(null);
-  const [editingText, setEditingText] = useState("");
+  const [editingText, setEditingText] = useState('');
+  const [editingRating, setEditingRating] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMyFeedbacks, setShowMyFeedbacks] = useState(false);
   const [myFeedbacks, setMyFeedbacks] = useState([]);
 
-  // Lấy danh sách phòng
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        const res = await axios.get('http://localhost:8080/api/member/rooms');
-        setRooms(res.data);
-        if (res.data.length > 0) {
-          setSelectedRoom(res.data[0].roomId);
-        }
-      } catch (err) {
-        setError('Không lấy được danh sách phòng');
-      }
-    };
-    fetchRooms();
-  }, []);
-
-  // Lấy feedbacks của phòng được chọn
+  // Lấy tất cả feedbacks
   useEffect(() => {
     const fetchFeedbacks = async () => {
-      if (!selectedRoom) return;
       try {
-        const res = await axios.get(`http://localhost:8080/api/feedbacks/room/${selectedRoom}`);
-        setFeedbacks(res.data);
+        const res = await axios.get('http://localhost:8080/api/feedbacks/all');
+        // Sắp xếp theo feedbackId giảm dần để lấy feedback mới nhất
+        const sortedFeedbacks = res.data.sort((a, b) => b.feedbackId - a.feedbackId);
+        setAllFeedbacks(sortedFeedbacks);
+        // Hiển thị 5 feedback mới nhất
+        setDisplayedFeedbacks(sortedFeedbacks.slice(0, 5));
       } catch (err) {
         setError('Không lấy được danh sách feedback');
       }
     };
     fetchFeedbacks();
-  }, [selectedRoom, success, editingId]); // Thêm editingId để refresh khi edit xong
+  }, [success, editingId]); // Refresh khi có thay đổi
+
+  // Hiển thị tất cả feedback
+  const handleShowAllFeedbacks = () => {
+    setDisplayedFeedbacks(allFeedbacks);
+    setShowAllFeedbacks(true);
+  };
 
   // Lấy feedback của user
   const fetchMyFeedbacks = async () => {
@@ -99,16 +178,23 @@ const Feedback = () => {
       setError('Nội dung feedback không được để trống');
       return;
     }
+    if (!rating || rating === 0) {
+      setError('Vui lòng chọn đánh giá từ 1 đến 5 sao');
+      return;
+    }
     setLoading(true);
     try {
       await axios.post('http://localhost:8080/api/feedbacks', {
         memberId: user_id,
-        roomId: selectedRoom,
-        feedbackText
+        feedbackText: feedbackText.trim(),
+        rating: rating
       });
       setSuccess('Gửi feedback thành công!');
       setFeedbackText('');
+      setRating(0);
       setShowAddModal(false);
+      // Reset về hiển thị 5 feedback mới nhất
+      setShowAllFeedbacks(false);
     } catch (err) {
       setError(err.response?.data || err.message);
     } finally {
@@ -121,8 +207,9 @@ const Feedback = () => {
     try {
       setError('');
       setSuccess('');
-    setEditingId(fb.feedbackId);
-    setEditingText(fb.feedbackText);
+      setEditingId(fb.feedbackId);
+      setEditingText(fb.feedbackText);
+      setEditingRating(fb.rating || 0);
     } catch (err) {
       console.error('Error setting edit mode:', err);
       setError('Có lỗi xảy ra khi chỉnh sửa');
@@ -134,7 +221,6 @@ const Feedback = () => {
     setError('');
     setSuccess('');
     
-    // Validation
     if (!feedbackId) {
       setError('ID feedback không hợp lệ');
       return;
@@ -152,11 +238,12 @@ const Feedback = () => {
     
     setLoading(true);
     try {
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:8080/api/feedbacks/${feedbackId}/member/${user_id}`,
         {
           memberId: user_id,
-          feedbackText: editingText.trim()
+          feedbackText: editingText.trim(),
+          rating: editingRating
         }
       );
       
@@ -165,7 +252,7 @@ const Feedback = () => {
         if (!prev || !Array.isArray(prev)) return [];
         return prev.map(fb => 
           fb.feedbackId === feedbackId 
-            ? { ...fb, feedbackText: editingText.trim() }
+            ? { ...fb, feedbackText: editingText.trim(), rating: editingRating }
             : fb
         );
       });
@@ -173,6 +260,7 @@ const Feedback = () => {
       setSuccess('Cập nhật feedback thành công!');
       setEditingId(null);
       setEditingText('');
+      setEditingRating(0);
       
     } catch (err) {
       console.error('Error updating feedback:', err);
@@ -186,11 +274,11 @@ const Feedback = () => {
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditingText('');
+    setEditingRating(0);
   };
 
   // Xóa feedback
   const handleDelete = async (feedbackId) => {
-    // Validation
     if (!feedbackId) {
       setError('ID feedback không hợp lệ');
       return;
@@ -208,7 +296,7 @@ const Feedback = () => {
     setLoading(true);
     
     try {
-      const response = await axios.delete(
+      await axios.delete(
         `http://localhost:8080/api/feedbacks/${feedbackId}/member/${user_id}`
       );
       
@@ -282,19 +370,8 @@ const Feedback = () => {
       color: '#d1d5db',
       marginRight: '1rem',
       fontWeight: '500',
-      display: 'inline-block',
+      display: 'block',
       marginBottom: '0.5rem'
-    },
-    select: {
-      padding: '0.75rem',
-      borderRadius: '8px',
-      border: '2px solid #35373b',
-      backgroundColor: '#1f2125',
-      color: '#ffffff',
-      fontSize: '1rem',
-      outline: 'none',
-      transition: 'border-color 0.3s ease',
-      minWidth: '200px'
     },
     buttonContainer: {
       textAlign: 'center',
@@ -321,6 +398,11 @@ const Feedback = () => {
     },
     btnCancel: {
       backgroundColor: '#6b7280'
+    },
+    btnShowMore: {
+      backgroundColor: '#8b5cf6',
+      marginTop: '1rem',
+      width: '100%'
     },
     modal: {
       position: 'fixed',
@@ -381,7 +463,11 @@ const Feedback = () => {
     feedbackMeta: {
       marginBottom: '0.5rem',
       color: '#d1d5db',
-      fontSize: '0.9rem'
+      fontSize: '0.9rem',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '1rem',
+      flexWrap: 'wrap'
     },
     feedbackText: {
       color: '#ffffff',
@@ -441,28 +527,10 @@ const Feedback = () => {
           
           {success && <div style={pageStyles.successMessage}>{success}</div>}
           {error && <div style={pageStyles.errorMessage}>{error}</div>}
-        
-        {/* Chọn phòng */}
-          <div style={pageStyles.formGroup}>
-            <label style={pageStyles.label}>Chọn phòng:</label>
-          <select 
-              value={selectedRoom || ''} 
-            onChange={(e) => setSelectedRoom(Number(e.target.value))}
-              style={pageStyles.select}
-              onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
-              onBlur={(e) => e.target.style.borderColor = '#35373b'}
-          >
-            {rooms.map(room => (
-              <option key={room.roomId} value={room.roomId}>
-                {room.roomName}
-              </option>
-            ))}
-          </select>
-        </div>
 
-        {/* Nút thêm feedback và danh sách feedback đã gửi */}
+          {/* Nút thêm feedback và danh sách feedback đã gửi */}
           <div style={pageStyles.buttonContainer}>
-          <button 
+            <button 
               style={pageStyles.btn}
               onClick={() => {
                 setError('');
@@ -471,36 +539,37 @@ const Feedback = () => {
               }}
               onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
               onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
-          >
-            Thêm feedback mới
-          </button>
-          <button
+            >
+              Thêm feedback mới
+            </button>
+            <button
               style={{ ...pageStyles.btn, ...pageStyles.btnSecondary }}
-            onClick={() => {
+              onClick={() => {
                 setError('');
                 setSuccess('');
-              fetchMyFeedbacks();
-              setShowMyFeedbacks(true);
-            }}
+                fetchMyFeedbacks();
+                setShowMyFeedbacks(true);
+              }}
               onMouseOver={(e) => e.target.style.backgroundColor = '#1976d2'}
               onMouseOut={(e) => e.target.style.backgroundColor = '#2196f3'}
-          >
-            Danh sách feedback đã gửi
-          </button>
-        </div>
+            >
+              Feedback của tôi
+            </button>
+          </div>
 
-        {/* Modal danh sách feedback đã gửi */}
-        {showMyFeedbacks && (
+          {/* Modal danh sách feedback đã gửi */}
+          {showMyFeedbacks && (
             <div style={pageStyles.modal} onClick={() => {
               setShowMyFeedbacks(false);
               setError('');
               setSuccess('');
               setEditingId(null);
               setEditingText('');
-          }}>
+              setEditingRating(0);
+            }}>
               <div style={pageStyles.modalContent} onClick={(e) => e.stopPropagation()}>
-                <h3 style={pageStyles.modalTitle}>Feedback bạn đã gửi</h3>
-              <button
+                <h3 style={pageStyles.modalTitle}>Feedback của tôi</h3>
+                <button
                   style={{ ...pageStyles.btn, ...pageStyles.btnCancel, marginBottom: '1rem' }}
                   onClick={() => {
                     setShowMyFeedbacks(false);
@@ -508,37 +577,31 @@ const Feedback = () => {
                     setSuccess('');
                     setEditingId(null);
                     setEditingText('');
+                    setEditingRating(0);
                   }}
                   onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
                   onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-              >
-                Đóng
-              </button>
-              {myFeedbacks.length === 0 ? (
+                >
+                  Đóng
+                </button>
+                {myFeedbacks.length === 0 ? (
                   <div style={{ color: '#d1d5db', textAlign: 'center', padding: '2rem' }}>
                     Bạn chưa gửi feedback nào.
                   </div>
-              ) : (
-                  <div style={{ color: '#ef4444', textAlign: 'center', padding: '1rem', marginBottom: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px' }}>
-                    ⚠️ Backend API không trả về feedbackId. Chức năng edit/delete không khả dụng.
-                  </div>
-                ) && (
+                ) : (
                   myFeedbacks.map((fb, index) => (
                     <div key={fb.feedbackId || `modal-feedback-${index}`} style={pageStyles.feedbackCard}>
                       <div style={pageStyles.feedbackMeta}>
-                        <strong>Phòng:</strong> {fb.roomName || fb.room?.roomName || 'Không rõ'}
-                    </div>
-                      <div style={pageStyles.feedbackMeta}>
-                        <strong>Ngày gửi:</strong> {fb.feedbackDate}
-                    </div>
+                        <span><strong>Ngày gửi:</strong> {fb.feedbackDate}</span>
+                        <StarRating rating={fb.rating || 5} readonly size={16} />
+                      </div>
                       <div style={pageStyles.feedbackText}>
                         <strong>Nội dung:</strong>
-                        {editingId === (fb.feedbackId || `modal-fb-${index}`) ? (
-                          <div key={`edit-${fb.feedbackId || `modal-fb-${index}`}`}>
-                          <textarea
-                              key={`modal-textarea-${fb.feedbackId || `modal-fb-${index}`}`}
-                            value={editingText}
-                            onChange={(e) => setEditingText(e.target.value)}
+                        {editingId === fb.feedbackId ? (
+                          <div>
+                            <textarea
+                              value={editingText}
+                              onChange={(e) => setEditingText(e.target.value)}
                               style={{ 
                                 ...pageStyles.textarea, 
                                 marginTop: '0.5rem',
@@ -546,142 +609,144 @@ const Feedback = () => {
                               }}
                               onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
                               onBlur={(e) => e.target.style.borderColor = '#35373b'}
-                          />
-                            <div key={`modal-edit-buttons-${fb.feedbackId || `modal-fb-${index}`}`} style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                            <button
-                                key={`modal-save-btn-${fb.feedbackId || `modal-fb-${index}`}`}
+                            />
+                            <div style={pageStyles.formGroup}>
+                              <label style={pageStyles.label}>Đánh giá:</label>
+                              <StarRating 
+                                rating={editingRating} 
+                                onRatingChange={setEditingRating} 
+                                size={20}
+                              />
+                            </div>
+                            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                              <button
                                 style={pageStyles.btn}
-                                onClick={() => handleSaveEdit(fb.feedbackId || `modal-fb-${index}`)}
-                              disabled={loading}
+                                onClick={() => handleSaveEdit(fb.feedbackId)}
+                                disabled={loading}
                                 onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
                                 onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
-                            >
+                              >
                                 {loading ? 'Đang lưu...' : 'Lưu'}
-                            </button>
-                            <button
-                                key={`modal-cancel-btn-${fb.feedbackId || `modal-fb-${index}`}`}
+                              </button>
+                              <button
                                 style={{ ...pageStyles.btn, ...pageStyles.btnCancel }}
-                              onClick={handleCancelEdit}
+                                onClick={handleCancelEdit}
                                 onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
                                 onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-                            >
-                              Hủy
-                            </button>
+                              >
+                                Hủy
+                              </button>
                             </div>
                           </div>
-                      ) : (
-                          <span key={`text-${fb.feedbackId || `modal-fb-${index}`}`} style={{ marginLeft: '0.5rem' }}>{fb.feedbackText}</span>
-                      )}
-                    </div>
-                      {editingId !== (fb.feedbackId || `modal-fb-${index}`) && (
-                        <div key={`modal-action-buttons-${fb.feedbackId || `modal-fb-${index}`}`} style={pageStyles.actionButtons}>
-                        <button
+                        ) : (
+                          <span style={{ marginLeft: '0.5rem' }}>{fb.feedbackText}</span>
+                        )}
+                      </div>
+                      {editingId !== fb.feedbackId && (
+                        <div style={pageStyles.actionButtons}>
+                          <button
                             style={{ ...pageStyles.actionBtn, ...pageStyles.editBtn }}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              console.log('Edit button clicked for feedback:', fb.feedbackId || `modal-fb-${index}`);
-                              if (fb.feedbackId) {
-                                handleEdit(fb);
-                              } else {
-                                console.error('Cannot edit: feedback ID is missing');
-                              }
+                              handleEdit(fb);
                             }}
                             onMouseOver={(e) => e.target.style.backgroundColor = '#1976d2'}
                             onMouseOut={(e) => e.target.style.backgroundColor = '#2196f3'}
                             disabled={loading}
-                        >
-                          Sửa
-                        </button>
-                        <button
+                          >
+                            Sửa
+                          </button>
+                          <button
                             style={{ ...pageStyles.actionBtn, ...pageStyles.deleteBtn }}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              console.log('Delete button clicked for feedback:', fb.feedbackId || `modal-fb-${index}`);
-                              if (fb.feedbackId) {
-                                handleDelete(fb.feedbackId);
-                              } else {
-                                console.error('Cannot delete: feedback ID is missing');
-                              }
+                              handleDelete(fb.feedbackId);
                             }}
                             onMouseOver={(e) => e.target.style.backgroundColor = '#d32f2f'}
                             onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
                             disabled={loading}
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Modal thêm feedback */}
-        {showAddModal && (
+          {/* Modal thêm feedback */}
+          {showAddModal && (
             <div style={pageStyles.modal} onClick={() => {
               setShowAddModal(false);
               setError('');
               setSuccess('');
               setFeedbackText('');
-          }}>
+              setRating(0);
+            }}>
               <div style={{ ...pageStyles.modalContent, maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
                 <h3 style={pageStyles.modalTitle}>Thêm feedback mới</h3>
-              <form onSubmit={handleSubmit}>
-                <textarea
-                  style={{ 
-                      ...pageStyles.textarea,
-                      marginBottom: '1.5rem'
-                  }}
-                  placeholder="Nhập nội dung góp ý của bạn..."
-                  value={feedbackText}
-                  onChange={(e) => setFeedbackText(e.target.value)}
-                    onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
-                    onBlur={(e) => e.target.style.borderColor = '#35373b'}
-                />
+                <form onSubmit={handleSubmit}>
+                  <div style={pageStyles.formGroup}>
+                    <label style={pageStyles.label}>Nội dung feedback:</label>
+                    <textarea
+                      style={pageStyles.textarea}
+                      placeholder="Nhập nội dung góp ý của bạn..."
+                      value={feedbackText}
+                      onChange={(e) => setFeedbackText(e.target.value)}
+                      onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
+                      onBlur={(e) => e.target.style.borderColor = '#35373b'}
+                    />
+                  </div>
+                  <div style={pageStyles.formGroup}>
+                    <label style={pageStyles.label}>Đánh giá:</label>
+                    <StarRating rating={rating} onRatingChange={setRating} size={24} />
+                  </div>
                   <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                  <button 
-                    type="button"
+                    <button 
+                      type="button"
                       style={{ ...pageStyles.btn, ...pageStyles.btnCancel }}
                       onClick={() => {
                         setShowAddModal(false);
                         setError('');
                         setSuccess('');
                         setFeedbackText('');
+                        setRating(0);
                       }}
                       onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
                       onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-                  >
-                    Hủy
-                  </button>
-                  <button 
+                    >
+                      Hủy
+                    </button>
+                    <button 
                       style={pageStyles.btn}
-                    type="submit"
-                    disabled={loading}
+                      type="submit"
+                      disabled={loading}
                       onMouseOver={(e) => !loading && (e.target.style.backgroundColor = '#d79447')}
                       onMouseOut={(e) => !loading && (e.target.style.backgroundColor = '#f9ac54')}
-                  >
+                    >
                       {loading ? 'Đang gửi...' : 'Gửi feedback'}
-                  </button>
-                </div>
-              </form>
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Danh sách feedback */}
+          {/* Danh sách tất cả feedback */}
           <div style={{ marginTop: '2rem' }}>
             <h3 style={{ 
               ...pageStyles.title, 
               fontSize: '1.5rem', 
               marginBottom: '1.5rem' 
             }}>
-              Danh sách feedback
+              {showAllFeedbacks ? 'Tất cả feedback' : '5 feedback mới nhất'}
             </h3>
-          {feedbacks.length === 0 ? (
+            {displayedFeedbacks.length === 0 ? (
               <div style={{ 
                 textAlign: 'center', 
                 color: '#d1d5db', 
@@ -691,95 +756,102 @@ const Feedback = () => {
               }}>
                 Chưa có feedback nào.
               </div>
-          ) : (
-              feedbacks.map((fb, index) => (
-                <div key={fb.feedbackId || `main-feedback-${index}`} style={pageStyles.feedbackCard}>
-                  <div style={pageStyles.feedbackMeta}>
-                    <strong>Người gửi:</strong> {fb.userName}
-                </div>
-                  <div style={pageStyles.feedbackMeta}>
-                    <strong>Ngày gửi:</strong> {fb.feedbackDate}
-                </div>
-                  <div style={pageStyles.feedbackText}>
-                    <strong>Nội dung:</strong>
-                    {editingId === (fb.feedbackId || `main-fb-${index}`) ? (
-                      <div key={`feedback-edit-${fb.feedbackId || `main-fb-${index}`}`}>
-                      <textarea
-                          key={`main-textarea-${fb.feedbackId || `main-fb-${index}`}`}
-                        value={editingText}
-                        onChange={(e) => setEditingText(e.target.value)}
-                          style={{ 
-                            ...pageStyles.textarea, 
-                            marginTop: '0.5rem',
-                            minHeight: '80px'
-                          }}
-                          onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
-                          onBlur={(e) => e.target.style.borderColor = '#35373b'}
-                      />
-                        <div key={`main-edit-buttons-${fb.feedbackId || `main-fb-${index}`}`} style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                        <button
-                            key={`main-save-btn-${fb.feedbackId || `main-fb-${index}`}`}
-                            style={pageStyles.btn}
-                            onClick={() => handleSaveEdit(fb.feedbackId || `main-fb-${index}`)}
-                          disabled={loading}
-                            onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
-                            onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
-                        >
-                            {loading ? 'Đang lưu...' : 'Lưu'}
-                        </button>
-                        <button
-                            key={`main-cancel-btn-${fb.feedbackId || `main-fb-${index}`}`}
-                            style={{ ...pageStyles.btn, ...pageStyles.btnCancel }}
-                          onClick={handleCancelEdit}
-                            onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
-                            onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-                        >
-                          Hủy
-                        </button>
+            ) : (
+              <>
+                {displayedFeedbacks.map((fb, index) => (
+                  <div key={fb.feedbackId || `main-feedback-${index}`} style={pageStyles.feedbackCard}>
+                    <div style={pageStyles.feedbackMeta}>
+                      <span><strong>Người gửi:</strong> {fb.userName}</span>
+                      <span><strong>Ngày gửi:</strong> {fb.feedbackDate}</span>
+                      <StarRating rating={fb.rating || 5} readonly size={16} />
+                    </div>
+                    <div style={pageStyles.feedbackText}>
+                      <strong>Nội dung:</strong>
+                      {editingId === fb.feedbackId ? (
+                        <div>
+                          <textarea
+                            value={editingText}
+                            onChange={(e) => setEditingText(e.target.value)}
+                            style={{ 
+                              ...pageStyles.textarea, 
+                              marginTop: '0.5rem',
+                              minHeight: '80px'
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
+                            onBlur={(e) => e.target.style.borderColor = '#35373b'}
+                          />
+                          <div style={pageStyles.formGroup}>
+                            <label style={pageStyles.label}>Đánh giá:</label>
+                            <StarRating 
+                              rating={editingRating} 
+                              onRatingChange={setEditingRating} 
+                              size={20}
+                            />
+                          </div>
+                          <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                            <button
+                              style={pageStyles.btn}
+                              onClick={() => handleSaveEdit(fb.feedbackId)}
+                              disabled={loading}
+                              onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
+                              onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
+                            >
+                              {loading ? 'Đang lưu...' : 'Lưu'}
+                            </button>
+                            <button
+                              style={{ ...pageStyles.btn, ...pageStyles.btnCancel }}
+                              onClick={handleCancelEdit}
+                              onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
+                              onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
+                            >
+                              Hủy
+                            </button>
+                          </div>
                         </div>
+                      ) : (
+                        <span style={{ marginLeft: '0.5rem' }}>{fb.feedbackText}</span>
+                      )}
+                    </div>
+                    {editingId !== fb.feedbackId && user_id && fb.userName === user?.user_name && (
+                      <div style={pageStyles.actionButtons}>
+                        <button
+                          style={{ ...pageStyles.actionBtn, ...pageStyles.editBtn }}
+                          onClick={() => handleEdit(fb)}
+                          onMouseOver={(e) => e.target.style.backgroundColor = '#1976d2'}
+                          onMouseOut={(e) => e.target.style.backgroundColor = '#2196f3'}
+                          disabled={loading}
+                        >
+                          Sửa
+                        </button>
+                        <button
+                          style={{ ...pageStyles.actionBtn, ...pageStyles.deleteBtn }}
+                          onClick={() => handleDelete(fb.feedbackId)}
+                          onMouseOver={(e) => e.target.style.backgroundColor = '#d32f2f'}
+                          onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
+                          disabled={loading}
+                        >
+                          Xóa
+                        </button>
                       </div>
-                  ) : (
-                      <span key={`feedback-text-${fb.feedbackId || `main-fb-${index}`}`} style={{ marginLeft: '0.5rem' }}>{fb.feedbackText}</span>
-                  )}
-                </div>
-                  {editingId !== (fb.feedbackId || `main-fb-${index}`) && user_id && 
-                    (fb.userName === user?.user_name || fb.memberId === user_id) && (
-                    <div key={`action-buttons-${fb.feedbackId || `main-fb-${index}`}`} style={pageStyles.actionButtons}>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Nút hiển thị thêm feedback */}
+                {!showAllFeedbacks && allFeedbacks.length > 5 && (
+                  <div style={{ textAlign: 'center' }}>
                     <button
-                        style={{ ...pageStyles.actionBtn, ...pageStyles.editBtn }}
-                        onClick={() => {
-                          if (fb.feedbackId) {
-                            handleEdit(fb);
-                          } else {
-                            console.error('Cannot edit: feedback ID is missing');
-                          }
-                        }}
-                        onMouseOver={(e) => e.target.style.backgroundColor = '#1976d2'}
-                        onMouseOut={(e) => e.target.style.backgroundColor = '#2196f3'}
-                        disabled={loading || !fb.feedbackId}
+                      style={{ ...pageStyles.btn, ...pageStyles.btnShowMore }}
+                      onClick={handleShowAllFeedbacks}
+                      onMouseOver={(e) => e.target.style.backgroundColor = '#7c3aed'}
+                      onMouseOut={(e) => e.target.style.backgroundColor = '#8b5cf6'}
                     >
-                      Sửa
-                    </button>
-                    <button
-                        style={{ ...pageStyles.actionBtn, ...pageStyles.deleteBtn }}
-                        onClick={() => {
-                          if (fb.feedbackId) {
-                            handleDelete(fb.feedbackId);
-                          } else {
-                            console.error('Cannot delete: feedback ID is missing');
-                          }
-                        }}
-                        onMouseOver={(e) => e.target.style.backgroundColor = '#d32f2f'}
-                        onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
-                        disabled={loading || !fb.feedbackId}
-                    >
-                      Xóa
+                      Hiển thị tất cả feedback ({allFeedbacks.length - 5} feedback khác)
                     </button>
                   </div>
                 )}
-              </div>
-            ))
-          )}
+              </>
+            )}
           </div>
         </div>
       </div>

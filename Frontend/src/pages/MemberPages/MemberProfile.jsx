@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { getUser, setUser, getUserId } from '../../utils/auth';
 import styles from '../../assets/css/MemberHomePage.module.css';
 import MemberNavbar from '../../Components/MemberNavbar';
 
 const MemberProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(() => {
-    const user = JSON.parse(localStorage.getItem('user')) || {};
+    const user = getUser() || {};
     return { ...user };
   });
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  const user = JSON.parse(localStorage.getItem('user')) || {};
+  const user = getUser() || {};
+  const userId = getUserId();
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -38,7 +40,7 @@ const MemberProfile = () => {
     setSuccess('');
     try {
       const response = await fetch(
-        `http://localhost:8080/api/profile/update/${user.user_id}`,
+        `http://localhost:8080/api/profile/update/${userId}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -57,8 +59,8 @@ const MemberProfile = () => {
       }
       setIsEditing(false);
       setSuccess('Cập nhật thành công!');
-      // Cập nhật lại localStorage
-      localStorage.setItem('user', JSON.stringify({ ...user, ...formData }));
+      // Cập nhật lại user data
+      setUser({ ...user, ...formData });
     } catch (err) {
       setError(err.message);
     }

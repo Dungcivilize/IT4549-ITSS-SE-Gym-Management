@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Data
@@ -25,15 +27,16 @@ public class Feedback {
     @JoinColumn(name = "member_id", nullable = false)
     private User member;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
-
-    @Column(name = "feedback_text", nullable = false)
+    @Column(name = "feedback_text", nullable = false, columnDefinition = "TEXT")
     private String feedbackText;
 
     @Column(name = "feedback_date", nullable = false)
     private LocalDate feedbackDate;
+
+    @Column(name = "rating", nullable = false)
+    @Min(value = 1, message = "Rating phải từ 1 đến 5")
+    @Max(value = 5, message = "Rating phải từ 1 đến 5")
+    private Integer rating = 5;
 
     public Long getFeedbackId() {
         return feedbackId;
@@ -51,14 +54,6 @@ public class Feedback {
         this.member = member;
     }
 
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
     public String getFeedbackText() {
         return feedbackText;
     }
@@ -73,5 +68,13 @@ public class Feedback {
 
     public void setFeedbackDate(LocalDate feedbackDate) {
         this.feedbackDate = feedbackDate;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
     }
 }

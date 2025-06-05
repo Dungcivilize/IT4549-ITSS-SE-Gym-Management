@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getUser, getUserId } from '../../utils/auth';
 import './TrainerMembersList.css';
 
 function TrainerMembersList() {
@@ -7,8 +8,8 @@ function TrainerMembersList() {
   const [selectedMemberId, setSelectedMemberId] = useState(null);
   const [attendances, setAttendances] = useState([]);
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  const trainerId = user?.user_id;
+  const user = getUser();
+  const trainerId = getUserId();
 
   useEffect(() => {
     if (!trainerId) return;
