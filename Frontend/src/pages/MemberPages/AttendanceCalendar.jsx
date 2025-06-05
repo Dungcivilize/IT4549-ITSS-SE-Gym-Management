@@ -165,26 +165,26 @@ function AttendanceCalendar() {
         </div>
       ) : (
         <div style={styles.calendarGrid}>
-          {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map(dow => (
+        {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map(dow => (
             <div key={dow} style={styles.dayName}>{dow}</div>
-          ))}
+        ))}
 
-          {/* Padding đầu tháng */}
-          {(() => {
-            const firstDay = new Date(`${month}-01`).getDay();
-            const blanks = [];
-            const start = firstDay === 0 ? 6 : firstDay - 1;
-            for (let i = 0; i < start; i++) {
+        {/* Padding đầu tháng */}
+        {(() => {
+          const firstDay = new Date(`${month}-01`).getDay();
+          const blanks = [];
+          const start = firstDay === 0 ? 6 : firstDay - 1;
+          for (let i = 0; i < start; i++) {
               blanks.push(<div key={'blank-' + i} style={styles.emptyCell}></div>);
-            }
-            return blanks;
-          })()}
+          }
+          return blanks;
+        })()}
 
           {daysArray.map(day => {
             const isChecked = isCheckedIn(day);
             return (
-              <div
-                key={day}
+          <div
+            key={day}
                 style={{
                   ...styles.dayCell,
                   ...(isChecked ? styles.dayCellCheckedIn : {})
@@ -200,12 +200,12 @@ function AttendanceCalendar() {
                     e.target.style.borderColor = '#35373b';
                   }
                 }}
-              >
-                {day}
-              </div>
+          >
+            {day}
+          </div>
             );
           })}
-        </div>
+      </div>
       )}
     </div>
   );
