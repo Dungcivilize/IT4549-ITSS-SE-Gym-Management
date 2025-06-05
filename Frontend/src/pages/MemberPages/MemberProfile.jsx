@@ -65,10 +65,13 @@ const MemberProfile = () => {
   };
 
   return (
-    <div
-      className={styles.pageWrapper}
-      style={{ minHeight: '100vh', padding: '2rem' }}
-    >
+    <div style={{
+      minHeight: '100vh',
+      padding: '2rem',
+      backgroundColor: '#111317',
+      background: 'radial-gradient(circle, rgba(249, 172, 84, 0.3) 0%, rgba(15, 15, 15, 0.95) 70%, #111317 100%)',
+      fontFamily: 'Poppins, sans-serif'
+    }}>
       <MemberNavbar />
       <div className={styles.profileBox}>
         <h2 style={{ color: '#f9ac54', textAlign: 'center' }}>

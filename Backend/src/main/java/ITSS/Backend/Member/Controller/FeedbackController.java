@@ -85,6 +85,7 @@ public class FeedbackController {
         List<Feedback> feedbacks = feedbackRepository.findByMemberUserId(memberId);
         List<FeedbackMemberResponse> response = feedbacks.stream()
                 .map(fb -> new FeedbackMemberResponse(
+                        fb.getFeedbackId(),
                         fb.getRoom().getRoomId(),
                         fb.getRoom().getRoomName(),
                         fb.getFeedbackText(),
