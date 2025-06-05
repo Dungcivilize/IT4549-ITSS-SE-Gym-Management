@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import MemberNavbar from "../../Components/MemberNavbar.jsx";
+import { getUserId } from "../../utils/auth";
 
 const RegisterPackage = () => {
   const [packages, setPackages] = useState([]);
@@ -13,7 +14,7 @@ const RegisterPackage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/packages")
+      .get("http://localhost:8080/api/membership-packages")
       .then((res) => setPackages(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -25,7 +26,7 @@ const RegisterPackage = () => {
 
     if (pkg.pt) {
       axios
-        .get(`http://localhost:8080/api/packages/${pkg.packageId}/trainers`)
+        .get(`http://localhost:8080/api/membership-packages/${pkg.packageId}/trainers`)
         .then((res) => setTrainers(res.data))
         .catch((err) => {
           console.error("Lỗi khi lấy danh sách huấn luyện viên:", err);
@@ -39,16 +40,24 @@ const RegisterPackage = () => {
   const handleRegister = () => {
     if (!selectedPackage) return;
 
+    const currentUserId = getUserId();
+    if (!currentUserId) {
+      alert("❌ Vui lòng đăng nhập để đăng ký gói tập!");
+      return;
+    }
+
     if (selectedPackage.pt && !selectedTrainerId) {
       alert("Vui lòng chọn huấn luyện viên trước khi đăng ký!");
       return;
     }
 
     const payload = {
-      memberId: 1, // Thay bằng ID thật nếu có context user login
-      trainerId: selectedPackage.pt ? selectedTrainerId || null : null,
-      packageId: selectedPackage.packageId,
+      memberId: Number(currentUserId), // Chuyển sang số
+      trainerId: selectedPackage.pt ? Number(selectedTrainerId) || null : null, // Chuyển sang số
+      packageId: Number(selectedPackage.packageId), // Chuyển sang số
     };
+
+    console.log("Payload gửi đến backend:", payload); // Debug log
 
     setRegistering(true);
 
@@ -59,8 +68,9 @@ const RegisterPackage = () => {
         setShowModal(false);
       })
       .catch((err) => {
-        console.error(err);
-        alert("❌ Đăng ký thất bại. Vui lòng thử lại sau.");
+        console.error("Chi tiết lỗi:", err.response?.data || err.message);
+        const errorMessage = err.response?.data || "Đăng ký thất bại. Vui lòng thử lại sau.";
+        alert(`❌ ${errorMessage}`);
       })
       .finally(() => setRegistering(false));
   };
@@ -287,7 +297,7 @@ const RegisterPackage = () => {
         </p>
 
         <div style={pageStyles.cardGrid}>
-          {packages.map((pkg) => (
+            {packages.map((pkg) => (
             <div
               key={pkg.packageId}
               style={pageStyles.card}
@@ -343,7 +353,7 @@ const RegisterPackage = () => {
                 </li>
               </ul>
             </div>
-          ))}
+            ))}
         </div>
 
         {showModal && selectedPackage && (
@@ -380,55 +390,55 @@ const RegisterPackage = () => {
                 </div>
               </div>
 
-              {selectedPackage.pt ? (
-                trainers.length > 0 ? (
+                {selectedPackage.pt ? (
+                  trainers.length > 0 ? (
                   <div style={pageStyles.dropdown}>
                     <label style={pageStyles.dropdownLabel} htmlFor="trainer">
                       Chọn huấn luyện viên:
                     </label>
-                    <select
-                      id="trainer"
+                      <select
+                        id="trainer"
                       style={pageStyles.select}
-                      value={selectedTrainerId}
-                      onChange={(e) => setSelectedTrainerId(e.target.value)}
+                        value={selectedTrainerId}
+                        onChange={(e) => setSelectedTrainerId(e.target.value)}
                       onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
                       onBlur={(e) => e.target.style.borderColor = '#35373b'}
-                    >
-                      <option value="">-- Chọn PT --</option>
-                      {trainers.map((t) => (
-                        <option key={t.userId} value={t.userId}>
-                          {t.fullname}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ) : (
+                      >
+                        <option value="">-- Chọn PT --</option>
+                        {trainers.map((t) => (
+                          <option key={t.userId} value={t.userId}>
+                            {t.fullname}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
                   <p style={pageStyles.description}>
                     Không tìm thấy huấn luyện viên phù hợp cho gói này.
-                  </p>
-                )
-              ) : (
+                    </p>
+                  )
+                ) : (
                 <p style={pageStyles.description}>
                   Gói tập hiện tại không bao gồm dịch vụ huấn luyện viên cá nhân.
-                </p>
-              )}
+                  </p>
+                )}
 
               <div style={pageStyles.description}>
                 Gói tập <strong>{selectedPackage.packageName}</strong> phù hợp cho những người
-                muốn duy trì thể lực bền vững và nâng cao sức khỏe toàn diện
+                  muốn duy trì thể lực bền vững và nâng cao sức khỏe toàn diện
                 trong {selectedPackage.duration} ngày. Với các thiết bị hiện đại và
                 không gian tập luyện chuyên nghiệp.
               </div>
 
-              <button
+                <button
                 style={pageStyles.registerBtn}
-                onClick={handleRegister}
-                disabled={registering}
+                  onClick={handleRegister}
+                  disabled={registering}
                 onMouseOver={(e) => !registering && (e.target.style.backgroundColor = '#d79447')}
                 onMouseOut={(e) => !registering && (e.target.style.backgroundColor = '#f9ac54')}
-              >
+                >
                 {registering ? "Đang xử lý..." : "Đăng ký ngay"}
-              </button>
+                </button>
             </div>
           </div>
         )}

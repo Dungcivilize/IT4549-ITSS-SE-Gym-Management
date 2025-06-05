@@ -121,8 +121,8 @@ const Feedback = () => {
     try {
       setError('');
       setSuccess('');
-      setEditingId(fb.feedbackId);
-      setEditingText(fb.feedbackText);
+    setEditingId(fb.feedbackId);
+    setEditingText(fb.feedbackText);
     } catch (err) {
       console.error('Error setting edit mode:', err);
       setError('Có lỗi xảy ra khi chỉnh sửa');
@@ -441,28 +441,28 @@ const Feedback = () => {
           
           {success && <div style={pageStyles.successMessage}>{success}</div>}
           {error && <div style={pageStyles.errorMessage}>{error}</div>}
-          
-          {/* Chọn phòng */}
+        
+        {/* Chọn phòng */}
           <div style={pageStyles.formGroup}>
             <label style={pageStyles.label}>Chọn phòng:</label>
-            <select 
+          <select 
               value={selectedRoom || ''} 
-              onChange={(e) => setSelectedRoom(Number(e.target.value))}
+            onChange={(e) => setSelectedRoom(Number(e.target.value))}
               style={pageStyles.select}
               onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
               onBlur={(e) => e.target.style.borderColor = '#35373b'}
-            >
-              {rooms.map(room => (
-                <option key={room.roomId} value={room.roomId}>
-                  {room.roomName}
-                </option>
-              ))}
-            </select>
-          </div>
+          >
+            {rooms.map(room => (
+              <option key={room.roomId} value={room.roomId}>
+                {room.roomName}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          {/* Nút thêm feedback và danh sách feedback đã gửi */}
+        {/* Nút thêm feedback và danh sách feedback đã gửi */}
           <div style={pageStyles.buttonContainer}>
-            <button 
+          <button 
               style={pageStyles.btn}
               onClick={() => {
                 setError('');
@@ -471,36 +471,36 @@ const Feedback = () => {
               }}
               onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
               onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
-            >
-              Thêm feedback mới
-            </button>
-            <button
+          >
+            Thêm feedback mới
+          </button>
+          <button
               style={{ ...pageStyles.btn, ...pageStyles.btnSecondary }}
-              onClick={() => {
+            onClick={() => {
                 setError('');
                 setSuccess('');
-                fetchMyFeedbacks();
-                setShowMyFeedbacks(true);
-              }}
+              fetchMyFeedbacks();
+              setShowMyFeedbacks(true);
+            }}
               onMouseOver={(e) => e.target.style.backgroundColor = '#1976d2'}
               onMouseOut={(e) => e.target.style.backgroundColor = '#2196f3'}
-            >
-              Danh sách feedback đã gửi
-            </button>
-          </div>
+          >
+            Danh sách feedback đã gửi
+          </button>
+        </div>
 
-          {/* Modal danh sách feedback đã gửi */}
-          {showMyFeedbacks && (
+        {/* Modal danh sách feedback đã gửi */}
+        {showMyFeedbacks && (
             <div style={pageStyles.modal} onClick={() => {
               setShowMyFeedbacks(false);
               setError('');
               setSuccess('');
               setEditingId(null);
               setEditingText('');
-            }}>
+          }}>
               <div style={pageStyles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <h3 style={pageStyles.modalTitle}>Feedback bạn đã gửi</h3>
-                <button
+              <button
                   style={{ ...pageStyles.btn, ...pageStyles.btnCancel, marginBottom: '1rem' }}
                   onClick={() => {
                     setShowMyFeedbacks(false);
@@ -511,14 +511,14 @@ const Feedback = () => {
                   }}
                   onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
                   onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-                >
-                  Đóng
-                </button>
-                {myFeedbacks.length === 0 ? (
+              >
+                Đóng
+              </button>
+              {myFeedbacks.length === 0 ? (
                   <div style={{ color: '#d1d5db', textAlign: 'center', padding: '2rem' }}>
                     Bạn chưa gửi feedback nào.
                   </div>
-                ) : (
+              ) : (
                   <div style={{ color: '#ef4444', textAlign: 'center', padding: '1rem', marginBottom: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px' }}>
                     ⚠️ Backend API không trả về feedbackId. Chức năng edit/delete không khả dụng.
                   </div>
@@ -527,18 +527,18 @@ const Feedback = () => {
                     <div key={fb.feedbackId || `modal-feedback-${index}`} style={pageStyles.feedbackCard}>
                       <div style={pageStyles.feedbackMeta}>
                         <strong>Phòng:</strong> {fb.roomName || fb.room?.roomName || 'Không rõ'}
-                      </div>
+                    </div>
                       <div style={pageStyles.feedbackMeta}>
                         <strong>Ngày gửi:</strong> {fb.feedbackDate}
-                      </div>
+                    </div>
                       <div style={pageStyles.feedbackText}>
                         <strong>Nội dung:</strong>
                         {editingId === (fb.feedbackId || `modal-fb-${index}`) ? (
                           <div key={`edit-${fb.feedbackId || `modal-fb-${index}`}`}>
-                            <textarea
+                          <textarea
                               key={`modal-textarea-${fb.feedbackId || `modal-fb-${index}`}`}
-                              value={editingText}
-                              onChange={(e) => setEditingText(e.target.value)}
+                            value={editingText}
+                            onChange={(e) => setEditingText(e.target.value)}
                               style={{ 
                                 ...pageStyles.textarea, 
                                 marginTop: '0.5rem',
@@ -546,36 +546,36 @@ const Feedback = () => {
                               }}
                               onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
                               onBlur={(e) => e.target.style.borderColor = '#35373b'}
-                            />
+                          />
                             <div key={`modal-edit-buttons-${fb.feedbackId || `modal-fb-${index}`}`} style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                              <button
+                            <button
                                 key={`modal-save-btn-${fb.feedbackId || `modal-fb-${index}`}`}
                                 style={pageStyles.btn}
                                 onClick={() => handleSaveEdit(fb.feedbackId || `modal-fb-${index}`)}
-                                disabled={loading}
+                              disabled={loading}
                                 onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
                                 onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
-                              >
+                            >
                                 {loading ? 'Đang lưu...' : 'Lưu'}
-                              </button>
-                              <button
+                            </button>
+                            <button
                                 key={`modal-cancel-btn-${fb.feedbackId || `modal-fb-${index}`}`}
                                 style={{ ...pageStyles.btn, ...pageStyles.btnCancel }}
-                                onClick={handleCancelEdit}
+                              onClick={handleCancelEdit}
                                 onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
                                 onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-                              >
-                                Hủy
-                              </button>
+                            >
+                              Hủy
+                            </button>
                             </div>
                           </div>
-                        ) : (
+                      ) : (
                           <span key={`text-${fb.feedbackId || `modal-fb-${index}`}`} style={{ marginLeft: '0.5rem' }}>{fb.feedbackText}</span>
-                        )}
-                      </div>
+                      )}
+                    </div>
                       {editingId !== (fb.feedbackId || `modal-fb-${index}`) && (
                         <div key={`modal-action-buttons-${fb.feedbackId || `modal-fb-${index}`}`} style={pageStyles.actionButtons}>
-                          <button
+                        <button
                             style={{ ...pageStyles.actionBtn, ...pageStyles.editBtn }}
                             onClick={(e) => {
                               e.preventDefault();
@@ -590,10 +590,10 @@ const Feedback = () => {
                             onMouseOver={(e) => e.target.style.backgroundColor = '#1976d2'}
                             onMouseOut={(e) => e.target.style.backgroundColor = '#2196f3'}
                             disabled={loading}
-                          >
-                            Sửa
-                          </button>
-                          <button
+                        >
+                          Sửa
+                        </button>
+                        <button
                             style={{ ...pageStyles.actionBtn, ...pageStyles.deleteBtn }}
                             onClick={(e) => {
                               e.preventDefault();
@@ -608,43 +608,43 @@ const Feedback = () => {
                             onMouseOver={(e) => e.target.style.backgroundColor = '#d32f2f'}
                             onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
                             disabled={loading}
-                          >
-                            Xóa
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
+                        >
+                          Xóa
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Modal thêm feedback */}
-          {showAddModal && (
+        {/* Modal thêm feedback */}
+        {showAddModal && (
             <div style={pageStyles.modal} onClick={() => {
               setShowAddModal(false);
               setError('');
               setSuccess('');
               setFeedbackText('');
-            }}>
+          }}>
               <div style={{ ...pageStyles.modalContent, maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
                 <h3 style={pageStyles.modalTitle}>Thêm feedback mới</h3>
-                <form onSubmit={handleSubmit}>
-                  <textarea
-                    style={{
+              <form onSubmit={handleSubmit}>
+                <textarea
+                  style={{ 
                       ...pageStyles.textarea,
                       marginBottom: '1.5rem'
-                    }}
-                    placeholder="Nhập nội dung góp ý của bạn..."
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
+                  }}
+                  placeholder="Nhập nội dung góp ý của bạn..."
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
                     onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
                     onBlur={(e) => e.target.style.borderColor = '#35373b'}
-                  />
+                />
                   <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                    <button 
-                      type="button"
+                  <button 
+                    type="button"
                       style={{ ...pageStyles.btn, ...pageStyles.btnCancel }}
                       onClick={() => {
                         setShowAddModal(false);
@@ -654,25 +654,25 @@ const Feedback = () => {
                       }}
                       onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
                       onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-                    >
-                      Hủy
-                    </button>
-                    <button 
+                  >
+                    Hủy
+                  </button>
+                  <button 
                       style={pageStyles.btn}
-                      type="submit"
-                      disabled={loading}
+                    type="submit"
+                    disabled={loading}
                       onMouseOver={(e) => !loading && (e.target.style.backgroundColor = '#d79447')}
                       onMouseOut={(e) => !loading && (e.target.style.backgroundColor = '#f9ac54')}
-                    >
+                  >
                       {loading ? 'Đang gửi...' : 'Gửi feedback'}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                  </button>
+                </div>
+              </form>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Danh sách feedback */}
+        {/* Danh sách feedback */}
           <div style={{ marginTop: '2rem' }}>
             <h3 style={{ 
               ...pageStyles.title, 
@@ -681,7 +681,7 @@ const Feedback = () => {
             }}>
               Danh sách feedback
             </h3>
-            {feedbacks.length === 0 ? (
+          {feedbacks.length === 0 ? (
               <div style={{ 
                 textAlign: 'center', 
                 color: '#d1d5db', 
@@ -691,23 +691,23 @@ const Feedback = () => {
               }}>
                 Chưa có feedback nào.
               </div>
-            ) : (
+          ) : (
               feedbacks.map((fb, index) => (
                 <div key={fb.feedbackId || `main-feedback-${index}`} style={pageStyles.feedbackCard}>
                   <div style={pageStyles.feedbackMeta}>
                     <strong>Người gửi:</strong> {fb.userName}
-                  </div>
+                </div>
                   <div style={pageStyles.feedbackMeta}>
                     <strong>Ngày gửi:</strong> {fb.feedbackDate}
-                  </div>
+                </div>
                   <div style={pageStyles.feedbackText}>
                     <strong>Nội dung:</strong>
                     {editingId === (fb.feedbackId || `main-fb-${index}`) ? (
                       <div key={`feedback-edit-${fb.feedbackId || `main-fb-${index}`}`}>
-                        <textarea
+                      <textarea
                           key={`main-textarea-${fb.feedbackId || `main-fb-${index}`}`}
-                          value={editingText}
-                          onChange={(e) => setEditingText(e.target.value)}
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
                           style={{ 
                             ...pageStyles.textarea, 
                             marginTop: '0.5rem',
@@ -715,37 +715,37 @@ const Feedback = () => {
                           }}
                           onFocus={(e) => e.target.style.borderColor = '#f9ac54'}
                           onBlur={(e) => e.target.style.borderColor = '#35373b'}
-                        />
+                      />
                         <div key={`main-edit-buttons-${fb.feedbackId || `main-fb-${index}`}`} style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                          <button
+                        <button
                             key={`main-save-btn-${fb.feedbackId || `main-fb-${index}`}`}
                             style={pageStyles.btn}
                             onClick={() => handleSaveEdit(fb.feedbackId || `main-fb-${index}`)}
-                            disabled={loading}
+                          disabled={loading}
                             onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
                             onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
-                          >
+                        >
                             {loading ? 'Đang lưu...' : 'Lưu'}
-                          </button>
-                          <button
+                        </button>
+                        <button
                             key={`main-cancel-btn-${fb.feedbackId || `main-fb-${index}`}`}
                             style={{ ...pageStyles.btn, ...pageStyles.btnCancel }}
-                            onClick={handleCancelEdit}
+                          onClick={handleCancelEdit}
                             onMouseOver={(e) => e.target.style.backgroundColor = '#545456'}
                             onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-                          >
-                            Hủy
-                          </button>
+                        >
+                          Hủy
+                        </button>
                         </div>
                       </div>
-                    ) : (
+                  ) : (
                       <span key={`feedback-text-${fb.feedbackId || `main-fb-${index}`}`} style={{ marginLeft: '0.5rem' }}>{fb.feedbackText}</span>
-                    )}
-                  </div>
+                  )}
+                </div>
                   {editingId !== (fb.feedbackId || `main-fb-${index}`) && user_id && 
                     (fb.userName === user?.user_name || fb.memberId === user_id) && (
                     <div key={`action-buttons-${fb.feedbackId || `main-fb-${index}`}`} style={pageStyles.actionButtons}>
-                      <button
+                    <button
                         style={{ ...pageStyles.actionBtn, ...pageStyles.editBtn }}
                         onClick={() => {
                           if (fb.feedbackId) {
@@ -757,10 +757,10 @@ const Feedback = () => {
                         onMouseOver={(e) => e.target.style.backgroundColor = '#1976d2'}
                         onMouseOut={(e) => e.target.style.backgroundColor = '#2196f3'}
                         disabled={loading || !fb.feedbackId}
-                      >
-                        Sửa
-                      </button>
-                      <button
+                    >
+                      Sửa
+                    </button>
+                    <button
                         style={{ ...pageStyles.actionBtn, ...pageStyles.deleteBtn }}
                         onClick={() => {
                           if (fb.feedbackId) {
@@ -772,14 +772,14 @@ const Feedback = () => {
                         onMouseOver={(e) => e.target.style.backgroundColor = '#d32f2f'}
                         onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
                         disabled={loading || !fb.feedbackId}
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
           </div>
         </div>
       </div>
