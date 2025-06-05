@@ -1,7 +1,7 @@
 package ITSS.Backend.Member.Controller;
 
 import ITSS.Backend.Member.DTO.*;
-import ITSS.Backend.Member.Service.MemberMembershipService;
+import ITSS.Backend.Member.Service.MembershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +15,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MembershipController {
 
-    private final MemberMembershipService memberMembershipService;
+    private final MembershipService membershipService;
 
     @GetMapping("/current/{userId}")
     public ResponseEntity<?> getCurrentMembership(@PathVariable Long userId) {
-        Optional<CurrentMembershipResponse> dtoOpt = memberMembershipService.getCurrentMembership(userId);
+        Optional<CurrentMembershipResponse> dtoOpt = membershipService.getCurrentMembership(userId);
         return dtoOpt
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -27,23 +27,23 @@ public class MembershipController {
 
     @GetMapping("/current")
     public ResponseEntity<List<CurrentMembershipAdminResponse>> getAllCurrentMemberships() {
-        return ResponseEntity.ok(memberMembershipService.getAllCurrentMemberships());
+        return ResponseEntity.ok(membershipService.getAllCurrentMemberships());
     }
 
     @GetMapping("/trainer-summary")
     public ResponseEntity<List<TrainerPackageSummaryResponse>> getTrainerSummaries() {
-        return ResponseEntity.ok(memberMembershipService.getTrainerPackageSummaries());
+        return ResponseEntity.ok(membershipService.getTrainerPackageSummaries());
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterMembershipRequest req) {
-        memberMembershipService.registerMembership(req);
+        membershipService.registerMembership(req);
         return ResponseEntity.ok("Đăng ký gói tập thành công!");
     }
 
     @PostMapping("/pay")
     public ResponseEntity<?> payMembership(@RequestBody PayMembershipRequest req) {
-        boolean updated = memberMembershipService.payMembership(req);
+        boolean updated = membershipService.payMembership(req);
         if (updated) {
             return ResponseEntity.ok("Bạn đã thanh toán thành công, vui lòng đợi xác nhận");
         } else {
@@ -53,7 +53,7 @@ public class MembershipController {
 
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelMembership(@RequestBody PayMembershipRequest req) {
-        boolean updated = memberMembershipService.cancelMembership(req);
+        boolean updated = membershipService.cancelMembership(req);
         if (updated) {
             return ResponseEntity.ok("Đã huỷ gói tập");
         } else {
@@ -63,7 +63,7 @@ public class MembershipController {
 
     @PostMapping("/extend")
     public ResponseEntity<?> extendMembership(@RequestBody PayMembershipRequest req) {
-        boolean extended = memberMembershipService.extendMembership(req);
+        boolean extended = membershipService.extendMembership(req);
         if (extended) {
             return ResponseEntity.ok("Gia hạn gói tập thành công");
         } else {

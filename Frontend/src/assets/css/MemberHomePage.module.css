@@ -39,25 +39,20 @@
 }
 
 .btn {
-  padding: 0.5rem 1.2rem;
+  padding: 1rem 2rem;
   outline: none;
   border: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--white); /* chữ trắng cho nổi bật */
-  background-color: var(--secondary-color); /* cam */
-  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--white);
+  background-color: #f9ac54;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 2px 5px rgba(249, 172, 84, 0.6);
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.7); /* tạo bóng chữ trắng */
+  transition: 0.3s;
 }
 
 .btn:hover {
   background-color: var(--secondary-color-dark);
-  box-shadow: 0 4px 8px rgba(215, 148, 71, 0.8);
 }
-
 
 img {
   width: 100%;
@@ -82,60 +77,43 @@ body {
 nav {
   max-width: var(--max-width);
   margin: auto;
-  padding: 1.5rem 2rem; /* padding gọn lại, cân đối */
+  padding: 2rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 3rem; /* tăng gap để thoáng */
-
-  border-radius: 8px;
+  gap: 2rem;
 }
 
 .nav__logo {
   max-width: 150px;
-  transition: transform 0.3s ease;
-  cursor: pointer;
-}
-.nav__logo:hover {
-  transform: scale(1.05);
 }
 
 .nav__links {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 3.5rem; /* khoảng cách rộng thoáng */
+  gap: 3rem;
 }
 
 .link a {
   position: relative;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
   color: var(--white);
-  font-weight: 600;
-  font-size: 1.1rem;
-  text-decoration: none;
-  transition: color 0.3s ease;
 }
 
 .link a::after {
   content: "";
   position: absolute;
-  height: 3px; /* underline dày hơn chút */
+  height: 2px;
   width: 0;
-  left: 50%;  /* bắt đầu từ giữa */
+  left: 0;
   bottom: 0;
   background-color: #f9ac54;
-  border-radius: 2px;
-  transition: width 0.3s ease, left 0.3s ease;
-}
-
-.link a:hover {
-  color: #f9ac54;
+  transition: 0.3s;
 }
 
 .link a:hover::after {
-  width: 60%; /* underline rộng hơn */
-  left: 20%; /* dịch sang trái để underline nằm giữa text */
+  width: 50%;
 }
 
 .header__container {

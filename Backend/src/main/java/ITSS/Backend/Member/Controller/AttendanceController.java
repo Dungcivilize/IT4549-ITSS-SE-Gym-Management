@@ -19,21 +19,28 @@ public class AttendanceController {
     private AttendanceService attendanceService;
     private final AttendanceRepository attendanceRepository;
 
+
     @GetMapping("/monthly/{memberId}")
-    public ResponseEntity<List<AttendanceMonthlyResponse>> getMonthlyAttendance(@PathVariable Long memberId) {
+    public ResponseEntity<List<AttendanceMonthlyResponse>> getMonthlyAttendance(
+            @PathVariable Long memberId) {
         List<Object[]> rawResult = attendanceRepository.getMonthlyAttendanceByMember(memberId);
+
         List<AttendanceMonthlyResponse> response = rawResult.stream()
-                .map(row -> new AttendanceMonthlyResponse(String.valueOf(row[0]), ((Number) row[1]).intValue()))
+                .map(row -> new AttendanceMonthlyResponse(
+                        String.valueOf(row[0]),
+                        ((Number) row[1]).intValue()
+                ))
                 .toList();
+
         return ResponseEntity.ok(response);
     }
 
-    // === Phần thêm mới đây ===
     @GetMapping("/dates/{memberId}")
-    public ResponseEntity<List<String>> getAttendanceDatesByMonth(
+    public ResponseEntity<?> getAttendanceDatesByMonth(
             @PathVariable Long memberId,
             @RequestParam String month) {
         List<String> dates = attendanceService.getAttendanceDatesByMonth(memberId, month);
         return ResponseEntity.ok(dates);
     }
+
 }

@@ -25,10 +25,6 @@ public class Feedback {
     @JoinColumn(name = "member_id", nullable = false)
     private User member;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
-
     @Column(name = "feedback_text", nullable = false)
     private String feedbackText;
 
@@ -49,14 +45,6 @@ public class Feedback {
 
     public void setMember(User member) {
         this.member = member;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
     }
 
     public String getFeedbackText() {

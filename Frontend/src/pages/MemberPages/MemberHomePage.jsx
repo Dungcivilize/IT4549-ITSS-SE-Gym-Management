@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "../../assets/css/MemberHomePage.module.css";
 import CurrentPackage from "./CurrentPackage";
-import AttendanceChart from "./AttendanceChart";
+import AttendanceChart from "./AttendanceChart"; // ⬅️ thêm dòng này
 import MemberNavbar from "../../Components/MemberNavbar";
 
 const MemberHomePage = () => {

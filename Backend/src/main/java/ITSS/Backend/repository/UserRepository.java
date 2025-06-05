@@ -5,12 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import ITSS.Backend.entity.User;
 
-import java.util.Optional;
-
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUserName(String userName);
+    User findByUserName(String userName);
     User findByEmail(String email);
-    long countByRole(String role);
+
     boolean existsByEmail(String email);
 }

@@ -25,27 +25,27 @@ const MemberNavbar = () => {
       <ul className={styles.nav__links}>
         <li className={styles.link}>
           <Link to="/member/home">
-            <button className={styles.btn}>Trang chủ</button>
+            <button>Trang chủ</button>
           </Link>
         </li>
         <li className={styles.link}>
           <Link to="/packages">
-            <button className={styles.btn}>Đăng ký gói tập</button>
+            <button>Đăng ký gói tập</button>
           </Link>
         </li>
         <li className={styles.link}>
           <Link to="/schedule">
-            <button className={styles.btn}>Lịch tập</button>
+            <button>Lịch tập</button>
           </Link>
         </li>
         <li className={styles.link}>
           <Link to="/feedback">
-            <button className={styles.btn}>Phản hồi</button>
+            <button>Phản hồi</button>
           </Link>
         </li>
         <li className={styles.link}>
           <Link to="/promotion">
-            <button className={styles.btn}>Khuyến mãi</button>
+            <button>Khuyến mãi</button>
           </Link>
         </li>
       </ul>

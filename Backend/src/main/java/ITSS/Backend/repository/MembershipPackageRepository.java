@@ -10,7 +10,8 @@ import ITSS.Backend.entity.MembershipPackage;
 
 @Repository
 public interface MembershipPackageRepository extends JpaRepository<MembershipPackage, Long> {
-    long count();
     Optional<MembershipPackage> findById(Long id);
+
+
 
 } 
