@@ -1,15 +1,18 @@
 package ITSS.Backend.Member.Service;
 
 import ITSS.Backend.Member.DTO.*;
+import ITSS.Backend.entity.AcceptedBill;
 import ITSS.Backend.entity.Membership;
 import ITSS.Backend.entity.MembershipPackage;
 import ITSS.Backend.entity.User;
+import ITSS.Backend.repository.AcceptedBillRepository;
 import ITSS.Backend.repository.MembershipPackageRepository;
 import ITSS.Backend.repository.MembershipRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +22,8 @@ public class MemberMembershipService {
 
     private final MembershipRepository membershipRepository;
     private final MembershipPackageRepository membershipPackageRepository;
+    private final AcceptedBillRepository acceptedBillRepository;
+
 
     public Optional<CurrentMembershipResponse> getCurrentMembership(Long userId) {
         Optional<Membership> opt = membershipRepository.findCurrentMembershipByUserId(userId);
@@ -31,6 +36,16 @@ public class MemberMembershipService {
             dto.setPaymentStatus(m.getPaymentStatus().toString());
             dto.setPackageId(m.getMembershipPackage().getPackageId());
             dto.setPtMeetingDaysLeft(m.getPtMeetingDaysLeft());
+            dto.setPrice(m.getMembershipPackage().getPrice());
+
+            MembershipPackage pkg = m.getMembershipPackage(); // thêm dòng này
+
+            Double discount = pkg.getDiscount();
+            long originalPrice = pkg.getPrice(); // nếu chưa khai báo
+            long finalPrice = Math.round(originalPrice * (1 - discount));
+
+            dto.setPrice(finalPrice);
+
             return dto;
         });
     }
@@ -130,20 +145,60 @@ public void registerMembership(RegisterMembershipRequest req) {
 }
 
 
+//    public boolean payMembership(PayMembershipRequest req) {
+//        Optional<Membership> membershipOpt = membershipRepository
+//                .findByMemberUserIdAndMembershipPackagePackageIdAndPaymentStatus(
+//                        req.getMemberId(), req.getPackageId(), Membership.PaymentStatus.Unpaid
+//                );
+//
+//        if (membershipOpt.isPresent()) {
+//            Membership membership = membershipOpt.get();
+//            membership.setPaymentStatus(Membership.PaymentStatus.Processing);
+//            membershipRepository.save(membership);
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
+
     public boolean payMembership(PayMembershipRequest req) {
         Optional<Membership> membershipOpt = membershipRepository
                 .findByMemberUserIdAndMembershipPackagePackageIdAndPaymentStatus(
                         req.getMemberId(), req.getPackageId(), Membership.PaymentStatus.Unpaid
                 );
 
-        if (membershipOpt.isPresent()) {
-            Membership membership = membershipOpt.get();
-            membership.setPaymentStatus(Membership.PaymentStatus.Processing);
-            membershipRepository.save(membership);
-            return true;
-        } else {
+        if (membershipOpt.isEmpty()) {
             return false;
         }
+
+        Membership membership = membershipOpt.get();
+
+        // Cập nhật trạng thái thanh toán
+        membership.setPaymentStatus(Membership.PaymentStatus.Processing);
+        membershipRepository.save(membership);
+
+        // Lấy gói tập và người dùng
+        MembershipPackage pkg = membership.getMembershipPackage();
+        Long memberId = membership.getMember() != null ? membership.getMember().getUserId() : null;
+
+        if (pkg == null || memberId == null) {
+            throw new IllegalStateException("Thiếu thông tin gói tập hoặc người dùng.");
+        }
+
+        // Tính số tiền cần thanh toán
+        long originalPrice = pkg.getPrice();
+        double discount = pkg.getDiscount();
+        long finalAmount = (long) (originalPrice * (1 - discount));
+
+        // Tạo hóa đơn mới
+        AcceptedBill bill = new AcceptedBill();
+        bill.setMemberId(memberId);
+        bill.setPackageId(pkg.getPackageId());
+        bill.setAmount(finalAmount);
+        bill.setPaymentDate(LocalDateTime.now());
+
+        acceptedBillRepository.save(bill);
+        return true;
     }
 
     public boolean cancelMembership(PayMembershipRequest req) {
@@ -187,5 +242,8 @@ public void registerMembership(RegisterMembershipRequest req) {
         }
     }
 
+    public List<TransactionHistoryResponse> getTransactionHistory(Long memberId) {
+        return acceptedBillRepository.getHistoryByMemberId(memberId);
+    }
 
 }

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { getUserName, removeUser } from '../utils/auth';
-import logo from '../assets/img/logo.png';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { getUserName, removeUser } from "../utils/auth";
+import logo from "../assets/img/logo.png";
 
 const MemberNavbar = () => {
   const userName = getUserName();
@@ -10,7 +10,7 @@ const MemberNavbar = () => {
 
   useEffect(() => {
     // Inject CSS for hover effects - same as Home.jsx
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       .nav-link-hover::after {
         content: '';
@@ -33,87 +33,87 @@ const MemberNavbar = () => {
 
   const handleLogout = () => {
     removeUser();
-    navigate('/login');
+    navigate("/login");
   };
 
   const pageStyles = {
     nav: {
-      maxWidth: '1200px',
-      margin: 'auto',
-      padding: '2rem 1rem',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: '2rem',
-      fontFamily: 'Poppins, sans-serif'
+      maxWidth: "1200px",
+      margin: "auto",
+      padding: "2rem 1rem",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "2rem",
+      fontFamily: "Poppins, sans-serif",
     },
     navLogo: {
-      maxWidth: '150px'
+      maxWidth: "150px",
     },
     logoImg: {
-      width: '100%',
-      display: 'flex'
+      width: "100%",
+      display: "flex",
     },
     navLinks: {
-      listStyle: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '3rem',
+      listStyle: "none",
+      display: "flex",
+      alignItems: "center",
+      gap: "3rem",
       margin: 0,
-      padding: 0
+      padding: 0,
     },
     link: {
-      position: 'relative',
-      paddingBottom: '0.75rem',
-      color: '#ffffff',
-      textDecoration: 'none',
-      fontWeight: '500'
+      position: "relative",
+      paddingBottom: "0.75rem",
+      color: "#ffffff",
+      textDecoration: "none",
+      fontWeight: "500",
     },
     btn: {
-      padding: '1rem 2rem',
-      outline: 'none',
-      border: 'none',
-      fontSize: '1rem',
-      color: '#ffffff',
-      backgroundColor: '#f9ac54',
-      borderRadius: '5px',
-      cursor: 'pointer',
-      transition: '0.3s',
-      margin: '2px',
-      textDecoration: 'none',
-      display: 'inline-block'
+      padding: "1rem 2rem",
+      outline: "none",
+      border: "none",
+      fontSize: "1rem",
+      color: "#ffffff",
+      backgroundColor: "#f9ac54",
+      borderRadius: "5px",
+      cursor: "pointer",
+      transition: "0.3s",
+      margin: "2px",
+      textDecoration: "none",
+      display: "inline-block",
     },
     userInfo: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '1rem',
-      position: 'relative'
+      display: "flex",
+      alignItems: "center",
+      gap: "1rem",
+      position: "relative",
     },
     userButton: {
-      color: 'white',
-      cursor: 'pointer',
-      padding: '0.5rem',
-      borderRadius: '4px',
-      transition: 'background-color 0.3s ease'
+      color: "white",
+      cursor: "pointer",
+      padding: "0.5rem",
+      borderRadius: "4px",
+      transition: "background-color 0.3s ease",
     },
     dropdown: {
-      position: 'absolute',
-      top: '100%',
+      position: "absolute",
+      top: "100%",
       right: 0,
-      backgroundColor: '#1f2125',
-      borderRadius: '8px',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-      padding: '0.5rem 0',
-      minWidth: '200px',
-      zIndex: 1000
+      backgroundColor: "#1f2125",
+      borderRadius: "8px",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+      padding: "0.5rem 0",
+      minWidth: "200px",
+      zIndex: 1000,
     },
     dropdownItem: {
-      display: 'block',
-      padding: '0.75rem 1rem',
-      color: '#d1d5db',
-      textDecoration: 'none',
-      transition: 'background-color 0.3s ease'
-    }
+      display: "block",
+      padding: "0.75rem 1rem",
+      color: "#d1d5db",
+      textDecoration: "none",
+      transition: "background-color 0.3s ease",
+    },
   };
 
   return (
@@ -126,8 +126,8 @@ const MemberNavbar = () => {
 
       <ul style={pageStyles.navLinks}>
         <li>
-          <Link 
-            to="/member/home" 
+          <Link
+            to="/member/home"
             style={pageStyles.link}
             className="nav-link-hover"
           >
@@ -135,8 +135,8 @@ const MemberNavbar = () => {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/packages" 
+          <Link
+            to="/packages"
             style={pageStyles.link}
             className="nav-link-hover"
           >
@@ -144,8 +144,8 @@ const MemberNavbar = () => {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/schedule" 
+          <Link
+            to="/schedule"
             style={pageStyles.link}
             className="nav-link-hover"
           >
@@ -153,12 +153,21 @@ const MemberNavbar = () => {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/feedback" 
+          <Link
+            to="/feedback"
             style={pageStyles.link}
             className="nav-link-hover"
           >
             Phản hồi
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/transactions"
+            style={pageStyles.link}
+            className="nav-link-hover"
+          >
+            Lịch sử giao dịch
           </Link>
         </li>
       </ul>
@@ -168,8 +177,8 @@ const MemberNavbar = () => {
           <div
             style={pageStyles.userButton}
             onClick={() => setShowDropdown(!showDropdown)}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#35373b'}
-            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#35373b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "transparent")}
           >
             👤 {userName}
           </div>
@@ -178,8 +187,12 @@ const MemberNavbar = () => {
               <Link
                 to="/member/profile"
                 style={pageStyles.dropdownItem}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#35373b'}
-                onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+                onMouseOver={(e) =>
+                  (e.target.style.backgroundColor = "#35373b")
+                }
+                onMouseOut={(e) =>
+                  (e.target.style.backgroundColor = "transparent")
+                }
                 onClick={() => setShowDropdown(false)}
               >
                 Thông tin hội viên
@@ -187,8 +200,12 @@ const MemberNavbar = () => {
               <Link
                 to="/member/change-password"
                 style={pageStyles.dropdownItem}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#35373b'}
-                onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+                onMouseOver={(e) =>
+                  (e.target.style.backgroundColor = "#35373b")
+                }
+                onMouseOut={(e) =>
+                  (e.target.style.backgroundColor = "transparent")
+                }
                 onClick={() => setShowDropdown(false)}
               >
                 Thay đổi mật khẩu
@@ -199,8 +216,8 @@ const MemberNavbar = () => {
         <button
           style={pageStyles.btn}
           onClick={handleLogout}
-          onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
-          onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#d79447")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#f9ac54")}
         >
           Đăng xuất
         </button>

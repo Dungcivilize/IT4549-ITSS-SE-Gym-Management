@@ -12,4 +12,6 @@ public class CurrentMembershipResponse {
     private String paymentStatus;
     private Long packageId; // ✅ thêm dòng này
     private Long ptMeetingDaysLeft;
+    private Long price; // hoặc Integer tùy backend
+
 }

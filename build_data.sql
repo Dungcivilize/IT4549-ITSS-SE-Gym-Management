@@ -95,12 +95,32 @@ CREATE TABLE `Attendance` (
 -- Bảng lưu bill đã thanh toán
 CREATE TABLE `Accepted_bill` ( 
     `bill_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `membership_id` BIGINT UNSIGNED NOT NULL,
+    `member_id` BIGINT UNSIGNED NOT NULL,
+    `package_id` BIGINT unsigned NOT NULL,
     `amount` DOUBLE NOT NULL,
     `payment_date` TIMESTAMP NOT NULL,
-    FOREIGN KEY (`membership_id`) REFERENCES `Membership`(`membership_id`)
+    FOREIGN KEY (`package_id`) REFERENCES `MembershipPackage`(`package_id`),
+    FOREIGN KEY (`member_id`) REFERENCES `Users`(`user_id`)
 );
 
+DELIMITER //
+
+CREATE TRIGGER trg_set_pt_meeting_days_left
+BEFORE INSERT ON Membership
+FOR EACH ROW
+BEGIN
+  DECLARE max_days INT;
+
+  SELECT max_pt_meeting_days
+  INTO max_days
+  FROM MembershipPackage
+  WHERE package_id = NEW.package_id;
+
+  SET NEW.pt_meeting_days_left = IFNULL(max_days, 0);
+END;
+//
+
+DELIMITER ;
 
 
 -- Thêm user

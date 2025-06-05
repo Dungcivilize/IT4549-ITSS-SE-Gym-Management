@@ -71,5 +71,10 @@ public class MembershipController {
         }
     }
 
+    @GetMapping("/history/{memberId}")
+    public ResponseEntity<List<TransactionHistoryResponse>> getTransactionHistory(@PathVariable Long memberId) {
+        List<TransactionHistoryResponse> history = memberMembershipService.getTransactionHistory(memberId);
+        return ResponseEntity.ok(history);
+    }
 
 }
