@@ -17,10 +17,21 @@ const RegisterPackage = () => {
   const [checkingMembership, setCheckingMembership] = useState(false);
 
   useEffect(() => {
-    // Load packages
+    // Load packages và sắp xếp theo discount
     axios
       .get("http://localhost:8080/api/packages")
-      .then((res) => setPackages(res.data))
+      .then((res) => {
+        // Sắp xếp packages: gói có discount cao hơn sẽ lên trước
+        const sortedPackages = res.data.sort((a, b) => {
+          // Gói có discount cao hơn sẽ lên trước
+          if (b.discount !== a.discount) {
+            return b.discount - a.discount;
+          }
+          // Nếu discount bằng nhau, sắp xếp theo packageId
+          return a.packageId - b.packageId;
+        });
+        setPackages(sortedPackages);
+      })
       .catch((err) => console.error("Lỗi khi lấy danh sách gói tập:", err));
 
     // Check current membership
@@ -274,6 +285,13 @@ const RegisterPackage = () => {
       color: '#ffffff',
       marginBottom: '0.5rem'
     },
+    originalPrice: {
+      fontSize: '1.5rem',
+      fontWeight: '400',
+      color: '#9ca3af',
+      textDecoration: 'line-through',
+      marginBottom: '0.3rem'
+    },
     currency: {
       fontSize: '1rem',
       color: '#f9ac54'
@@ -281,6 +299,18 @@ const RegisterPackage = () => {
     duration: {
       color: '#d1d5db',
       fontSize: '0.9rem'
+    },
+    discountBadge: {
+      position: 'absolute',
+      top: '1rem',
+      left: '1rem',
+      backgroundColor: '#ef4444',
+      color: '#ffffff',
+      padding: '0.4rem 0.8rem',
+      borderRadius: '20px',
+      fontSize: '0.8rem',
+      fontWeight: '600',
+      zIndex: 2
     },
     features: {
       listStyle: 'none',
@@ -440,6 +470,11 @@ const RegisterPackage = () => {
     }
   };
 
+  // Hàm tính giá sau khi giảm giá
+  const calculateDiscountedPrice = (originalPrice, discount) => {
+    return originalPrice * (1 - discount);
+  };
+
   return (
     <div style={pageStyles.container}>
       <MemberNavbar />
@@ -483,10 +518,19 @@ const RegisterPackage = () => {
                 e.currentTarget.style.borderColor = 'rgba(249, 172, 84, 0.1)';
               }}
             >
+              {/* Discount Badge */}
+              {pkg.discount > 0 && (
+                <div style={pageStyles.discountBadge}>
+                  🔥 -{Math.round(pkg.discount * 100)}%
+                </div>
+              )}
+
               <div style={pageStyles.cardHeader}>
                 <div>
                   <h3 style={pageStyles.packageName}>{pkg.packageName}</h3>
-                  <span style={pageStyles.packageType}>{pkg.packageType}</span>
+                  {pkg.packageType && (
+                    <span style={pageStyles.packageType}>{pkg.packageType}</span>
+                  )}
                 </div>
                 <div style={{
                   ...pageStyles.ptBadge,
@@ -497,8 +541,13 @@ const RegisterPackage = () => {
               </div>
 
               <div style={pageStyles.priceSection}>
+                {pkg.discount > 0 && (
+                  <div style={pageStyles.originalPrice}>
+                    {pkg.price.toLocaleString()}₫
+                  </div>
+                )}
                 <div style={pageStyles.price}>
-                  {pkg.price.toLocaleString()}
+                  {calculateDiscountedPrice(pkg.price, pkg.discount).toLocaleString()}
                   <span style={pageStyles.currency}>₫</span>
                 </div>
                 <div style={pageStyles.duration}>{pkg.duration} ngày</div>
@@ -511,16 +560,25 @@ const RegisterPackage = () => {
                 </li>
                 <li style={pageStyles.feature}>
                   <span style={pageStyles.featureIcon}>💰</span>
-                  Giá: {pkg.price.toLocaleString()}₫
+                  Giá: {pkg.discount > 0 ? calculateDiscountedPrice(pkg.price, pkg.discount).toLocaleString() : pkg.price.toLocaleString()}₫
+                  {pkg.discount > 0 && <span style={{color: '#ef4444', marginLeft: '0.5rem'}}>(-{Math.round(pkg.discount * 100)}%)</span>}
                 </li>
-                <li style={pageStyles.feature}>
-                  <span style={pageStyles.featureIcon}>📁</span>
-                  Loại: {pkg.packageType}
-                </li>
+                {pkg.packageType && (
+                  <li style={pageStyles.feature}>
+                    <span style={pageStyles.featureIcon}>📁</span>
+                    Loại: {pkg.packageType}
+                  </li>
+                )}
                 <li style={pageStyles.feature}>
                   <span style={pageStyles.featureIcon}>🏋️‍♂️</span>
                   {pkg.pt ? 'Có huấn luyện viên' : 'Tự tập luyện'}
                 </li>
+                {pkg.pt && pkg.maxPtMeetingDays && (
+                  <li style={pageStyles.feature}>
+                    <span style={pageStyles.featureIcon}>📅</span>
+                    {pkg.maxPtMeetingDays} buổi PT
+                  </li>
+                )}
               </ul>
             </div>
           ))}
@@ -548,17 +606,46 @@ const RegisterPackage = () => {
                 </div>
                 <div style={pageStyles.detailItem}>
                   <span style={pageStyles.detailIcon}>💸</span>
-                  Giá: {selectedPackage.price.toLocaleString()}₫
+                  Giá gốc: {selectedPackage.price.toLocaleString()}₫
                 </div>
-                <div style={pageStyles.detailItem}>
-                  <span style={pageStyles.detailIcon}>📁</span>
-                  Loại: {selectedPackage.packageType}
-                </div>
+                {selectedPackage.discount > 0 && (
+                  <>
+                    <div style={pageStyles.detailItem}>
+                      <span style={pageStyles.detailIcon}>🔥</span>
+                      Giảm giá: {Math.round(selectedPackage.discount * 100)}%
+                    </div>
+                    <div style={pageStyles.detailItem}>
+                      <span style={pageStyles.detailIcon}>💰</span>
+                      Giá sau giảm: {calculateDiscountedPrice(selectedPackage.price, selectedPackage.discount).toLocaleString()}₫
+                    </div>
+                  </>
+                )}
+                {selectedPackage.packageType && (
+                  <div style={pageStyles.detailItem}>
+                    <span style={pageStyles.detailIcon}>📁</span>
+                    Loại: {selectedPackage.packageType}
+                  </div>
+                )}
                 <div style={pageStyles.detailItem}>
                   <span style={pageStyles.detailIcon}>🏋️</span>
                   Có PT: {selectedPackage.pt ? "Có" : "Không"}
                 </div>
+                {selectedPackage.pt && selectedPackage.maxPtMeetingDays && (
+                  <div style={pageStyles.detailItem}>
+                    <span style={pageStyles.detailIcon}>📅</span>
+                    Số buổi PT: {selectedPackage.maxPtMeetingDays} buổi
+                  </div>
+                )}
               </div>
+
+              {/* Hiển thị mô tả gói tập */}
+              {selectedPackage.description && (
+                <div style={pageStyles.description}>
+                  <strong>📝 Mô tả gói tập:</strong>
+                  <br />
+                  {selectedPackage.description}
+                </div>
+              )}
 
               {selectedPackage.pt && (
                 <>
@@ -605,19 +692,6 @@ const RegisterPackage = () => {
                 </>
               )}
 
-              {!selectedPackage.pt && (
-                <div style={pageStyles.description}>
-                  Gói tập hiện tại không bao gồm dịch vụ huấn luyện viên cá nhân.
-                </div>
-              )}
-
-              <div style={pageStyles.description}>
-                Gói tập <strong>{selectedPackage.packageName}</strong> phù hợp cho những người
-                muốn duy trì thể lực bền vững và nâng cao sức khỏe toàn diện
-                trong {selectedPackage.duration} ngày. Với các thiết bị hiện đại và
-                không gian tập luyện chuyên nghiệp.
-              </div>
-
               <button
                 style={{
                   ...pageStyles.registerBtn,
@@ -641,7 +715,9 @@ const RegisterPackage = () => {
                   ? "Đang xử lý..." 
                   : currentMembership 
                     ? "Bạn đã có gói tập" 
-                    : "Đăng ký ngay"
+                    : selectedPackage.discount > 0
+                      ? `Đăng ký ngay - Tiết kiệm ${(selectedPackage.price - calculateDiscountedPrice(selectedPackage.price, selectedPackage.discount)).toLocaleString()}₫`
+                      : "Đăng ký ngay"
                 }
               </button>
             </div>
