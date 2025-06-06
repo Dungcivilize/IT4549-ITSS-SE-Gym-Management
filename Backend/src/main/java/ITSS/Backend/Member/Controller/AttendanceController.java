@@ -1,5 +1,6 @@
 package ITSS.Backend.Member.Controller;
 
+import ITSS.Backend.Member.DTO.AttendanceDateFeedbackResponse;
 import ITSS.Backend.Member.DTO.AttendanceMonthlyResponse;
 import ITSS.Backend.Member.Service.AttendanceService;
 import ITSS.Backend.repository.AttendanceRepository;
@@ -30,10 +31,10 @@ public class AttendanceController {
 
     // === Phần thêm mới đây ===
     @GetMapping("/dates/{memberId}")
-    public ResponseEntity<List<String>> getAttendanceDatesByMonth(
+    public ResponseEntity<List<AttendanceDateFeedbackResponse>> getAttendanceDatesByMonth(
             @PathVariable Long memberId,
             @RequestParam String month) {
-        List<String> dates = attendanceService.getAttendanceDatesByMonth(memberId, month);
-        return ResponseEntity.ok(dates);
+        List<AttendanceDateFeedbackResponse> datesWithFeedback = attendanceService.getAttendanceDatesWithFeedbackByMonth(memberId, month);
+        return ResponseEntity.ok(datesWithFeedback);
     }
 }

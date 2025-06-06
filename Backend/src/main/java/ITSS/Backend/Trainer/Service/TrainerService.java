@@ -53,7 +53,8 @@ public class TrainerService {
         List<Attendance> attendances = attendanceRepository.findByMember_UserId(memberId);
         return attendances.stream().map(a -> new TrainerAttendanceDTO(
                 a.getAttendanceId(),
-                a.getCheckinDate()
+                a.getCheckinDate(),
+                a.getFeedback()
         )).collect(Collectors.toList());
     }
 
@@ -65,7 +66,7 @@ public class TrainerService {
         attendance.setCheckinDate(LocalDateTime.now());
 
         Attendance saved = attendanceRepository.save(attendance);
-        return new TrainerAttendanceDTO(saved.getAttendanceId(), saved.getCheckinDate());
+        return new TrainerAttendanceDTO(saved.getAttendanceId(), saved.getCheckinDate(), saved.getFeedback());
     }
 
     public User updateTrainerProfile(Long trainerId, TrainerUpdateProfile updateProfile) {
@@ -84,4 +85,13 @@ public class TrainerService {
     public User getTrainerProfile(Long trainerId) {
         return findTrainerById(trainerId);
     }
+
+    public TrainerAttendanceDTO updateAttendanceFeedback(Long attendanceId, String feedback) {
+        Attendance attendance = attendanceRepository.findById(attendanceId)
+                .orElseThrow(() -> new RuntimeException("Attendance not found"));
+        attendance.setFeedback(feedback);
+        Attendance updated = attendanceRepository.save(attendance);
+        return new TrainerAttendanceDTO(updated.getAttendanceId(), updated.getCheckinDate(), updated.getFeedback());
+    }
+
 }

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { getUser, getUserId } from '../../utils/auth';
 import './TrainerMembersList.css';
 
 function TrainerMembersList() {
   const [members, setMembers] = useState([]);
   const [selectedMemberId, setSelectedMemberId] = useState(null);
   const [attendances, setAttendances] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const user = getUser();
-  const trainerId = getUserId();
+  const user = JSON.parse(localStorage.getItem('user'));
+  const trainerId = user?.user_id;
 
   useEffect(() => {
     if (!trainerId) return;
@@ -36,9 +36,24 @@ function TrainerMembersList() {
       .catch((err) => console.error(err));
   };
 
+  const handleUpdateFeedback = (attendanceId, feedback) => {
+    axios
+      .put(`http://localhost:8080/api/trainer/attendance/${attendanceId}/feedback`, { feedback })
+      .then(() => {
+        setSuccessMessage('Cập nhật feedback thành công!');
+        setTimeout(() => setSuccessMessage(''), 3000); // 3 giây tự ẩn thông báo
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <div className="trainer-members-container">
       <h2 className="trainer-members-title">Danh sách Hội viên</h2>
+        {successMessage && (
+        <div className="success-message">
+          {successMessage}
+        </div>
+        )}
       <table className="trainer-members-table">
         <thead>
           <tr>
@@ -76,16 +91,38 @@ function TrainerMembersList() {
             <thead>
               <tr>
                 <th>Check-in Date</th>
+                <th>Feedback</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {attendances.map((att) => (
-                <tr key={att.id}>
+              {attendances.map((att, index) => (
+                <tr key={att.attendanceId}>
                   <td>{new Date(att.checkinDate).toLocaleString()}</td>
+                  <td>
+                    <input
+                      type="text"
+                      className="trainer-feedback-input"
+                      value={att.feedback || ''}
+                      onChange={(e) => {
+                        const updated = [...attendances];
+                        updated[index].feedback = e.target.value;
+                        setAttendances(updated);
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <button
+                      className="trainer-update-button"
+                      onClick={() => handleUpdateFeedback(att.attendanceId, att.feedback)}
+                    >
+                      Cập nhật
+                    </button>
+                  </td>
                 </tr>
               ))}
               <tr>
-                <td>
+                <td colSpan={3}>
                   <button
                     className="trainer-members-button"
                     onClick={() => handleCreateAttendance(selectedMemberId)}

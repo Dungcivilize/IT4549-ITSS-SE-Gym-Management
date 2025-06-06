@@ -12,5 +12,5 @@ import java.time.LocalDateTime;
 public class TrainerAttendanceDTO {
     private Long attendanceId;
     private LocalDateTime checkinDate;
+    private String feedback;
 }
-

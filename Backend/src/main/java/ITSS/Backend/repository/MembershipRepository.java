@@ -67,4 +67,6 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
 """)
     List<Object[]> getMonthlyRevenue(@Param("year") int year);
 
+    Optional<Membership> findTopByMemberUserIdOrderByStartDateDesc(Long userId);
+
 }
