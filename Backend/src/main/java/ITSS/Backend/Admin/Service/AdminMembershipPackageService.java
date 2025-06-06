@@ -45,7 +45,6 @@ public class AdminMembershipPackageService {
             existing.setPackageName(dto.getPackageName());
             existing.setDuration(dto.getDuration());
             existing.setPrice(dto.getPrice());
-            existing.setPackageType(dto.getPackageType());
             existing.setPT(dto.getPT());
             // set trainers
             List<User> trainers = userRepo.findAllById(dto.getTrainerIds());
@@ -68,7 +67,6 @@ public class AdminMembershipPackageService {
         dto.setPackageName(entity.getPackageName());
         dto.setDuration(entity.getDuration());
         dto.setPrice(entity.getPrice());
-        dto.setPackageType(entity.getPackageType());
         dto.setPT(entity.getPT());
         dto.setTrainerIds(entity.getTrainers()
                 .stream().map(User::getUserId).collect(Collectors.toList()));
@@ -81,7 +79,6 @@ public class AdminMembershipPackageService {
         entity.setPackageName(dto.getPackageName());
         entity.setDuration(dto.getDuration());
         entity.setPrice(dto.getPrice());
-        entity.setPackageType(dto.getPackageType());
         entity.setPT(dto.getPT());
         List<User> trainers = userRepo.findAllById(dto.getTrainerIds());
         entity.setTrainers(trainers);

@@ -4,6 +4,7 @@ import ITSS.Backend.Receptionist.DTO.*;
 import ITSS.Backend.entity.Equipment;
 import ITSS.Backend.entity.Membership;
 import ITSS.Backend.entity.User;
+import ITSS.Backend.repository.AcceptedBillRepository;
 import ITSS.Backend.repository.EquipmentRepository;
 import ITSS.Backend.repository.MembershipRepository;
 import ITSS.Backend.repository.UserRepository;
@@ -24,6 +25,7 @@ public class ReceptionistService {
     @Autowired
     private EquipmentRepository equipmentRepository;
     private final MembershipRepository membershipRepository;
+    private final AcceptedBillRepository acceptedBillRepository;
 
     public RevenueStatisticsDTO getMonthlyRevenueStatistics(int year, int month) {
         List<Membership> memberships = membershipRepository.findByStartDateInMonth(year, month);
@@ -31,10 +33,8 @@ public class ReceptionistService {
         long totalMembers = membershipRepository.countDistinctMembersByStartDateInMonth(year, month);
         long paidMembers = membershipRepository.countDistinctPaidMembersByStartDateInMonth(year, month);
 
-        double totalRevenue = memberships.stream()
-                .filter(m -> m.getPaymentStatus() == Membership.PaymentStatus.Paid)
-                .mapToDouble(m -> m.getMembershipPackage() != null ? m.getMembershipPackage().getPrice() : 0)
-                .sum();
+        Long totalRevenueLong = acceptedBillRepository.getTotalAmountByYearAndMonth(year, month);
+        double totalRevenue = totalRevenueLong != null ? totalRevenueLong.doubleValue() : 0;
 
         Map<String, Long> packageCounts = memberships.stream()
                 .collect(Collectors.groupingBy(
@@ -49,11 +49,8 @@ public class ReceptionistService {
         List<Double> monthlyRevenues = new java.util.ArrayList<>();
 
         for (int month = 1; month <= 12; month++) {
-            List<Membership> memberships = membershipRepository.findByStartDateInMonth(year, month);
-            double revenue = memberships.stream()
-                    .filter(m -> m.getPaymentStatus() == Membership.PaymentStatus.Paid)
-                    .mapToDouble(m -> m.getMembershipPackage() != null ? m.getMembershipPackage().getPrice() : 0)
-                    .sum();
+            Long totalAmount = acceptedBillRepository.getTotalAmountByYearAndMonth(year, month);
+            double revenue = totalAmount != null ? totalAmount.doubleValue() : 0;
             monthlyRevenues.add(revenue);
         }
 

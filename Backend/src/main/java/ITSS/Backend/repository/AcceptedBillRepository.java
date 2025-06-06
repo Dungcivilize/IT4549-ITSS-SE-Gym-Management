@@ -17,5 +17,6 @@ public interface AcceptedBillRepository extends JpaRepository<AcceptedBill, Long
             "ORDER BY b.paymentDate DESC")
     List<TransactionHistoryResponse> getHistoryByMemberId(@Param("memberId") Long memberId);
 
-
+    @Query("SELECT SUM(b.amount) FROM AcceptedBill b WHERE YEAR(b.paymentDate) = :year AND MONTH(b.paymentDate) = :month")
+    Long getTotalAmountByYearAndMonth(@Param("year") int year, @Param("month") int month);
 }
