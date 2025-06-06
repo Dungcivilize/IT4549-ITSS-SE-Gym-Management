@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import QRCodeImage from "../../assets/img/QRCode.jpg";
+import MemberNavbar from "../../Components/MemberNavbar";
 
 const CurrentPackage = ({ memberId }) => {
   const [data, setData] = useState(null);
@@ -9,14 +10,70 @@ const CurrentPackage = ({ memberId }) => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [transactionCode, setTransactionCode] = useState("");
   const [paymentMode, setPaymentMode] = useState("pay"); // pay | extend
+  const [paymentStatusInfo, setPaymentStatusInfo] = useState(null);
+
+  // Hàm fetch dữ liệu chung
+  const fetchData = async () => {
+    if (!memberId) return;
+    
+    try {
+      // Lấy thông tin membership hiện tại
+      const membershipResponse = await axios.get(`http://localhost:8080/api/memberships/current/${memberId}`);
+      setData(membershipResponse.data);
+      
+      // Lấy thông tin payment status để kiểm tra reject reason
+      const statusResponse = await axios.get(`http://localhost:8080/api/memberships/payment-status/${memberId}`);
+      const statuses = statusResponse.data;
+      
+      if (statuses && statuses.length > 0) {
+        // Lấy status gần nhất (có thể là processing hoặc unpaid với reject reason)
+        const latestStatus = statuses[0];
+        setPaymentStatusInfo(latestStatus);
+        console.log("📊 Latest payment status:", latestStatus);
+      } else {
+        setPaymentStatusInfo(null);
+      }
+      
+    } catch (err) {
+      console.log("Lỗi khi tải dữ liệu:", err);
+      if (err.response?.status === 404) {
+        setData(null);
+      }
+      setPaymentStatusInfo(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!memberId) return;
-    axios
-      .get(`http://localhost:8080/api/memberships/current/${memberId}`)
-      .then((res) => setData(res.data))
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
+    fetchData();
+    
+    // Tự động refresh mỗi 15 giây để cập nhật reject reason và payment status
+    const interval = setInterval(() => {
+      if (memberId) {
+        console.log("🔄 Auto refreshing payment status...");
+        axios
+          .get(`http://localhost:8080/api/memberships/payment-status/${memberId}`)
+          .then((res) => {
+            if (res.data && res.data.length > 0) {
+              const latestStatus = res.data[0];
+              // Chỉ cập nhật nếu có thay đổi
+              if (JSON.stringify(latestStatus) !== JSON.stringify(paymentStatusInfo)) {
+                setPaymentStatusInfo(latestStatus);
+                console.log("📊 Auto-refreshed payment status:", latestStatus);
+                
+                // Hiển thị thông báo nếu có reject reason mới
+                if (latestStatus.rejectReason && latestStatus.rejectReason !== paymentStatusInfo?.rejectReason) {
+                  console.log("🚨 New reject reason detected:", latestStatus.rejectReason);
+                }
+              }
+            }
+          })
+          .catch((err) => console.log("Lỗi auto refresh:", err));
+      }
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, [memberId]);
 
   const handleCancel = async () => {
@@ -38,23 +95,8 @@ const CurrentPackage = ({ memberId }) => {
       console.log("✅ Cancel response:", response.data);
       alert("✅ Đã hủy gói tập thành công!");
 
-      // Force refresh data from server
-      if (memberId) {
-        try {
-          const refreshResponse = await axios.get(
-            `http://localhost:8080/api/memberships/current/${memberId}`
-          );
-          setData(refreshResponse.data);
-        } catch (refreshErr) {
-          // If 404, user has no membership - this is expected after cancel
-          if (refreshErr.response?.status === 404) {
-            setData(null);
-          } else {
-            console.error("❌ Error refreshing data:", refreshErr);
-            setData(null); // Assume cancelled if can't refresh
-          }
-        }
-      }
+      // Refresh data sau khi cancel
+      await fetchData();
     } catch (err) {
       console.error("❌ Lỗi khi hủy gói tập:", {
         message: err.message,
@@ -70,38 +112,9 @@ const CurrentPackage = ({ memberId }) => {
   };
 
   const handleExtend = async () => {
-    const confirmed = window.confirm("Bạn có chắc chắn muốn gia hạn gói tập?");
-    if (!confirmed) return;
-
-    try {
-      // PayMembershipRequest structure for extend
-      const payload = {
-        memberId,
-        packageId: data.packageId,
-        transactionCode: "EXTEND_PENDING_" + Date.now(),
-      };
-
-      console.log("⏰ Sending extend request:", payload);
-
-      const response = await axios.post(
-        "http://localhost:8080/api/memberships/extend",
-        payload
-      );
-
-      console.log("✅ Extend response:", response.data);
-      setPaymentMode("extend");
-      setShowPaymentModal(true);
-      alert("Vui lòng thanh toán để hoàn tất gia hạn!");
-    } catch (err) {
-      console.error("❌ Lỗi khi gia hạn:", {
-        message: err.message,
-        status: err.response?.status,
-        data: err.response?.data,
-      });
-
-      const errorMessage = err.response?.data || "Gia hạn không thành công!";
-      alert(`❌ ${errorMessage}`);
-    }
+    // Hiện modal payment ngay để nhập transaction code
+    setPaymentMode("extend");
+    setShowPaymentModal(true);
   };
 
   const handleSubmit = async () => {
@@ -110,63 +123,44 @@ const CurrentPackage = ({ memberId }) => {
       return;
     }
 
-    if (paymentMode === "extend") {
-      alert("🎉 Gia hạn thành công!");
-      setShowPaymentModal(false);
-      setTransactionCode("");
-      // Refresh data
-      if (memberId) {
-        axios
-          .get(`http://localhost:8080/api/memberships/current/${memberId}`)
-          .then((res) => setData(res.data))
-          .catch(() => setData(null));
-      }
-      return;
-    }
-
     try {
-      // PayMembershipRequest structure for payment
       const payload = {
         memberId,
         packageId: data.packageId,
         transactionCode: transactionCode.trim(),
       };
 
-      console.log("💳 Sending payment request:", payload);
+      const apiEndpoint = paymentMode === "extend" 
+        ? "http://localhost:8080/api/memberships/extend"
+        : "http://localhost:8080/api/memberships/pay";
 
-      const response = await axios.post(
-        "http://localhost:8080/api/memberships/pay",
-        payload
-      );
+      const actionName = paymentMode === "extend" ? "gia hạn" : "thanh toán";
 
-      console.log("✅ Payment response:", response.data);
-      alert("✅ Thanh toán thành công!");
+      console.log(`💳 Sending ${actionName} with transaction code:`, payload);
+
+      const response = await axios.post(apiEndpoint, payload);
+
+      console.log(`✅ ${actionName} response:`, response.data);
+      alert("✅ " + response.data);
       setShowPaymentModal(false);
       setTransactionCode("");
 
-      // Force refresh data from server
-      if (memberId) {
-        try {
-          const refreshResponse = await axios.get(
-            `http://localhost:8080/api/memberships/current/${memberId}`
-          );
-          setData(refreshResponse.data);
-        } catch (refreshErr) {
-          console.error("❌ Error refreshing data after payment:", refreshErr);
-          // Don't set to null here, keep current data if refresh fails
-        }
-      }
+      // Refresh data sau khi hoàn tất
+      await fetchData();
     } catch (err) {
-      console.error("❌ Lỗi thanh toán:", {
+      const actionName = paymentMode === "extend" ? "gia hạn" : "thanh toán";
+      console.error(`❌ Lỗi ${actionName}:`, {
         message: err.message,
         status: err.response?.status,
         data: err.response?.data,
       });
 
-      const errorMessage = err.response?.data || "Lỗi khi thanh toán gói tập!";
+      const errorMessage = err.response?.data || `Lỗi khi ${actionName} gói tập!`;
       alert(`❌ ${errorMessage}`);
     }
   };
+
+
 
   const styles = {
     container: {
@@ -261,6 +255,16 @@ const CurrentPackage = ({ memberId }) => {
       padding: "0.75rem 1rem",
       borderRadius: "8px",
       borderLeft: "4px solid #f97316",
+    },
+    rejectReason: {
+      marginTop: "0.5rem",
+      fontSize: "0.9rem",
+      color: "#dc2626",
+      background: "#fee2e2",
+      padding: "0.5rem 0.75rem",
+      borderRadius: "6px",
+      border: "1px solid #fecaca",
+      fontWeight: "500",
     },
     overlay: {
       position: "fixed",
@@ -449,22 +453,36 @@ const CurrentPackage = ({ memberId }) => {
           )}
 
           {data.paymentStatus === "Unpaid" && (
-            <button
-              style={{ ...styles.btn, ...styles.payBtn }}
-              onClick={() => {
-                setPaymentMode("pay");
-                setShowPaymentModal(true);
-              }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#d97706")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#f59e0b")}
-            >
-              Thanh toán gói tập
-            </button>
+            <>
+              <button
+                style={{ ...styles.btn, ...styles.payBtn }}
+                onClick={() => {
+                  setPaymentMode("pay");
+                  setShowPaymentModal(true);
+                }}
+                onMouseOver={(e) => (e.target.style.backgroundColor = "#d97706")}
+                onMouseOut={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+              >
+                Thanh toán gói tập
+              </button>
+              
+              {paymentStatusInfo && paymentStatusInfo.rejectReason && (
+                <div style={styles.rejectReason}>
+                  <strong>❌ Lý do từ chối thanh toán:</strong><br />
+                  {paymentStatusInfo.rejectReason}
+                  {paymentStatusInfo.verifiedDate && (
+                    <div style={{ marginTop: "0.25rem", fontSize: "0.8rem", opacity: 0.8 }}>
+                      <em>Từ chối lúc: {new Date(paymentStatusInfo.verifiedDate).toLocaleString('vi-VN')}</em>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
 
           {data.paymentStatus === "Processing" && (
             <div style={styles.processing}>
-              Gói tập đang được xử lý, vui lòng đợi...
+              Gói tập đang được xử lý, vui lòng đợi xác nhận từ lễ tân...
             </div>
           )}
         </div>
@@ -524,7 +542,9 @@ const CurrentPackage = ({ memberId }) => {
               </div>
 
               <div style={styles.infoSection}>
-                <h3 style={styles.modalTitle}>{data.packageName}</h3>
+                <h3 style={styles.modalTitle}>
+                  {paymentMode === "extend" ? "Gia hạn gói tập" : "Thanh toán gói tập"} - {data.packageName}
+                </h3>
                 <p style={styles.modalInfoItem}>
                   <strong>Bắt đầu:</strong> {data.startDate}
                 </p>

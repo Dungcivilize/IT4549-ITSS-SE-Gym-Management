@@ -529,7 +529,7 @@ const RegisterPackage = () => {
                 <div>
                   <h3 style={pageStyles.packageName}>{pkg.packageName}</h3>
                   {pkg.packageType && (
-                    <span style={pageStyles.packageType}>{pkg.packageType}</span>
+                  <span style={pageStyles.packageType}>{pkg.packageType}</span>
                   )}
                 </div>
                 <div style={{
@@ -564,10 +564,10 @@ const RegisterPackage = () => {
                   {pkg.discount > 0 && <span style={{color: '#ef4444', marginLeft: '0.5rem'}}>(-{Math.round(pkg.discount * 100)}%)</span>}
                 </li>
                 {pkg.packageType && (
-                  <li style={pageStyles.feature}>
-                    <span style={pageStyles.featureIcon}>📁</span>
-                    Loại: {pkg.packageType}
-                  </li>
+                <li style={pageStyles.feature}>
+                  <span style={pageStyles.featureIcon}>📁</span>
+                  Loại: {pkg.packageType}
+                </li>
                 )}
                 <li style={pageStyles.feature}>
                   <span style={pageStyles.featureIcon}>🏋️‍♂️</span>
@@ -621,10 +621,10 @@ const RegisterPackage = () => {
                   </>
                 )}
                 {selectedPackage.packageType && (
-                  <div style={pageStyles.detailItem}>
-                    <span style={pageStyles.detailIcon}>📁</span>
-                    Loại: {selectedPackage.packageType}
-                  </div>
+                <div style={pageStyles.detailItem}>
+                  <span style={pageStyles.detailIcon}>📁</span>
+                  Loại: {selectedPackage.packageType}
+                </div>
                 )}
                 <div style={pageStyles.detailItem}>
                   <span style={pageStyles.detailIcon}>🏋️</span>
@@ -717,7 +717,7 @@ const RegisterPackage = () => {
                     ? "Bạn đã có gói tập" 
                     : selectedPackage.discount > 0
                       ? `Đăng ký ngay - Tiết kiệm ${(selectedPackage.price - calculateDiscountedPrice(selectedPackage.price, selectedPackage.discount)).toLocaleString()}₫`
-                      : "Đăng ký ngay"
+                    : "Đăng ký ngay"
                 }
               </button>
             </div>

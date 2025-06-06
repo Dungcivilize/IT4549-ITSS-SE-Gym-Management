@@ -1,8 +1,14 @@
 package ITSS.Backend.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Data
 @Entity
@@ -25,4 +31,13 @@ public class AcceptedBill {
 
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
+
+    @Column(name = "transaction_code", length = 50)
+    private String transactionCode;
+
+    @Column(name = "verified_date")
+    private LocalDateTime verifiedDate;
+
+    @Column(name = "reject_reason")
+    private String rejectReason;
 }
