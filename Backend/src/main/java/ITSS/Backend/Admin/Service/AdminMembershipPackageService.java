@@ -1,11 +1,11 @@
-package ITSS.Backend.Service.Admin;
+package ITSS.Backend.Admin.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import ITSS.Backend.DTO.Admin.MembershipPackageDTO;
+import ITSS.Backend.Admin.DTO.MembershipPackageDTO;
 import ITSS.Backend.entity.MembershipPackage;
 import ITSS.Backend.entity.User;
 import ITSS.Backend.repository.MembershipPackageRepository;

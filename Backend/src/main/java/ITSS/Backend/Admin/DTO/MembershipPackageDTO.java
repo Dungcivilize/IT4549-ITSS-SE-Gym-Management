@@ -1,4 +1,4 @@
-package ITSS.Backend.DTO.Admin;
+package ITSS.Backend.Admin.DTO;
 import java.util.List;
 import lombok.Data;
 
