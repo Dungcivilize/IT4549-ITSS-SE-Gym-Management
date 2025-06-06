@@ -93,7 +93,7 @@ CREATE TABLE `Attendance` (
 );
 
 -- Bảng lưu bill đã thanh toán
-CREATE TABLE `Accepted_bill` ( 
+CREATE TABLE Accepted_bill ( 
     `bill_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `member_id` BIGINT UNSIGNED NOT NULL,
     `package_id` BIGINT unsigned NOT NULL,
@@ -516,9 +516,10 @@ INSERT INTO Membership (member_id, trainer_id, package_id, start_date, end_date,
 (5, 58, 6, '2024-08-19', '2025-02-15', 'Paid', 22),
 (50, 58, 8, '2024-09-02', '2025-08-28', 'Processing', 2);
 
-INSERT INTO Accepted_bill (membership_id, amount, payment_date)
+INSERT INTO Accepted_bill (member_id, package_id, amount, payment_date)
 SELECT 
-    m.membership_id,
+    m.member_id,
+    m.package_id,
     p.price * (1 - p.discount / 100.0) AS amount,
     m.start_date AS payment_date
 FROM Membership m
