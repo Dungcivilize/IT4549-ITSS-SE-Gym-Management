@@ -3,14 +3,14 @@ package ITSS.Backend.repository;
 import java.util.List;
 import java.util.Optional;
 
-import ITSS.Backend.Member.DTO.TrainerPackageSummaryResponse;
-import ITSS.Backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import ITSS.Backend.Member.DTO.TrainerPackageSummaryResponse;
 import ITSS.Backend.entity.Membership;
+import ITSS.Backend.entity.User;
 
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
@@ -37,6 +37,8 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
     );
 
     Optional<Membership> findByMemberUserIdAndMembershipPackagePackageId(Long memberId, Long packageId);
+
+    List<Membership> findByMemberUserId(Long memberId);
 
     long countByTrainerAndPaymentStatus(User trainer, Membership.PaymentStatus status);
 

@@ -96,12 +96,16 @@ CREATE TABLE `Attendance` (
 CREATE TABLE Accepted_bill ( 
     `bill_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `member_id` BIGINT UNSIGNED NOT NULL,
-    `package_id` BIGINT unsigned NOT NULL,
+    `package_id` BIGINT UNSIGNED NOT NULL,
     `amount` DOUBLE NOT NULL,
     `payment_date` TIMESTAMP NOT NULL,
+    `transaction_code` VARCHAR(50) NULL,
+    `verified_date` TIMESTAMP NULL,
+    `reject_reason` TEXT NULL,
     FOREIGN KEY (`package_id`) REFERENCES `MembershipPackage`(`package_id`),
     FOREIGN KEY (`member_id`) REFERENCES `Users`(`user_id`)
 );
+
 
 DELIMITER //
 
@@ -516,12 +520,18 @@ INSERT INTO Membership (member_id, trainer_id, package_id, start_date, end_date,
 (5, 58, 6, '2024-08-19', '2025-02-15', 'Paid', 22),
 (50, 58, 8, '2024-09-02', '2025-08-28', 'Processing', 2);
 
-INSERT INTO Accepted_bill (member_id, package_id, amount, payment_date)
+-- Dữ liệu test cho member chờ verify payment
+INSERT INTO Accepted_bill (member_id, package_id, amount, payment_date, transaction_code, verified_date, reject_reason)
 SELECT 
     m.member_id,
     m.package_id,
-    p.price * (1 - p.discount / 100.0) AS amount,
-    m.start_date AS payment_date
+    CAST(p.price * (1 - p.discount) AS DOUBLE) AS amount,
+    NOW() AS payment_date,
+    NULL AS transaction_code,      -- Chưa có mã giao dịch
+    NULL AS verified_date,         -- Chưa verify
+    NULL AS reject_reason
 FROM Membership m
 JOIN MembershipPackage p ON m.package_id = p.package_id
-WHERE m.payment_status = 'Paid';
+LEFT JOIN Accepted_bill ab ON m.member_id = ab.member_id AND m.package_id = ab.package_id
+WHERE m.payment_status = 'Processing'
+AND ab.bill_id IS NULL;
