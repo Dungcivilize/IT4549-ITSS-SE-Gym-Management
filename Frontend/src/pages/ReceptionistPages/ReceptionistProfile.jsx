@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getUser, getUserUsername } from '../../utils/auth';
 import './ReceptionistProfile.css';
 
 export default function ReceptionistProfile() {
@@ -13,16 +12,22 @@ export default function ReceptionistProfile() {
   const [username, setUsername] = useState(null);
 
   useEffect(() => {
-    const user = getUser();
-    if (!user) {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
       setError('Bạn chưa đăng nhập');
       return;
     }
+    let user = null;
+    try {
+      user = JSON.parse(userStr);
+    } catch (e) {
+      setError('Dữ liệu user không hợp lệ');
+      return;
+    }
 
-    const currentUsername = getUserUsername();
-    setUsername(currentUsername);
+    setUsername(user.user_name);
 
-    fetch(`http://localhost:8080/api/receptionist/profile?username=${currentUsername}`, {
+    fetch(`http://localhost:8080/api/receptionist/profile?username=${user.user_name}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     })

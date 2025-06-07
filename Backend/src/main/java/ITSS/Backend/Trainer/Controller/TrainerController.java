@@ -1,5 +1,6 @@
 package ITSS.Backend.Trainer.Controller;
 
+import ITSS.Backend.Trainer.DTO.FeedbackRequestDTO;
 import ITSS.Backend.Trainer.DTO.TrainerAttendanceDTO;
 import ITSS.Backend.Trainer.DTO.TrainerMemberDTO;
 import ITSS.Backend.Trainer.DTO.TrainerUpdateProfile;
@@ -52,4 +53,18 @@ public class TrainerController {
         User updated = trainerService.updateTrainerProfile(trainerId, updateProfile);
         return ResponseEntity.ok(updated);
     }
+
+    @PutMapping("/attendance/{attendanceId}/feedback")
+    public ResponseEntity<?> updateFeedback(
+            @PathVariable Long attendanceId,
+            @RequestBody FeedbackRequestDTO dto
+    ) {
+        try {
+            TrainerAttendanceDTO updated = trainerService.updateAttendanceFeedback(attendanceId, dto.getFeedback());
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
+        }
+    }
+
 }

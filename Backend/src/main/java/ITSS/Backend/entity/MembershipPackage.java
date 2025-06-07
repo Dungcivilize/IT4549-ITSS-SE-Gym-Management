@@ -33,9 +33,6 @@ public class MembershipPackage {
     @Column
     private Double discount;
 
-    @Column(name = "package_type")
-    private String packageType;
-
     @Column(columnDefinition = "TEXT")
     private String description;
 

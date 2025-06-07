@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { getUser, setUser, getUserId } from '../../utils/auth';
 import styles from '../../assets/css/MemberHomePage.module.css';
 import MemberNavbar from '../../Components/MemberNavbar';
 
 const MemberProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(() => {
-    const user = getUser() || {};
+    const user = JSON.parse(localStorage.getItem('user')) || {};
     return { ...user };
   });
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  const user = getUser() || {};
-  const userId = getUserId();
+  const user = JSON.parse(localStorage.getItem('user')) || {};
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -40,7 +38,7 @@ const MemberProfile = () => {
     setSuccess('');
     try {
       const response = await fetch(
-        `http://localhost:8080/api/profile/update/${userId}`,
+        `http://localhost:8080/api/profile/update/${user.user_id}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -59,21 +57,18 @@ const MemberProfile = () => {
       }
       setIsEditing(false);
       setSuccess('Cập nhật thành công!');
-      // Cập nhật lại user data
-      setUser({ ...user, ...formData });
+      // Cập nhật lại localStorage
+      localStorage.setItem('user', JSON.stringify({ ...user, ...formData }));
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      padding: '2rem',
-      backgroundColor: '#111317',
-      background: 'radial-gradient(circle, rgba(249, 172, 84, 0.3) 0%, rgba(15, 15, 15, 0.95) 70%, #111317 100%)',
-      fontFamily: 'Poppins, sans-serif'
-    }}>
+    <div
+      className={styles.pageWrapper}
+      style={{ minHeight: '100vh', padding: '2rem' }}
+    >
       <MemberNavbar />
       <div className={styles.profileBox}>
         <h2 style={{ color: '#f9ac54', textAlign: 'center' }}>

@@ -1,9 +1,10 @@
-package ITSS.Backend.Controller.Admin;
+package ITSS.Backend.Admin.Controller;
 
 
-import ITSS.Backend.DTO.Admin.UserRequestDTO;
-import ITSS.Backend.DTO.Admin.UserResponseDTO;
-import ITSS.Backend.Service.Admin.*;
+import ITSS.Backend.Admin.DTO.UserRequestDTO;
+import ITSS.Backend.Admin.DTO.UserResponseDTO;
+import ITSS.Backend.Admin.Service.UserService;
+import ITSS.Backend.Admin.Service.*;
 
 import java.util.List;
 import java.util.Collections;
