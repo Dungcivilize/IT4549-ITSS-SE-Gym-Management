@@ -227,27 +227,40 @@ public void registerMembership(RegisterMembershipRequest req) {
     }
 
 
-    public boolean extendMembership(PayMembershipRequest req) {
-        // Tìm membership hiện tại (phải đang Paid hoặc đã hết hạn)
-        Optional<Membership> membershipOpt = membershipRepository
-                .findByMemberUserIdAndMembershipPackagePackageId(req.getMemberId(), req.getPackageId());
+    public void extendMembership(PayMembershipRequest req) {
+        // Tìm membership hiện tại (phải đang Paid và còn hiệu lực)
+        Optional<Membership> membershipOpt = membershipRepository.findCurrentMembershipByUserId(req.getMemberId());
 
         if (membershipOpt.isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("Không tìm thấy gói tập hiện tại để gia hạn");
         }
 
         Membership membership = membershipOpt.get();
 
+        // Kiểm tra xem có phải gói muốn gia hạn không
+        if (!membership.getMembershipPackage().getPackageId().equals(req.getPackageId())) {
+            throw new IllegalArgumentException("Gói tập muốn gia hạn không khớp với gói tập hiện tại");
+        }
+
+        // Kiểm tra trạng thái hiện tại
+        if (membership.getPaymentStatus() == Membership.PaymentStatus.Processing) {
+            throw new IllegalStateException("Gói tập đang trong quá trình xử lý thanh toán");
+        }
+
+        if (membership.getPaymentStatus() == Membership.PaymentStatus.Unpaid) {
+            throw new IllegalStateException("Vui lòng thanh toán gói tập hiện tại trước khi gia hạn");
+        }
+
         // Lấy thông tin gói tập để tính tiền và duration
         MembershipPackage pkg = membershipPackageRepository
                 .findById(req.getPackageId())
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin gói tập"));
 
-        if (pkg == null || pkg.getDuration() == null) {
-            return false; // Không có thông tin về gói
+        if (pkg.getDuration() == null) {
+            throw new IllegalArgumentException("Gói tập không có thông tin thời hạn");
         }
 
-        // Tính số tiền cần thanh toán cho gia hạn (giống như pay)
+        // Tính số tiền cần thanh toán cho gia hạn
         long originalPrice = pkg.getPrice();
         double discount = pkg.getDiscount();
         long finalAmount = (long) (originalPrice * (1 - discount));
@@ -258,18 +271,13 @@ public void registerMembership(RegisterMembershipRequest req) {
         bill.setPackageId(pkg.getPackageId());
         bill.setAmount(finalAmount);
         bill.setPaymentDate(LocalDateTime.now());
-        bill.setTransactionCode(req.getTransactionCode()); // Lưu mã giao dịch
+        bill.setTransactionCode(req.getTransactionCode());
 
         acceptedBillRepository.save(bill);
 
-        // Cập nhật trạng thái membership thành Processing (chờ xác nhận thanh toán)
+        // Cập nhật trạng thái membership thành Processing
         membership.setPaymentStatus(Membership.PaymentStatus.Processing);
-        
-        // 🚨 KHÔNG gia hạn ngay! Chỉ gia hạn sau khi receptionist approve
-        // Gia hạn sẽ được thực hiện trong PaymentVerificationService.verifyPayment()
-        
         membershipRepository.save(membership);
-        return true;
     }
 
     public List<TransactionHistoryResponse> getTransactionHistory(Long memberId) {

@@ -1,26 +1,26 @@
-import React, { useState } from "react";
-import styles from "../../assets/css/MemberHomePage.module.css";
-import MemberNavbar from "../../Components/MemberNavbar";
+import React, { useState } from 'react';
+import styles from '../../assets/css/MemberHomePage.module.css';
+import MemberNavbar from '../../Components/MemberNavbar';
 
 const ChangePassword = () => {
-  const [newPassword, setNewPassword] = useState("");
-  const [rePassword, setRePassword] = useState("");
+  const [newPassword, setNewPassword] = useState('');
+  const [rePassword, setRePassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
-  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+  const user = JSON.parse(localStorage.getItem('user')) || {};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
+    setError('');
+    setSuccess('');
 
     if (!newPassword || !rePassword) {
-      setError("Vui lòng nhập đầy đủ thông tin.");
+      setError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
     if (newPassword !== rePassword) {
-      setError("Mật khẩu nhập lại không khớp.");
+      setError('Mật khẩu nhập lại không khớp.');
       return;
     }
     setLoading(true);
@@ -28,17 +28,17 @@ const ChangePassword = () => {
       const response = await fetch(
         `http://localhost:8080/api/profile/update/${user.user_id}`,
         {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password: newPassword }),
         }
       );
       if (!response.ok) {
-        throw new Error("Đổi mật khẩu thất bại!");
+        throw new Error('Đổi mật khẩu thất bại!');
       }
-      setSuccess("Đổi mật khẩu thành công!");
-      setNewPassword("");
-      setRePassword("");
+      setSuccess('Đổi mật khẩu thành công!');
+      setNewPassword('');
+      setRePassword('');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -47,12 +47,25 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className={styles.pageWrapper} style={{ minHeight: "100vh", padding: "2rem" }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        padding: '2rem',
+        backgroundColor: '#111317',
+        background:
+          'radial-gradient(circle, rgba(249, 172, 84, 0.3) 0%, rgba(15, 15, 15, 0.95) 70%, #111317 100%)',
+        fontFamily: 'Poppins, sans-serif',
+      }}
+    >
       <MemberNavbar />
       <div className={styles.profileBox}>
-        <h2 style={{ color: "#f9ac54", textAlign: "center" }}>Đổi mật khẩu</h2>
-        {success && <div style={{ color: "green", textAlign: "center" }}>{success}</div>}
-        {error && <div style={{ color: "red", textAlign: "center" }}>{error}</div>}
+        <h2 style={{ color: '#f9ac54', textAlign: 'center' }}>Đổi mật khẩu</h2>
+        {success && (
+          <div style={{ color: 'green', textAlign: 'center' }}>{success}</div>
+        )}
+        {error && (
+          <div style={{ color: 'red', textAlign: 'center' }}>{error}</div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className={styles.profileItem}>
             <span className={styles.profileItemIcon}>🔑</span>
@@ -78,9 +91,9 @@ const ChangePassword = () => {
               autoComplete="new-password"
             />
           </div>
-          <div style={{ textAlign: "center", marginTop: 24 }}>
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
             <button className={styles.btn} type="submit" disabled={loading}>
-              {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
+              {loading ? 'Đang xử lý...' : 'Đổi mật khẩu'}
             </button>
           </div>
         </form>
