@@ -15,7 +15,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState({
     email: false,
-    password: false
+    password: false,
   });
 
   useEffect(() => {
@@ -60,26 +60,25 @@ function Login() {
 
       setUser(response.data);
 
-    const role = response.data.role;
-    if (role === 'receptionist') {
-      navigate('/receptionist/revenue');
-    } else if (role === 'trainer') {
-      navigate('/trainer/home'); 
-    } else if (role === 'member') {
-      navigate('/member/home'); 
-    } else if (role === 'admin') {
-      navigate('/admin/dashboard'); 
-    } else {
-      // Mặc định hoặc thông báo lỗi
-      navigate('/');
-    }
+      const role = response.data.role;
+      if (role === 'receptionist') {
+        navigate('/receptionist/revenue');
+      } else if (role === 'trainer') {
+        navigate('/trainer/home');
+      } else if (role === 'member') {
+        navigate('/member/home');
+      } else if (role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        // Mặc định hoặc thông báo lỗi
+        navigate('/');
+      }
     } catch (err) {
       setError('Email hoặc mật khẩu không đúng');
     } finally {
       setLoading(false);
     }
   };
-
 
   const pageStyles = {
     nav: {
@@ -92,14 +91,14 @@ function Login() {
       gap: '2rem',
       backgroundColor: 'transparent',
       boxShadow: 'none',
-      fontFamily: 'Poppins, sans-serif'
+      fontFamily: 'Poppins, sans-serif',
     },
     navLogo: {
-      maxWidth: '150px'
+      maxWidth: '150px',
     },
     logoImg: {
       width: '100%',
-      display: 'flex'
+      display: 'flex',
     },
     navLinks: {
       listStyle: 'none',
@@ -107,14 +106,14 @@ function Login() {
       alignItems: 'center',
       gap: '3rem',
       margin: 0,
-      padding: 0
+      padding: 0,
     },
     link: {
       position: 'relative',
       paddingBottom: '0.75rem',
       color: '#ffffff',
       textDecoration: 'none',
-      fontWeight: '500'
+      fontWeight: '500',
     },
     btn: {
       padding: '1rem 2rem',
@@ -128,7 +127,7 @@ function Login() {
       transition: '0.3s',
       margin: '2px',
       textDecoration: 'none',
-      display: 'inline-block'
+      display: 'inline-block',
     },
     wrapper: {
       display: 'flex',
@@ -136,17 +135,17 @@ function Login() {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: '60vh',
-      padding: '2rem'
+      padding: '2rem',
     },
     formHeader: {
       marginBottom: '2rem',
-      textAlign: 'center'
+      textAlign: 'center',
     },
     title: {
       fontSize: '2rem',
       fontWeight: '600',
       color: '#f9ac54',
-      marginBottom: '1rem'
+      marginBottom: '1rem',
     },
     form: {
       backgroundColor: 'rgba(31, 33, 37, 0.9)',
@@ -154,11 +153,11 @@ function Login() {
       borderRadius: '12px',
       boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
       minWidth: '400px',
-      backdropFilter: 'blur(10px)'
+      backdropFilter: 'blur(10px)',
     },
     inputBox: {
       marginBottom: '1.5rem',
-      position: 'relative'
+      position: 'relative',
     },
     inputField: {
       width: '100%',
@@ -170,7 +169,7 @@ function Login() {
       fontSize: '1rem',
       outline: 'none',
       transition: 'border-color 0.3s ease',
-      fontFamily: 'Poppins, sans-serif'
+      fontFamily: 'Poppins, sans-serif',
     },
     label: {
       position: 'absolute',
@@ -184,14 +183,14 @@ function Login() {
       fontWeight: '400',
       transition: 'all 0.3s ease',
       pointerEvents: 'none',
-      cursor: 'text'
+      cursor: 'text',
     },
     labelFocused: {
       top: '0',
       left: '1rem',
       fontSize: '0.85rem',
       color: '#f9ac54',
-      fontWeight: '500'
+      fontWeight: '500',
     },
     error: {
       backgroundColor: '#dc2626',
@@ -200,7 +199,7 @@ function Login() {
       borderRadius: '6px',
       marginBottom: '1rem',
       textAlign: 'center',
-      fontSize: '0.9rem'
+      fontSize: '0.9rem',
     },
     submitBtn: {
       width: '100%',
@@ -213,17 +212,17 @@ function Login() {
       fontWeight: '600',
       cursor: 'pointer',
       transition: 'background-color 0.3s ease',
-      fontFamily: 'Poppins, sans-serif'
+      fontFamily: 'Poppins, sans-serif',
     },
     switchForm: {
       textAlign: 'center',
       marginTop: '1.5rem',
-      color: '#d1d5db'
+      color: '#d1d5db',
     },
     switchLink: {
       color: '#f9ac54',
       textDecoration: 'none',
-      fontWeight: '500'
+      fontWeight: '500',
     },
     forgotLink: {
       color: '#f9ac54',
@@ -231,32 +230,38 @@ function Login() {
       fontSize: '0.9rem',
       textAlign: 'right',
       display: 'block',
-      marginBottom: '1rem'
-    }
+      marginBottom: '1rem',
+    },
   };
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#111317',
-        background: 'radial-gradient(circle, rgba(249, 172, 84, 0.3) 0%, rgba(15, 15, 15, 0.95) 70%, #111317 100%)'
-      }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#111317',
+          background:
+            'radial-gradient(circle, rgba(249, 172, 84, 0.3) 0%, rgba(15, 15, 15, 0.95) 70%, #111317 100%)',
+        }}
+      >
         <Loading message="Đang đăng nhập..." />
       </div>
     );
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#111317',
-      background: 'radial-gradient(circle, rgba(249, 172, 84, 0.3) 0%, rgba(15, 15, 15, 0.95) 70%, #111317 100%)',
-      fontFamily: 'Poppins, sans-serif'
-    }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundColor: '#111317',
+        background:
+          'radial-gradient(circle, rgba(249, 172, 84, 0.3) 0%, rgba(15, 15, 15, 0.95) 70%, #111317 100%)',
+        fontFamily: 'Poppins, sans-serif',
+      }}
+    >
       <nav style={pageStyles.nav}>
         <div style={pageStyles.navLogo}>
           <Link to="/">
@@ -265,35 +270,65 @@ function Login() {
         </div>
         <ul style={pageStyles.navLinks}>
           <li>
-            <a href="/#trang-chu" style={pageStyles.link} className="nav-link-hover">Trang chủ</a>
+            <a
+              href="/#trang-chu"
+              style={pageStyles.link}
+              className="nav-link-hover"
+            >
+              Trang chủ
+            </a>
           </li>
           <li>
-            <a href="/#chuong-trinh" style={pageStyles.link} className="nav-link-hover">Chương trình</a>
+            <a
+              href="/#chuong-trinh"
+              style={pageStyles.link}
+              className="nav-link-hover"
+            >
+              Chương trình
+            </a>
           </li>
           <li>
-            <a href="/#dich-vu" style={pageStyles.link} className="nav-link-hover">Dịch vụ</a>
+            <a
+              href="/#dich-vu"
+              style={pageStyles.link}
+              className="nav-link-hover"
+            >
+              Dịch vụ
+            </a>
           </li>
           <li>
-            <a href="/#gioi-thieu" style={pageStyles.link} className="nav-link-hover">Giới thiệu</a>
+            <a
+              href="/#gioi-thieu"
+              style={pageStyles.link}
+              className="nav-link-hover"
+            >
+              Giới thiệu
+            </a>
           </li>
           <li>
-            <a href="/#cong-dong" style={pageStyles.link} className="nav-link-hover">Cộng đồng</a>
+            <a
+              href="/#cong-dong"
+              style={pageStyles.link}
+              className="nav-link-hover"
+            >
+              Cộng đồng
+            </a>
           </li>
         </ul>
         <div>
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             style={pageStyles.btn}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
+            onMouseOver={(e) => (e.target.style.backgroundColor = '#d79447')}
+            onMouseOut={(e) => (e.target.style.backgroundColor = '#f9ac54')}
           >
             Đăng nhập
           </Link>
-          <Link 
-            to="/register" 
+          <Link
+            to="/register"
             style={pageStyles.btn}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#d79447'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#f9ac54'}
+            onMouseOver={(e) => (e.target.style.backgroundColor = '#d79447')}
+            onMouseOut={(e) => (e.target.style.backgroundColor = '#f9ac54')}
           >
             Đăng ký
           </Link>
@@ -305,7 +340,11 @@ function Login() {
           <div style={pageStyles.title}>Đăng nhập</div>
         </div>
 
-        <form onSubmit={handleSubmit} style={pageStyles.form} autoComplete="off">
+        <form
+          onSubmit={handleSubmit}
+          style={pageStyles.form}
+          autoComplete="off"
+        >
           {error && <div style={pageStyles.error}>{error}</div>}
 
           <div style={pageStyles.inputBox}>
@@ -326,7 +365,14 @@ function Login() {
                 setFocused({ ...focused, email: false });
               }}
             />
-            <label htmlFor="email" style={focused.email || formData.email ? { ...pageStyles.label, ...pageStyles.labelFocused } : pageStyles.label}>
+            <label
+              htmlFor="email"
+              style={
+                focused.email || formData.email
+                  ? { ...pageStyles.label, ...pageStyles.labelFocused }
+                  : pageStyles.label
+              }
+            >
               Email
             </label>
           </div>
@@ -349,21 +395,32 @@ function Login() {
                 setFocused({ ...focused, password: false });
               }}
             />
-            <label htmlFor="password" style={focused.password || formData.password ? { ...pageStyles.label, ...pageStyles.labelFocused } : pageStyles.label}>
+            <label
+              htmlFor="password"
+              style={
+                focused.password || formData.password
+                  ? { ...pageStyles.label, ...pageStyles.labelFocused }
+                  : pageStyles.label
+              }
+            >
               Mật khẩu
             </label>
           </div>
 
-          <Link to="#" style={pageStyles.forgotLink}>
+          {/* <Link to="#" style={pageStyles.forgotLink}>
             Quên mật khẩu?
-          </Link>
+          </Link> */}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             style={pageStyles.submitBtn}
             disabled={loading}
-            onMouseOver={(e) => !loading && (e.target.style.backgroundColor = '#d79447')}
-            onMouseOut={(e) => !loading && (e.target.style.backgroundColor = '#f9ac54')}
+            onMouseOver={(e) =>
+              !loading && (e.target.style.backgroundColor = '#d79447')
+            }
+            onMouseOut={(e) =>
+              !loading && (e.target.style.backgroundColor = '#f9ac54')
+            }
           >
             {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>
