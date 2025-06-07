@@ -1,0 +1,141 @@
+.attendance-calendar {
+  max-width: 480px;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+  color: var(--text-light);
+  background-color: var(--background-color);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.attendance-calendar h3 {
+  text-align: center;
+  margin-bottom: 12px;
+  color: var(--secondary-color);
+}
+
+.attendance-calendar .month-picker {
+  display: block;
+  margin: 0 auto 20px auto;
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1.5px solid var(--input-border-color);
+  background-color: var(--primary-color-light);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: border-color var(--transition-3s);
+}
+
+.attendance-calendar .month-picker:focus {
+  border-color: var(--secondary-color);
+  outline: none;
+}
+
+.attendance-calendar .calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  user-select: none;
+}
+
+.attendance-calendar .calendar-grid > .day-name {
+  font-weight: 700;
+  text-align: center;
+  color: var(--secondary-color-dark);
+}
+
+.attendance-calendar .calendar-grid > .empty-cell {
+  background-color: transparent;
+  border: none;
+}
+
+.attendance-calendar .calendar-grid > .day-cell {
+  position: relative;
+  padding: 10px 0;
+  border: 1.5px solid var(--input-border-color);
+  text-align: center;
+  border-radius: 8px;
+  cursor: default;
+  transition: background-color var(--transition-3s), border-color var(--transition-3s);
+  color: var(--text-light);
+  background-color: var(--primary-color-light);
+}
+
+/* Có tập với PT + feedback (cam đậm) */
+.attendance-calendar .calendar-grid > .day-cell.pt-session {
+  background-color: #ff8c00; /* cam đậm */
+  border-color: #cc7000;     /* cam đậm hơn */
+  color: #fff;               /* chữ trắng cho tương phản */
+  font-weight: 700;
+}
+
+/* Có tập với PT nhưng không có feedback (màu vàng nhạt hoặc cam nhạt hơn, dễ phân biệt) */
+.attendance-calendar .calendar-grid > .day-cell.pt-session-no-feedback {
+  background-color: #ffd59e; /* cam nhạt */
+  border-color: #ffbb33;     /* cam nhạt hơn */
+  color: #5a3e00;            /* nâu đậm, dễ nhìn */
+  font-weight: 600;
+  box-shadow: none;          /* không shadow để nhẹ nhàng */
+}
+
+/* Không tập */
+.attendance-calendar .calendar-grid > .day-cell.normal-session {
+  background-color: var(--primary-color-light);
+  color: var(--text-light);
+}
+
+
+.attendance-calendar .calendar-grid > .day-cell:hover {
+  border-color: var(--secondary-color);
+}
+
+/* Tooltip ẩn mặc định */
+.attendance-calendar .calendar-grid > .day-cell .feedback-tooltip {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 140px;
+  max-width: 220px;
+  padding: 8px 12px;
+  background-color: var(--secondary-color);
+  color: var(--black-color);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  white-space: normal;
+  z-index: 10;
+}
+
+/* Tooltip mũi tên nhỏ */
+.attendance-calendar .calendar-grid > .day-cell .feedback-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--secondary-color) transparent transparent transparent;
+}
+
+/* Hiển thị tooltip khi hover ô ngày có feedback */
+.attendance-calendar .calendar-grid > .day-cell.pt-session:hover .feedback-tooltip,
+.attendance-calendar .calendar-grid > .day-cell.normal-session:hover .feedback-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.attendance-calendar .pt-remaining-text {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  color: var(--secondary-color); /* màu chủ đạo */
+  font-weight: 600;
+}

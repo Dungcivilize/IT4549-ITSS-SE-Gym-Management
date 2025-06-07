@@ -1,4 +1,4 @@
-package ITSS.Backend.Service.Admin;
+package ITSS.Backend.Admin.Service;
 
 import java.util.Map;
 import java.util.HashMap;

@@ -22,7 +22,9 @@ public interface AcceptedBillRepository extends JpaRepository<AcceptedBill, Long
     @Query("SELECT b FROM AcceptedBill b WHERE b.memberId = :memberId AND b.packageId = :packageId ORDER BY b.paymentDate DESC")
     List<AcceptedBill> findByMemberIdAndPackageIdOrderByPaymentDateDesc(@Param("memberId") Long memberId, @Param("packageId") Long packageId);
 
-    // Đếm số lần thanh toán thành công (verified) của member cho package
     @Query("SELECT COUNT(b) FROM AcceptedBill b WHERE b.memberId = :memberId AND b.packageId = :packageId AND b.verifiedDate IS NOT NULL")
     Long countVerifiedBillsByMemberAndPackage(@Param("memberId") Long memberId, @Param("packageId") Long packageId);
+  
+    @Query("SELECT SUM(b.amount) FROM AcceptedBill b WHERE YEAR(b.paymentDate) = :year AND MONTH(b.paymentDate) = :month")
+    Long getTotalAmountByYearAndMonth(@Param("year") int year, @Param("month") int month);
 }
