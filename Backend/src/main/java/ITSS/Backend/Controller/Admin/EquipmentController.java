@@ -1,8 +1,7 @@
-package ITSS.Backend.Admin.Controller;
+package ITSS.Backend.Controller.Admin;
 
-import ITSS.Backend.Admin.DTO.EquipmentDTO;
-import ITSS.Backend.Admin.Service.EquipmentService;
-
+import ITSS.Backend.DTO.Admin.EquipmentDTO;
+import ITSS.Backend.Service.Admin.EquipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

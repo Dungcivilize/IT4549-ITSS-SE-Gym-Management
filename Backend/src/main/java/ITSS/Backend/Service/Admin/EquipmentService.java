@@ -1,6 +1,6 @@
-package ITSS.Backend.Admin.Service;
+package ITSS.Backend.Service.Admin;
 
-import ITSS.Backend.Admin.DTO.EquipmentDTO;
+import ITSS.Backend.DTO.Admin.EquipmentDTO;
 import ITSS.Backend.entity.Equipment;
 import ITSS.Backend.entity.Room;
 import ITSS.Backend.repository.EquipmentRepository;

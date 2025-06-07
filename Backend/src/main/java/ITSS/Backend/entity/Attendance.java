@@ -27,7 +27,4 @@ public class Attendance {
 
     @Column(name = "checkin_date", nullable = false)
     private LocalDateTime checkinDate;
-
-    @Column(name = "feedback")
-    private String feedback;
 } 

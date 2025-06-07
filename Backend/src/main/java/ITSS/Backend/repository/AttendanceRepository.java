@@ -25,16 +25,4 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<LocalDateTime> findByMemberIdAndMonth(@Param("memberId") Long memberId, @Param("month") String month);
 
     List<Attendance> findByMember_UserId(Long memberId);
-
-    @Query(value = "SELECT DATE(checkin_date) as date, feedback " +
-            "FROM attendance " +
-            "WHERE member_id = :memberId " +
-            "AND DATE_FORMAT(checkin_date, '%Y-%m') = :month " +
-            "ORDER BY checkin_date",
-            nativeQuery = true)
-    List<Object[]> findDatesAndFeedbackByMemberIdAndMonth(@Param("memberId") Long memberId,
-                                                          @Param("month") String month);
-
-    int countByMember_UserIdAndFeedbackIsNotNull(Long memberId);
-
 } 
