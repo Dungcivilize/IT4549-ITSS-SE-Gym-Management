@@ -7,9 +7,10 @@ public class MembershipPackageDTO {
     private Long packageId;
     private String packageName;
     private Long duration;
+    private Integer maxPtMeetingDays;
     private Long price;
-    private String packageType;
     private Boolean PT;
+    private Double discount;
     private List<Long> trainerIds;
 }
 
