@@ -81,7 +81,9 @@ export default function PackageManagement() {
     } else {
       await axios.post('http://localhost:8080/api/membership-packages', formData);
     }
+
     setFormData({ packageName: '', duration: '', price: '', maxPtMeetingDays: '', discount: '', pt: false, trainerIds: [] });
+
     setEditingId(null);
     fetchPackages();
   };
