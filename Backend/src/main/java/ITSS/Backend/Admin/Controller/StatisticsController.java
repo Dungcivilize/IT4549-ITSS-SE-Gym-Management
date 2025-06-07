@@ -1,71 +1,41 @@
 package ITSS.Backend.Admin.Controller;
 
-import ITSS.Backend.entity.Equipment;
-import ITSS.Backend.entity.User;
-import ITSS.Backend.repository.EquipmentRepository;
-import ITSS.Backend.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import ITSS.Backend.repository.UserRepository;
+import ITSS.Backend.repository.MembershipPackageRepository;
+import ITSS.Backend.repository.EquipmentRepository;
 @RestController
 @RequestMapping("/api/statistics")
-@RequiredArgsConstructor
 public class StatisticsController {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    @GetMapping("/age-groups")
-    public ResponseEntity<List<Map<String, Object>>> getAgeGroupStats() {
-        List<User> users = userRepository.findAll();
-        Map<String, Integer> ageGroups = new HashMap<>();
+    @Autowired
+    private MembershipPackageRepository membershipPackageRepository;
 
-        LocalDate now = LocalDate.now();
-        for (User user : users) {
-            int age = Period.between(user.getDateOfBirth(), now).getYears();
-            String group;
-            if (age < 18) group = "<18";
-            else if (age < 30) group = "18-29";
-            else if (age < 45) group = "30-44";
-            else if (age < 60) group = "45-59";
-            else group = "60+";
+    @Autowired
+    private EquipmentRepository equipmentRepository;
 
-            ageGroups.put(group, ageGroups.getOrDefault(group, 0) + 1);
-        }
+    @GetMapping("/totals")
+    public ResponseEntity<Map<String, Long>> getTotals() {
+        Map<String, Long> response = new HashMap<>();
 
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : ageGroups.entrySet()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("range", entry.getKey());
-            map.put("count", entry.getValue());
-            result.add(map);
-        }
+        long totalMembers = userRepository.countByRole("member");  // giả sử có method này
+        long totalPackages = membershipPackageRepository.count();
+        long totalEquipments = equipmentRepository.count();
 
-        return ResponseEntity.ok(result);
-    }
+        response.put("totalMembers", totalMembers);
+        response.put("totalPackages", totalPackages);
+        response.put("totalEquipments", totalEquipments);
 
-    private final EquipmentRepository equipmentRepository;
-
-    @GetMapping("/equipment-status")
-    public ResponseEntity<Map<String, Integer>> getEquipmentStatusStats() {
-        List<Equipment> equipments = equipmentRepository.findAll();
-        Map<String, Integer> statusCount = new HashMap<>();
-
-        for (Equipment equipment : equipments) {
-            String status = equipment.getStatus();
-            statusCount.put(status, statusCount.getOrDefault(status, 0) + 1);
-        }
-
-        return ResponseEntity.ok(statusCount);
+        return ResponseEntity.ok(response);
     }
 }
-

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { FaExclamationTriangle, FaCheckCircle } from "react-icons/fa";
 
 const styles = {
   container: { maxWidth: "900px", margin: "0 auto", padding: "20px" },
@@ -101,14 +100,6 @@ const initialFormState = {
   roomId: "",
 };
 
-const statusColors = {
-  Unavailable: "#ef4444", // đỏ
-  Available: "#10b981",   // xanh lá
-  Maintenance: "#fbbf24", // vàng
-  Repair: "#f97316",      // cam (bổ sung)
-  Lost: "#6b7280",        // xám (bổ sung)
-};
-
 const Equipment = () => {
   const [equipments, setEquipments] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -116,7 +107,6 @@ const Equipment = () => {
   const [form, setForm] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [filterUnavailable, setFilterUnavailable] = useState(false);
 
   const API_BASE = "http://localhost:8080/api/equipments";
   const ROOMS_API = "http://localhost:8080/api/admin/rooms";
@@ -178,17 +168,13 @@ const Equipment = () => {
   };
 
   const handleEdit = (id) => {
-  const eq = equipments.find((e) => e.equipmentId === id);
-  if (eq) {
-    setForm({
-      ...eq,
-      status: eq.status === "Unavailable" ? "Maintenance" : eq.status,
-    });
-    setEditingId(id);
-    setShowForm(true);
-  }
-};
-
+    const eq = equipments.find((e) => e.equipmentId === id);
+    if (eq) {
+      setForm(eq);
+      setEditingId(id);
+      setShowForm(true);
+    }
+  };
 
   const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc muốn xóa thiết bị này không?")) {
@@ -216,67 +202,15 @@ const Equipment = () => {
     setSelectedRoomId(e.target.value);
   };
 
-  // Lọc thiết bị theo phòng
-  let filteredEquipments =
+  // Lọc thiết bị theo phòng nếu chọn phòng
+  const filteredEquipments =
     selectedRoomId === ""
       ? equipments
       : equipments.filter((eq) => eq.roomId.toString() === selectedRoomId);
 
-  // Lọc thiết bị theo trạng thái "Unavailable" nếu filter bật
-  if (filterUnavailable) {
-    filteredEquipments = filteredEquipments.filter(
-      (eq) => eq.status === "Unavailable"
-    );
-  }
-
-  // Kiểm tra xem có thiết bị nào "Unavailable" trong danh sách không để đổi màu nút
-  const hasUnavailable = equipments.some((eq) => eq.status === "Unavailable");
-
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Equipment Management</h1>
-
-      {/* Filter by status */}
-      <div style={{ marginBottom: "15px", display: "flex", alignItems: "center", gap: "12px" }}>
-  <button
-    onClick={() => setFilterUnavailable(!filterUnavailable)}
-    disabled={!hasUnavailable}
-    style={{
-      backgroundColor: filterUnavailable && hasUnavailable ? "#b22222" : hasUnavailable ? "#dc3545" : "#ccc",
-      color: "white",
-      border: "none",
-      padding: "10px 20px",
-      borderRadius: "6px",
-      cursor: hasUnavailable ? "pointer" : "not-allowed",
-      fontWeight: "600",
-      fontSize: "16px",
-      boxShadow: hasUnavailable ? "0 4px 6px rgba(220, 53, 69, 0.4)" : "none",
-      transition: "background-color 0.3s ease, box-shadow 0.3s ease",
-    }}
-    onMouseEnter={e => {
-      if (hasUnavailable) e.currentTarget.style.backgroundColor = "#a71d2a";
-    }}
-    onMouseLeave={e => {
-      if (hasUnavailable)
-        e.currentTarget.style.backgroundColor = filterUnavailable ? "#b22222" : "#dc3545";
-    }}
-  >
-    {filterUnavailable ? "Bỏ lọc máy lỗi" : "Lọc máy lỗi"}
-  </button>
-
-  {hasUnavailable ? (
-    <span style={{ color: "#dc3545", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px", fontSize: "16px" }}>
-      <FaExclamationTriangle />
-      Có máy hỏng cần bảo trì
-    </span>
-  ) : (
-    <span style={{ color: "#198754", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px", fontSize: "16px" }}>
-      <FaCheckCircle />
-      Máy móc vẫn ổn
-    </span>
-  )}
-</div>
-
 
       {/* Dropdown select room */}
       <select
@@ -302,18 +236,17 @@ const Equipment = () => {
         <form style={styles.form} onSubmit={handleSubmit}>
           <input
             style={styles.input}
-            type="text"
-            placeholder="Equipment Name"
             name="equipmentName"
+            placeholder="Equipment Name"
             value={form.equipmentName}
             onChange={handleChange}
             required
           />
           <input
             style={styles.input}
+            name="quantity"
             type="number"
             placeholder="Quantity"
-            name="quantity"
             value={form.quantity}
             onChange={handleChange}
             required
@@ -321,43 +254,35 @@ const Equipment = () => {
           />
           <input
             style={styles.input}
-            type="text"
-            placeholder="Manufacturer"
             name="manufacturer"
+            placeholder="Manufacturer"
             value={form.manufacturer}
             onChange={handleChange}
             required
           />
           <input
             style={styles.input}
+            name="price"
             type="number"
             placeholder="Price"
-            name="price"
             value={form.price}
             onChange={handleChange}
             required
             min={0}
             step="0.01"
           />
-          <select
+          <input
             style={styles.input}
             name="status"
+            placeholder="Status"
             value={form.status}
             onChange={handleChange}
             required
-          >
-            <option value="">-- Select Status --</option>
-            {Object.keys(statusColors).map((key) => (
-              <option key={key} value={key}>
-                {key}
-              </option>
-            ))}
-          </select>
+          />
           <input
             style={styles.input}
-            type="text"
-            placeholder="Notes"
             name="notes"
+            placeholder="Notes"
             value={form.notes}
             onChange={handleChange}
           />
@@ -376,17 +301,14 @@ const Equipment = () => {
             ))}
           </select>
 
-          <div style={{ textAlign: "right", marginTop: "10px" }}>
-            <button
-              type="submit"
-              style={styles.submitButton}
-            >
-              {editingId !== null ? "Update" : "Add"}
+          <div>
+            <button type="submit" style={styles.submitButton}>
+              {editingId !== null ? "Save" : "Add"}
             </button>
             <button
               type="button"
-              onClick={handleCancel}
               style={styles.cancelButton}
+              onClick={handleCancel}
             >
               Cancel
             </button>
@@ -397,8 +319,7 @@ const Equipment = () => {
       <table style={styles.table}>
         <thead>
           <tr>
-            <th style={styles.th}>ID</th>
-            <th style={styles.th}>Name</th>
+            <th style={styles.th}>Equipment Name</th>
             <th style={styles.th}>Quantity</th>
             <th style={styles.th}>Manufacturer</th>
             <th style={styles.th}>Price</th>
@@ -412,23 +333,14 @@ const Equipment = () => {
           {filteredEquipments.length > 0 ? (
             filteredEquipments.map((eq) => (
               <tr key={eq.equipmentId}>
-                <td style={styles.td}>{eq.equipmentId}</td>
                 <td style={styles.td}>{eq.equipmentName}</td>
                 <td style={styles.td}>{eq.quantity}</td>
                 <td style={styles.td}>{eq.manufacturer}</td>
-                <td style={styles.td}>{eq.price.toLocaleString()}</td>
-                <td
-                  style={{
-                    ...styles.td,
-                    color: statusColors[eq.status] || "#000",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {eq.status}
-                </td>
+                <td style={styles.td}>{eq.price}</td>
+                <td style={styles.td}>{eq.status}</td>
                 <td style={styles.td}>{eq.notes}</td>
                 <td style={styles.td}>
-                  {rooms.find((r) => r.roomId === eq.roomId)?.roomName || ""}
+                  {rooms.find((r) => r.roomId === eq.roomId)?.roomName || "Unknown"}
                 </td>
                 <td style={styles.td}>
                   <div style={styles.actionButtons}>
@@ -450,8 +362,8 @@ const Equipment = () => {
             ))
           ) : (
             <tr>
-              <td style={styles.td} colSpan="9">
-                No equipment found.
+              <td colSpan="8" style={styles.td}>
+                No equipment found
               </td>
             </tr>
           )}
