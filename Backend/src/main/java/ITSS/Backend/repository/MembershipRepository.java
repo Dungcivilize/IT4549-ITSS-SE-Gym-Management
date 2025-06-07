@@ -1,5 +1,7 @@
 package ITSS.Backend.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,5 +70,11 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
     ORDER BY MONTH(m.startDate)
 """)
     List<Object[]> getMonthlyRevenue(@Param("year") int year);
+
+    Optional<Membership> findTopByMemberUserIdOrderByStartDateDesc(Long userId);
+
+    List<Membership> findByTrainerUserIdAndPaymentStatusAndEndDateAfter(
+            Long trainerUserId, Membership.PaymentStatus paymentStatus, LocalDate now
+    );
 
 }
