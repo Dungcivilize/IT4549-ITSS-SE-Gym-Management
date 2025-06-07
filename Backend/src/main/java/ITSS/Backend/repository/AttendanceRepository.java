@@ -36,4 +36,5 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
                                                           @Param("month") String month);
 
     int countByMember_UserIdAndFeedbackIsNotNull(Long memberId);
+
 } 

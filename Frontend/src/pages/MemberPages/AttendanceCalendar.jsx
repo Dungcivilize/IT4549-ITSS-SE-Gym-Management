@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import './AttendanceCalendar.css';
 
 function AttendanceCalendar() {
-  const [attendanceData, setAttendanceData] = useState([]); // lưu mảng {date, feedback}
+  const [attendanceData, setAttendanceData] = useState([]); // [{ date, feedback }]
   const [month, setMonth] = useState('2025-06');
   const [loading, setLoading] = useState(false);
+  const [ptRemaining, setPtRemaining] = useState(null);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     const memberId = userData?.user_id;
     if (!memberId) return;
 
+    // Gọi API lịch điểm danh
     setLoading(true);
     fetch(`/api/attendance/dates/${memberId}?month=${month}`)
       .then(res => res.json())
@@ -23,25 +25,36 @@ function AttendanceCalendar() {
         setAttendanceData([]);
         setLoading(false);
       });
+
+    // Gọi API PT remaining
+    fetch(`/api/attendance/pt-remaining/${memberId}`)
+      .then(res => res.json())
+      .then(data => {
+        setPtRemaining(data.ptRemaining);
+      })
+      .catch(err => {
+        console.error("Lỗi lấy ptRemaining:", err);
+        setPtRemaining(null);
+      });
   }, [month]);
 
   const daysInMonth = new Date(month.split('-')[0], month.split('-')[1], 0).getDate();
   const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-  // Tạo map từ ngày -> feedback để tra cứu nhanh
   const feedbackMap = {};
   attendanceData.forEach(item => {
     feedbackMap[item.date] = item.feedback;
   });
 
-  const isCheckedIn = (day) => {
-    const dayStr = `${month}-${String(day).padStart(2, '0')}`;
-    return dayStr in feedbackMap;
-  };
-
   return (
     <div className="attendance-calendar">
       <h3>Lịch tập tháng {month}</h3>
+
+      {ptRemaining !== null && (
+        <p className="pt-remaining-text">
+          Số buổi tập với PT còn lại: <strong>{ptRemaining}</strong>
+        </p>
+      )}
 
       <input
         type="month"
@@ -66,23 +79,29 @@ function AttendanceCalendar() {
           return blanks;
         })()}
 
-        {daysArray.map(day => {
-          const dayStr = `${month}-${String(day).padStart(2, '0')}`;
-          const feedback = feedbackMap[dayStr];
-          return (
-            <div
-              key={day}
-              className={`day-cell ${feedback ? 'checked-in' : ''}`}
-            >
-              {day}
-              {feedback && (
-                <div className="feedback-tooltip">
-                  {feedback}
-                </div>
-              )}
-            </div>
-          );
-        })}
+{daysArray.map(day => {
+  const dayStr = `${month}-${String(day).padStart(2, '0')}`;
+  const feedback = feedbackMap[dayStr];
+
+  let sessionType = '';
+  if (dayStr in feedbackMap) {
+    // Có tập (feedback có thể null hoặc có nội dung)
+    sessionType = feedback ? 'pt-session' : 'pt-session-no-feedback';
+  } else {
+    // Không tập gì
+    sessionType = 'normal-session';
+  }
+
+  return (
+    <div key={day} className={`day-cell ${sessionType}`}>
+      {day}
+      {feedback && (
+        <div className="feedback-tooltip">{feedback}</div>
+      )}
+    </div>
+  );
+})}
+
       </div>
     </div>
   );

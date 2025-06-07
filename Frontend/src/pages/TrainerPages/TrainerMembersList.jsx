@@ -11,6 +11,34 @@ function TrainerMembersList() {
   const user = JSON.parse(localStorage.getItem('user'));
   const trainerId = user?.user_id;
 
+  // Hàm tính lại ptMeetingDaysLeft và ptMeetingDaysUsed cho từng attendance
+function computePtSessions(attendances) {
+  if (!attendances.length) return [];
+
+  // Sort theo checkinDate
+  const sorted = [...attendances].sort((a, b) => new Date(a.checkinDate) - new Date(b.checkinDate));
+
+  // Lấy ptMeetingDaysLeft ban đầu từ buổi đầu tiên
+  const initialPtLeft = sorted[0].ptMeetingDaysLeft ?? 0;
+
+  let ptUsedCount = 0;
+
+  return sorted.map((att) => {
+    // Nếu attendance có feedback (khác null và khác rỗng) thì tính là đã dùng 1 buổi PT
+    if (att.feedback && att.feedback.trim() !== '') {
+      ptUsedCount++;
+    }
+
+    const ptLeft = initialPtLeft - ptUsedCount;
+    return {
+      ...att,
+      ptMeetingDaysLeft: ptLeft < 0 ? 0 : ptLeft,
+      ptMeetingDaysUsed: ptUsedCount,
+    };
+  });
+}
+
+
   useEffect(() => {
     if (!trainerId) return;
     axios
@@ -23,7 +51,10 @@ function TrainerMembersList() {
     if (!selectedMemberId) return;
     axios
       .get(`http://localhost:8080/api/trainer/members/${selectedMemberId}/attendances`)
-      .then((res) => setAttendances(res.data))
+      .then((res) => {
+        const computed = computePtSessions(res.data);
+        setAttendances(computed);
+      })
       .catch((err) => console.error(err));
   }, [selectedMemberId]);
 
@@ -31,7 +62,10 @@ function TrainerMembersList() {
     axios
       .post(`http://localhost:8080/api/trainer/members/${memberId}/attendances`)
       .then((res) => {
-        setAttendances((prev) => [...prev, res.data]);
+        // Thêm attendance mới rồi tính lại
+        const newAttendances = [...attendances, res.data];
+        const computed = computePtSessions(newAttendances);
+        setAttendances(computed);
       })
       .catch((err) => console.error(err));
   };
@@ -49,11 +83,11 @@ function TrainerMembersList() {
   return (
     <div className="trainer-members-container">
       <h2 className="trainer-members-title">Danh sách Hội viên</h2>
-        {successMessage && (
+      {successMessage && (
         <div className="success-message">
           {successMessage}
         </div>
-        )}
+      )}
       <table className="trainer-members-table">
         <thead>
           <tr>
@@ -92,6 +126,8 @@ function TrainerMembersList() {
               <tr>
                 <th>Check-in Date</th>
                 <th>Feedback</th>
+                <th>PT Days Left</th>
+                <th>PT Days Used</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -111,6 +147,8 @@ function TrainerMembersList() {
                       }}
                     />
                   </td>
+                  <td>{att.ptMeetingDaysLeft}</td>
+                  <td>{att.ptMeetingDaysUsed}</td>
                   <td>
                     <button
                       className="trainer-update-button"
@@ -122,7 +160,7 @@ function TrainerMembersList() {
                 </tr>
               ))}
               <tr>
-                <td colSpan={3}>
+                <td colSpan={5}>
                   <button
                     className="trainer-members-button"
                     onClick={() => handleCreateAttendance(selectedMemberId)}
