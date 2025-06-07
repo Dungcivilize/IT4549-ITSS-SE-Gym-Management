@@ -1,11 +1,11 @@
-package ITSS.Backend.Service.Admin;
+package ITSS.Backend.Admin.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import ITSS.Backend.DTO.Admin.MembershipPackageDTO;
+import ITSS.Backend.Admin.DTO.MembershipPackageDTO;
 import ITSS.Backend.entity.MembershipPackage;
 import ITSS.Backend.entity.User;
 import ITSS.Backend.repository.MembershipPackageRepository;
@@ -44,12 +44,15 @@ public class AdminMembershipPackageService {
         return packageRepo.findById(id).map(existing -> {
             existing.setPackageName(dto.getPackageName());
             existing.setDuration(dto.getDuration());
+            existing.setMaxPtMeetingDays(dto.getMaxPtMeetingDays());
             existing.setPrice(dto.getPrice());
-            existing.setPackageType(dto.getPackageType());
             existing.setPT(dto.getPT());
-            // set trainers
+            existing.setDiscount(dto.getDiscount());
+            existing.setPrice(dto.getPrice()); 
+
             List<User> trainers = userRepo.findAllById(dto.getTrainerIds());
             existing.setTrainers(trainers);
+
             MembershipPackage updated = packageRepo.save(existing);
             return toDTO(updated);
         }).orElse(null);
@@ -61,31 +64,36 @@ public class AdminMembershipPackageService {
         return true;
     }
 
-    // chuyển từ entity sang dto
+    // Convert entity to DTO
     private MembershipPackageDTO toDTO(MembershipPackage entity) {
         MembershipPackageDTO dto = new MembershipPackageDTO();
         dto.setPackageId(entity.getPackageId());
         dto.setPackageName(entity.getPackageName());
         dto.setDuration(entity.getDuration());
+        dto.setMaxPtMeetingDays(entity.getMaxPtMeetingDays());
         dto.setPrice(entity.getPrice());
-        dto.setPackageType(entity.getPackageType());
         dto.setPT(entity.getPT());
+        dto.setDiscount(entity.getDiscount());
+        dto.setPrice(entity.getPrice()); 
         dto.setTrainerIds(entity.getTrainers()
                 .stream().map(User::getUserId).collect(Collectors.toList()));
         return dto;
     }
 
-    // chuyển từ dto sang entity (chỉ tạo mới)
+    // Convert DTO to entity (create only)
     private MembershipPackage toEntity(MembershipPackageDTO dto) {
         MembershipPackage entity = new MembershipPackage();
         entity.setPackageName(dto.getPackageName());
         entity.setDuration(dto.getDuration());
+        entity.setMaxPtMeetingDays(dto.getMaxPtMeetingDays());
         entity.setPrice(dto.getPrice());
-        entity.setPackageType(dto.getPackageType());
         entity.setPT(dto.getPT());
+        entity.setDiscount(dto.getDiscount());
+        entity.setPrice(dto.getPrice()); 
+
         List<User> trainers = userRepo.findAllById(dto.getTrainerIds());
         entity.setTrainers(trainers);
+
         return entity;
     }
 }
-

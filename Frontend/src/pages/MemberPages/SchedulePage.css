@@ -1,0 +1,22 @@
+/* SchedulePage.css */
+
+.schedule-page {
+  color: var(--white-color, #fff);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-page__content {
+  padding: 2rem;
+  max-width: var(--max-width, 1200px);
+  margin: 0 auto;
+  flex: 1;
+}
+
+.schedule-page__title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--secondary-color, #f9ac54);
+  font-weight: 600;
+}
