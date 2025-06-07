@@ -45,6 +45,7 @@ public class AdminMembershipPackageService {
             existing.setPackageName(dto.getPackageName());
             existing.setDuration(dto.getDuration());
             existing.setMaxPtMeetingDays(dto.getMaxPtMeetingDays());
+            existing.setPrice(dto.getPrice());
             existing.setPT(dto.getPT());
             existing.setDiscount(dto.getDiscount());
             existing.setPrice(dto.getPrice()); 
@@ -70,6 +71,7 @@ public class AdminMembershipPackageService {
         dto.setPackageName(entity.getPackageName());
         dto.setDuration(entity.getDuration());
         dto.setMaxPtMeetingDays(entity.getMaxPtMeetingDays());
+        dto.setPrice(entity.getPrice());
         dto.setPT(entity.getPT());
         dto.setDiscount(entity.getDiscount());
         dto.setPrice(entity.getPrice()); 
@@ -84,6 +86,7 @@ public class AdminMembershipPackageService {
         entity.setPackageName(dto.getPackageName());
         entity.setDuration(dto.getDuration());
         entity.setMaxPtMeetingDays(dto.getMaxPtMeetingDays());
+        entity.setPrice(dto.getPrice());
         entity.setPT(dto.getPT());
         entity.setDiscount(dto.getDiscount());
         entity.setPrice(dto.getPrice()); 

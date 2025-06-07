@@ -1,6 +1,20 @@
 package ITSS.Backend.Member.Service;
 
-import ITSS.Backend.Member.DTO.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import ITSS.Backend.Member.DTO.CurrentMembershipAdminResponse;
+import ITSS.Backend.Member.DTO.CurrentMembershipResponse;
+import ITSS.Backend.Member.DTO.PayMembershipRequest;
+import ITSS.Backend.Member.DTO.PaymentStatusResponse;
+import ITSS.Backend.Member.DTO.RegisterMembershipRequest;
+import ITSS.Backend.Member.DTO.TrainerPackageSummaryResponse;
+import ITSS.Backend.Member.DTO.TransactionHistoryResponse;
 import ITSS.Backend.entity.AcceptedBill;
 import ITSS.Backend.entity.Membership;
 import ITSS.Backend.entity.MembershipPackage;
@@ -9,12 +23,6 @@ import ITSS.Backend.repository.AcceptedBillRepository;
 import ITSS.Backend.repository.MembershipPackageRepository;
 import ITSS.Backend.repository.MembershipRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -196,6 +204,7 @@ public void registerMembership(RegisterMembershipRequest req) {
         bill.setPackageId(pkg.getPackageId());
         bill.setAmount(finalAmount);
         bill.setPaymentDate(LocalDateTime.now());
+        bill.setTransactionCode(req.getTransactionCode()); // Lưu mã giao dịch ngay
 
         acceptedBillRepository.save(bill);
         return true;
@@ -219,31 +228,100 @@ public void registerMembership(RegisterMembershipRequest req) {
 
 
     public boolean extendMembership(PayMembershipRequest req) {
+        // Tìm membership hiện tại (phải đang Paid hoặc đã hết hạn)
         Optional<Membership> membershipOpt = membershipRepository
                 .findByMemberUserIdAndMembershipPackagePackageId(req.getMemberId(), req.getPackageId());
 
-        if (membershipOpt.isPresent()) {
-            Membership membership = membershipOpt.get();
-
-            MembershipPackage fullPackage = membershipPackageRepository
-                    .findById(req.getPackageId())
-                    .orElse(null);
-
-            if (fullPackage == null || fullPackage.getDuration() == null) {
-                return false; // Không có thông tin về gói
-            }
-
-            LocalDate currentEndDate = membership.getEndDate();
-            membership.setEndDate(currentEndDate.plusDays(fullPackage.getDuration()));
-            membershipRepository.save(membership);
-            return true;
-        } else {
+        if (membershipOpt.isEmpty()) {
             return false;
         }
+
+        Membership membership = membershipOpt.get();
+
+        // Lấy thông tin gói tập để tính tiền và duration
+        MembershipPackage pkg = membershipPackageRepository
+                .findById(req.getPackageId())
+                .orElse(null);
+
+        if (pkg == null || pkg.getDuration() == null) {
+            return false; // Không có thông tin về gói
+        }
+
+        // Tính số tiền cần thanh toán cho gia hạn (giống như pay)
+        long originalPrice = pkg.getPrice();
+        double discount = pkg.getDiscount();
+        long finalAmount = (long) (originalPrice * (1 - discount));
+
+        // Tạo hóa đơn mới cho việc gia hạn
+        AcceptedBill bill = new AcceptedBill();
+        bill.setMemberId(req.getMemberId());
+        bill.setPackageId(pkg.getPackageId());
+        bill.setAmount(finalAmount);
+        bill.setPaymentDate(LocalDateTime.now());
+        bill.setTransactionCode(req.getTransactionCode()); // Lưu mã giao dịch
+
+        acceptedBillRepository.save(bill);
+
+        // Cập nhật trạng thái membership thành Processing (chờ xác nhận thanh toán)
+        membership.setPaymentStatus(Membership.PaymentStatus.Processing);
+        
+        // 🚨 KHÔNG gia hạn ngay! Chỉ gia hạn sau khi receptionist approve
+        // Gia hạn sẽ được thực hiện trong PaymentVerificationService.verifyPayment()
+        
+        membershipRepository.save(membership);
+        return true;
     }
 
     public List<TransactionHistoryResponse> getTransactionHistory(Long memberId) {
         return acceptedBillRepository.getHistoryByMemberId(memberId);
     }
+
+    public List<PaymentStatusResponse> getPaymentStatus(Long memberId) {
+        List<Membership> memberships = membershipRepository.findByMemberUserId(memberId);
+        
+        return memberships.stream().map(membership -> {
+            String packageName = membership.getMembershipPackage().getPackageName();
+            String paymentStatus = membership.getPaymentStatus().toString();
+            
+            // Tính amount từ package
+            double packagePrice = membership.getMembershipPackage().getPrice();
+            double discount = membership.getMembershipPackage().getDiscount();
+            Long amount = Math.round(packagePrice * (1 - discount));
+            
+            // Lấy thông tin từ AcceptedBill mới nhất (nếu có)
+            List<AcceptedBill> bills = acceptedBillRepository.findByMemberIdAndPackageIdOrderByPaymentDateDesc(
+                memberId, 
+                membership.getMembershipPackage().getPackageId()
+            );
+            
+            LocalDateTime paymentDate = null;
+            String transactionCode = null;
+            String rejectReason = null;
+            LocalDateTime verifiedDate = null;
+            
+            if (!bills.isEmpty()) {
+                AcceptedBill latestBill = bills.get(0);
+                paymentDate = latestBill.getPaymentDate();
+                transactionCode = latestBill.getTransactionCode();
+                rejectReason = latestBill.getRejectReason();
+                verifiedDate = latestBill.getVerifiedDate();
+            }
+            
+            return new PaymentStatusResponse(
+                membership.getMembershipId(),
+                packageName,
+                paymentStatus,
+                amount,
+                membership.getStartDate(),
+                membership.getEndDate(),
+                paymentDate,
+                transactionCode,
+                rejectReason,
+                verifiedDate
+            );
+        }).collect(Collectors.toList());
+    }
+
+
 
 }

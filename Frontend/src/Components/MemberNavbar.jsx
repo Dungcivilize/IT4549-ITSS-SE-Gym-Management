@@ -9,7 +9,7 @@ const MemberNavbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    // Inject CSS for hover effects - same as Home.jsx
+    // Inject CSS for hover effects and responsive design
     const style = document.createElement("style");
     style.textContent = `
       .nav-link-hover::after {
@@ -24,6 +24,25 @@ const MemberNavbar = () => {
       }
       .nav-link-hover:hover::after {
         width: 50%;
+      }
+      
+      @media (max-width: 768px) {
+        .nav-links-mobile {
+          display: none !important;
+        }
+        .nav-mobile-toggle {
+          display: block !important;
+          color: white;
+          font-size: 1.5rem;
+          cursor: pointer;
+          padding: 0.5rem;
+        }
+      }
+      
+      @media (min-width: 769px) {
+        .nav-mobile-toggle {
+          display: none !important;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -40,12 +59,14 @@ const MemberNavbar = () => {
     nav: {
       maxWidth: "1200px",
       margin: "auto",
-      padding: "2rem 1rem",
+      padding: "1rem 1rem",
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      gap: "2rem",
+      gap: "1rem",
       fontFamily: "Poppins, sans-serif",
+      flexWrap: "nowrap",
+      minHeight: "60px",
     },
     navLogo: {
       maxWidth: "150px",
@@ -58,9 +79,11 @@ const MemberNavbar = () => {
       listStyle: "none",
       display: "flex",
       alignItems: "center",
-      gap: "3rem",
+      gap: "2rem",
       margin: 0,
       padding: 0,
+      flexWrap: "nowrap",
+      minWidth: "0",
     },
     link: {
       position: "relative",
@@ -68,6 +91,8 @@ const MemberNavbar = () => {
       color: "#ffffff",
       textDecoration: "none",
       fontWeight: "500",
+      whiteSpace: "nowrap",
+      fontSize: "0.9rem",
     },
     btn: {
       padding: "1rem 2rem",
@@ -86,8 +111,9 @@ const MemberNavbar = () => {
     userInfo: {
       display: "flex",
       alignItems: "center",
-      gap: "1rem",
+      gap: "0.5rem",
       position: "relative",
+      flexShrink: 0,
     },
     userButton: {
       color: "white",
@@ -124,7 +150,7 @@ const MemberNavbar = () => {
         </Link>
       </div>
 
-      <ul style={pageStyles.navLinks}>
+      <ul style={pageStyles.navLinks} className="nav-links-mobile">
         <li>
           <Link
             to="/member/home"
@@ -140,7 +166,7 @@ const MemberNavbar = () => {
             style={pageStyles.link}
             className="nav-link-hover"
           >
-            Đăng ký gói tập
+            Đăng ký gói
           </Link>
         </li>
         <li>
@@ -167,10 +193,14 @@ const MemberNavbar = () => {
             style={pageStyles.link}
             className="nav-link-hover"
           >
-            Lịch sử giao dịch
+            Giao dịch
           </Link>
         </li>
       </ul>
+      
+      <div className="nav-mobile-toggle" style={{ display: 'none' }}>
+        ☰
+      </div>
 
       <div style={pageStyles.userInfo}>
         <div>
