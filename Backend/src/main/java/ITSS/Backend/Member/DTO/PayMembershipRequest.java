@@ -6,4 +6,5 @@ import lombok.Data;
 public class PayMembershipRequest {
     private Long memberId;
     private Long packageId;
+    private String transactionCode;
 }

@@ -1,14 +1,26 @@
 package ITSS.Backend.Member.Controller;
 
-import ITSS.Backend.Member.DTO.*;
-import ITSS.Backend.Member.Service.MemberMembershipService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import ITSS.Backend.Member.DTO.CurrentMembershipAdminResponse;
+import ITSS.Backend.Member.DTO.CurrentMembershipResponse;
+import ITSS.Backend.Member.DTO.PayMembershipRequest;
+import ITSS.Backend.Member.DTO.PaymentStatusResponse;
+import ITSS.Backend.Member.DTO.RegisterMembershipRequest;
+import ITSS.Backend.Member.DTO.TrainerPackageSummaryResponse;
+import ITSS.Backend.Member.DTO.TransactionHistoryResponse;
+import ITSS.Backend.Member.Service.MemberMembershipService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/memberships")
@@ -76,5 +88,13 @@ public class MembershipController {
         List<TransactionHistoryResponse> history = memberMembershipService.getTransactionHistory(memberId);
         return ResponseEntity.ok(history);
     }
+
+    @GetMapping("/payment-status/{memberId}")
+    public ResponseEntity<List<PaymentStatusResponse>> getPaymentStatus(@PathVariable Long memberId) {
+        List<PaymentStatusResponse> paymentStatus = memberMembershipService.getPaymentStatus(memberId);
+        return ResponseEntity.ok(paymentStatus);
+    }
+
+
 
 }
