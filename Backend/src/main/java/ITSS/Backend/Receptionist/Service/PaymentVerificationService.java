@@ -102,42 +102,40 @@ public class PaymentVerificationService {
             // Approve payment
             membership.setPaymentStatus(Membership.PaymentStatus.Paid);
             
-            // 🚨 Kiểm tra nếu đây là extend membership thì gia hạn endDate
-            if (!bills.isEmpty()) {
-                AcceptedBill bill = bills.get(0); // Lấy bill mới nhất
-                
-                // Đếm số lần thanh toán thành công trước đó
-                Long previousPayments = acceptedBillRepository.countVerifiedBillsByMemberAndPackage(
-                    membership.getMember().getUserId(),
-                    membership.getMembershipPackage().getPackageId()
-                );
-                
-                if (previousPayments > 0) {
-                    // Đã có ít nhất 1 lần thanh toán trước đó => đây là extend
-                    Long duration = membership.getMembershipPackage().getDuration();
-                    if (duration != null) {
-                        membership.setEndDate(membership.getEndDate().plusDays(duration.intValue()));
-                        System.out.println("🎯 [EXTEND APPROVED] Gia hạn thêm " + duration + " ngày");
-                    }
+            // Đếm số lần thanh toán thành công trước đó
+            Long previousPayments = acceptedBillRepository.countVerifiedBillsByMemberAndPackage(
+                membership.getMember().getUserId(),
+                membership.getMembershipPackage().getPackageId()
+            );
+            
+            if (previousPayments > 0) {
+                // Đây là lần gia hạn
+                Long duration = membership.getMembershipPackage().getDuration();
+                if (duration != null) {
+                    // Cộng thêm thời gian vào endDate
+                    membership.setEndDate(membership.getEndDate().plusDays(duration));
+                    System.out.println("🎯 [EXTEND APPROVED] Gia hạn thêm " + duration + " ngày");
                 }
-                
-                bill.setVerifiedDate(LocalDateTime.now());
-                bill.setRejectReason(null); // Clear any previous reject reason
-                acceptedBillRepository.save(bill);
             }
             
-        } else if ("REJECT".equals(request.getAction())) {
+            if (!bills.isEmpty()) {
+                AcceptedBill bill = bills.get(0);
+                bill.setVerifiedDate(LocalDateTime.now());
+                bill.setRejectReason(null);
+                acceptedBillRepository.save(bill);
+            }
+        } else {
             // Reject payment
             membership.setPaymentStatus(Membership.PaymentStatus.Unpaid);
             
-            // Cập nhật reject_reason trong bill mới nhất
             if (!bills.isEmpty()) {
-                AcceptedBill bill = bills.get(0); // Lấy bill mới nhất
-                bill.setRejectReason(request.getReason() != null ? request.getReason() : "Mã giao dịch không hợp lệ");
+                AcceptedBill bill = bills.get(0);
+                bill.setVerifiedDate(LocalDateTime.now());
+                bill.setRejectReason(request.getReason());
                 acceptedBillRepository.save(bill);
             }
         }
-
+        
         membershipRepository.save(membership);
         return true;
     }

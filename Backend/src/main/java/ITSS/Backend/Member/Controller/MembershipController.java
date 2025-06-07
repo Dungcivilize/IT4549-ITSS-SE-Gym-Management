@@ -75,11 +75,16 @@ public class MembershipController {
 
     @PostMapping("/extend")
     public ResponseEntity<?> extendMembership(@RequestBody PayMembershipRequest req) {
-        boolean extended = memberMembershipService.extendMembership(req);
-        if (extended) {
-            return ResponseEntity.ok("Gia hạn gói tập thành công");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không thể gia hạn: gói tập không tồn tại hoặc thiếu thông tin duration");
+        try {
+            memberMembershipService.extendMembership(req);
+            return ResponseEntity.ok("Gia hạn gói tập thành công, vui lòng đợi xác nhận");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Lỗi hệ thống khi gia hạn gói tập: " + e.getMessage());
         }
     }
 

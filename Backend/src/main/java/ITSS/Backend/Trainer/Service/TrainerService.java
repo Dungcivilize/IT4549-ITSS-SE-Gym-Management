@@ -1,21 +1,21 @@
 package ITSS.Backend.Trainer.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ITSS.Backend.Trainer.DTO.TrainerAttendanceDTO;
 import ITSS.Backend.Trainer.DTO.TrainerMemberDTO;
-import ITSS.Backend.Trainer.DTO.TrainerUpdateProfile;
 import ITSS.Backend.entity.Attendance;
 import ITSS.Backend.entity.Membership;
 import ITSS.Backend.entity.User;
 import ITSS.Backend.repository.AttendanceRepository;
 import ITSS.Backend.repository.MembershipRepository;
 import ITSS.Backend.repository.UserRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -34,7 +34,8 @@ public class TrainerService {
     private User findTrainerById(Long trainerId) {
         User trainer = userRepository.findById(trainerId)
                 .orElseThrow(() -> new RuntimeException("Trainer not found"));
-        if (!"trainer".equalsIgnoreCase(trainer.getRole())) {
+        String role = trainer.getRole().toLowerCase();
+        if (!role.equals("trainer") && !role.equals("member with pt")) {
             throw new RuntimeException("User is not a trainer");
         }
         return trainer;
@@ -54,9 +55,6 @@ public class TrainerService {
                 ))
                 .collect(Collectors.toList());
     }
-
-
-
 
     public List<TrainerAttendanceDTO> getAttendancesByMember(Long memberId) {
         List<Attendance> attendances = attendanceRepository.findByMember_UserId(memberId);
@@ -95,23 +93,6 @@ public class TrainerService {
         return new TrainerAttendanceDTO(saved.getAttendanceId(), saved.getCheckinDate(), saved.getFeedback(), ptLeft, ptUsed);
     }
 
-    public User updateTrainerProfile(Long trainerId, TrainerUpdateProfile updateProfile) {
-        User trainer = findTrainerById(trainerId);
-
-        trainer.setUserName(updateProfile.getUserName());
-        trainer.setEmail(updateProfile.getEmail());
-        trainer.setPhone(updateProfile.getPhone());
-        trainer.setFullname(updateProfile.getFullname());
-        trainer.setAddress(updateProfile.getAddress());
-        trainer.setDateOfBirth(updateProfile.getDateOfBirth());
-
-        return userRepository.save(trainer);
-    }
-
-    public User getTrainerProfile(Long trainerId) {
-        return findTrainerById(trainerId);
-    }
-
     public TrainerAttendanceDTO updateAttendanceFeedback(Long attendanceId, String feedback) {
         Attendance attendance = attendanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new RuntimeException("Attendance not found"));
@@ -130,8 +111,14 @@ public class TrainerService {
             if (ptLeft != null && ptLeft > 0) {
                 membership.setPtMeetingDaysLeft(ptLeft - 1);  // ptLeft - 1 là long - long = long, tự động phù hợp Long
                 membershipRepository.save(membership);
-            }
 
+                // Kiểm tra nếu đã hết buổi PT thì cập nhật role của member về "member"
+                if (ptLeft - 1 == 0) {
+                    User member = attendance.getMember();
+                    member.setRole("member");
+                    userRepository.save(member);
+                }
+            }
         }
 
         // Cập nhật feedback mới
@@ -150,6 +137,4 @@ public class TrainerService {
 
         return new TrainerAttendanceDTO(updated.getAttendanceId(), updated.getCheckinDate(), updated.getFeedback(), ptLeft, ptUsed);
     }
-
-
 }

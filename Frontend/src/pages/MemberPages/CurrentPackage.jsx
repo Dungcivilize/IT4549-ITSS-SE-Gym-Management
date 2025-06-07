@@ -1,41 +1,44 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import QRCodeImage from "../../assets/img/QRCode.jpg";
-import MemberNavbar from "../../Components/MemberNavbar";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import QRCodeImage from '../../assets/img/QRCode.jpg';
+import MemberNavbar from '../../Components/MemberNavbar';
 
 const CurrentPackage = ({ memberId }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [transactionCode, setTransactionCode] = useState("");
-  const [paymentMode, setPaymentMode] = useState("pay"); // pay | extend
+  const [transactionCode, setTransactionCode] = useState('');
+  const [paymentMode, setPaymentMode] = useState('pay'); // pay | extend
   const [paymentStatusInfo, setPaymentStatusInfo] = useState(null);
 
   // Hàm fetch dữ liệu chung
   const fetchData = async () => {
     if (!memberId) return;
-    
+
     try {
       // Lấy thông tin membership hiện tại
-      const membershipResponse = await axios.get(`http://localhost:8080/api/memberships/current/${memberId}`);
+      const membershipResponse = await axios.get(
+        `http://localhost:8080/api/memberships/current/${memberId}`
+      );
       setData(membershipResponse.data);
-      
+
       // Lấy thông tin payment status để kiểm tra reject reason
-      const statusResponse = await axios.get(`http://localhost:8080/api/memberships/payment-status/${memberId}`);
+      const statusResponse = await axios.get(
+        `http://localhost:8080/api/memberships/payment-status/${memberId}`
+      );
       const statuses = statusResponse.data;
-      
+
       if (statuses && statuses.length > 0) {
         // Lấy status gần nhất (có thể là processing hoặc unpaid với reject reason)
         const latestStatus = statuses[0];
         setPaymentStatusInfo(latestStatus);
-        console.log("📊 Latest payment status:", latestStatus);
+        console.log('📊 Latest payment status:', latestStatus);
       } else {
         setPaymentStatusInfo(null);
       }
-      
     } catch (err) {
-      console.log("Lỗi khi tải dữ liệu:", err);
+      console.log('Lỗi khi tải dữ liệu:', err);
       if (err.response?.status === 404) {
         setData(null);
       }
@@ -47,29 +50,40 @@ const CurrentPackage = ({ memberId }) => {
 
   useEffect(() => {
     fetchData();
-    
+
     // Tự động refresh mỗi 15 giây để cập nhật reject reason và payment status
     const interval = setInterval(() => {
       if (memberId) {
-        console.log("🔄 Auto refreshing payment status...");
+        console.log('🔄 Auto refreshing payment status...');
         axios
-          .get(`http://localhost:8080/api/memberships/payment-status/${memberId}`)
+          .get(
+            `http://localhost:8080/api/memberships/payment-status/${memberId}`
+          )
           .then((res) => {
             if (res.data && res.data.length > 0) {
               const latestStatus = res.data[0];
               // Chỉ cập nhật nếu có thay đổi
-              if (JSON.stringify(latestStatus) !== JSON.stringify(paymentStatusInfo)) {
+              if (
+                JSON.stringify(latestStatus) !==
+                JSON.stringify(paymentStatusInfo)
+              ) {
                 setPaymentStatusInfo(latestStatus);
-                console.log("📊 Auto-refreshed payment status:", latestStatus);
-                
+                console.log('📊 Auto-refreshed payment status:', latestStatus);
+
                 // Hiển thị thông báo nếu có reject reason mới
-                if (latestStatus.rejectReason && latestStatus.rejectReason !== paymentStatusInfo?.rejectReason) {
-                  console.log("🚨 New reject reason detected:", latestStatus.rejectReason);
+                if (
+                  latestStatus.rejectReason &&
+                  latestStatus.rejectReason !== paymentStatusInfo?.rejectReason
+                ) {
+                  console.log(
+                    '🚨 New reject reason detected:',
+                    latestStatus.rejectReason
+                  );
                 }
               }
             }
           })
-          .catch((err) => console.log("Lỗi auto refresh:", err));
+          .catch((err) => console.log('Lỗi auto refresh:', err));
       }
     }, 15000);
 
@@ -82,29 +96,29 @@ const CurrentPackage = ({ memberId }) => {
       const payload = {
         memberId,
         packageId: data.packageId,
-        transactionCode: "CANCEL_" + Date.now(), // Generate a cancel transaction code
+        transactionCode: 'CANCEL_' + Date.now(), // Generate a cancel transaction code
       };
 
-      console.log("🗑️ Sending cancel request:", payload);
+      console.log('🗑️ Sending cancel request:', payload);
 
       const response = await axios.post(
-        "http://localhost:8080/api/memberships/cancel",
+        'http://localhost:8080/api/memberships/cancel',
         payload
       );
 
-      console.log("✅ Cancel response:", response.data);
-      alert("✅ Đã hủy gói tập thành công!");
+      console.log('✅ Cancel response:', response.data);
+      alert('✅ Đã hủy gói tập thành công!');
 
       // Refresh data sau khi cancel
       await fetchData();
     } catch (err) {
-      console.error("❌ Lỗi khi hủy gói tập:", {
+      console.error('❌ Lỗi khi hủy gói tập:', {
         message: err.message,
         status: err.response?.status,
         data: err.response?.data,
       });
 
-      const errorMessage = err.response?.data || "Lỗi khi hủy gói tập";
+      const errorMessage = err.response?.data || 'Lỗi khi hủy gói tập';
       alert(`❌ ${errorMessage}`);
     } finally {
       setShowConfirm(false);
@@ -113,278 +127,295 @@ const CurrentPackage = ({ memberId }) => {
 
   const handleExtend = async () => {
     // Hiện modal payment ngay để nhập transaction code
-    setPaymentMode("extend");
+    setPaymentMode('extend');
     setShowPaymentModal(true);
   };
 
   const handleSubmit = async () => {
     if (!transactionCode.trim()) {
-      alert("❌ Vui lòng nhập mã giao dịch!");
+      alert('❌ Vui lòng nhập mã giao dịch!');
       return;
     }
 
     try {
       const payload = {
-        memberId,
+        memberId: memberId,
         packageId: data.packageId,
         transactionCode: transactionCode.trim(),
       };
 
-      const apiEndpoint = paymentMode === "extend" 
-        ? "http://localhost:8080/api/memberships/extend"
-        : "http://localhost:8080/api/memberships/pay";
+      const apiEndpoint =
+        paymentMode === 'extend'
+          ? 'http://localhost:8080/api/memberships/extend'
+          : 'http://localhost:8080/api/memberships/pay';
 
-      const actionName = paymentMode === "extend" ? "gia hạn" : "thanh toán";
+      const actionName = paymentMode === 'extend' ? 'gia hạn' : 'thanh toán';
 
-      console.log(`💳 Sending ${actionName} with transaction code:`, payload);
+      console.log(`💳 Gửi yêu cầu ${actionName}:`, payload);
 
       const response = await axios.post(apiEndpoint, payload);
 
-      console.log(`✅ ${actionName} response:`, response.data);
-      alert("✅ " + response.data);
+      console.log(`✅ Kết quả ${actionName}:`, response.data);
+      alert('✅ ' + response.data);
       setShowPaymentModal(false);
-      setTransactionCode("");
+      setTransactionCode('');
 
       // Refresh data sau khi hoàn tất
       await fetchData();
     } catch (err) {
-      const actionName = paymentMode === "extend" ? "gia hạn" : "thanh toán";
-      console.error(`❌ Lỗi ${actionName}:`, {
-        message: err.message,
-        status: err.response?.status,
-        data: err.response?.data,
-      });
+      const actionName = paymentMode === 'extend' ? 'gia hạn' : 'thanh toán';
+      console.error(`❌ Lỗi ${actionName}:`, err);
 
-      const errorMessage = err.response?.data || `Lỗi khi ${actionName} gói tập!`;
+      let errorMessage = `Lỗi khi ${actionName} gói tập!`;
+      
+      if (err.response) {
+        // Lỗi từ server
+        errorMessage = err.response.data || errorMessage;
+        console.log('Chi tiết lỗi:', {
+          status: err.response.status,
+          data: err.response.data
+        });
+      } else if (err.request) {
+        // Lỗi không có response
+        errorMessage = 'Không thể kết nối đến server';
+        console.log('Lỗi kết nối:', err.request);
+      } else {
+        // Lỗi khác
+        errorMessage = err.message;
+        console.log('Lỗi khác:', err.message);
+      }
+
       alert(`❌ ${errorMessage}`);
     }
   };
 
-
-
   const styles = {
     container: {
-      width: "100%",
-      display: "flex",
-      justifyContent: "center",
-      fontFamily: "Poppins, sans-serif",
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      fontFamily: 'Poppins, sans-serif',
+      marginTop: '2rem',
+      backgroundColor: 'transparent'
     },
     loading: {
-      textAlign: "center",
-      color: "#f97316",
-      fontSize: "1.2rem",
-      padding: "2rem",
+      textAlign: 'center',
+      color: '#f97316',
+      fontSize: '1.2rem',
+      padding: '2rem',
     },
     empty: {
-      fontStyle: "italic",
-      opacity: "0.75",
-      fontSize: "1rem",
-      textAlign: "center",
-      padding: "2rem",
+      fontStyle: 'italic',
+      opacity: '0.75',
+      fontSize: '1rem',
+      textAlign: 'center',
+      padding: '2rem',
     },
     card: {
-      backgroundColor: "#ffffff",
-      color: "#1a1a1a",
-      padding: "2rem",
-      borderRadius: "16px",
-      boxShadow: "0 6px 20px rgba(0, 0, 0, 0.15)",
-      width: "80%",
-      maxWidth: "1000px",
-      display: "flex",
-      justifyContent: "space-between",
-      gap: "2rem",
-      alignItems: "flex-start",
-      flexWrap: "wrap",
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      color: '#1a1a1a',
+      padding: '2rem',
+      borderRadius: '16px',
+      boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
+      width: '80%',
+      maxWidth: '1000px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      gap: '2rem',
+      alignItems: 'flex-start',
+      flexWrap: 'wrap',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
     },
     left: {
       flex: 1,
-      minWidth: "240px",
+      minWidth: '240px',
     },
     right: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "1rem",
-      minWidth: "200px",
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '1rem',
+      minWidth: '200px',
     },
     packageName: {
-      color: "#f97316",
-      fontSize: "1.8rem",
-      marginBottom: "1rem",
-      fontWeight: "bold",
+      color: '#f97316',
+      fontSize: '1.8rem',
+      marginBottom: '1rem',
+      fontWeight: 'bold',
     },
     infoItem: {
-      marginBottom: "0.5rem",
-      fontSize: "1rem",
-      lineHeight: "1.5",
-      color: "#1a1a1a",
+      marginBottom: '0.5rem',
+      fontSize: '1rem',
+      lineHeight: '1.5',
+      color: '#1a1a1a',
     },
     btn: {
-      padding: "0.75rem 1.5rem",
-      border: "none",
-      fontWeight: "bold",
-      borderRadius: "8px",
-      cursor: "pointer",
-      transition: "0.2s ease",
-      color: "white",
-      fontSize: "1rem",
+      padding: '0.75rem 1.5rem',
+      border: 'none',
+      fontWeight: 'bold',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      transition: '0.2s ease',
+      color: 'white',
+      fontSize: '1rem',
     },
     renewButton: {
-      backgroundColor: "#1e90ff",
-      color: "white",
-      padding: "10px 20px",
-      border: "none",
-      borderRadius: "6px",
-      cursor: "pointer",
-      fontWeight: "bold",
-      marginLeft: "10px",
+      backgroundColor: '#1e90ff',
+      color: 'white',
+      padding: '10px 20px',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontWeight: 'bold',
+      marginLeft: '10px',
     },
     extendBtn: {
-      backgroundColor: "#0ea5e9",
+      backgroundColor: '#0ea5e9',
     },
     cancelBtn: {
-      backgroundColor: "#ef4444",
+      backgroundColor: '#ef4444',
     },
     payBtn: {
-      backgroundColor: "#f59e0b",
+      backgroundColor: '#f59e0b',
     },
     processing: {
-      marginTop: "1rem",
-      fontStyle: "italic",
-      color: "#f59e0b",
-      background: "#fff7ed",
-      padding: "0.75rem 1rem",
-      borderRadius: "8px",
-      borderLeft: "4px solid #f97316",
+      marginTop: '1rem',
+      fontStyle: 'italic',
+      color: '#f59e0b',
+      background: '#fff7ed',
+      padding: '0.75rem 1rem',
+      borderRadius: '8px',
+      borderLeft: '4px solid #f97316',
     },
     rejectReason: {
-      marginTop: "0.5rem",
-      fontSize: "0.9rem",
-      color: "#dc2626",
-      background: "#fee2e2",
-      padding: "0.5rem 0.75rem",
-      borderRadius: "6px",
-      border: "1px solid #fecaca",
-      fontWeight: "500",
+      marginTop: '0.5rem',
+      fontSize: '0.9rem',
+      color: '#dc2626',
+      background: '#fee2e2',
+      padding: '0.5rem 0.75rem',
+      borderRadius: '6px',
+      border: '1px solid #fecaca',
+      fontWeight: '500',
     },
     overlay: {
-      position: "fixed",
+      position: 'fixed',
       top: 0,
       left: 0,
-      width: "100%",
-      height: "100%",
-      background: "rgba(0, 0, 0, 0.7)",
+      width: '100%',
+      height: '100%',
+      background: 'rgba(0, 0, 0, 0.7)',
       zIndex: 999,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     confirmBox: {
-      background: "rgb(94, 94, 94)",
-      padding: "20px",
-      borderRadius: "10px",
-      textAlign: "center",
-      color: "white",
+      background: 'rgb(94, 94, 94)',
+      padding: '20px',
+      borderRadius: '10px',
+      textAlign: 'center',
+      color: 'white',
     },
     confirmButtons: {
-      marginTop: "15px",
-      display: "flex",
-      gap: "10px",
-      justifyContent: "center",
+      marginTop: '15px',
+      display: 'flex',
+      gap: '10px',
+      justifyContent: 'center',
     },
     yesBtn: {
-      backgroundColor: "#ff4d4f",
-      color: "white",
+      backgroundColor: '#ff4d4f',
+      color: 'white',
     },
     noBtn: {
-      backgroundColor: "#ccc",
-      color: "black",
+      backgroundColor: '#ccc',
+      color: 'black',
     },
     modal: {
-      position: "relative",
-      background: "white",
-      padding: "40px",
-      borderRadius: "12px",
-      width: "900px",
-      boxShadow: "0 0 25px rgba(0, 0, 0, 0.4)",
+      position: 'relative',
+      background: 'white',
+      padding: '40px',
+      borderRadius: '12px',
+      width: '900px',
+      boxShadow: '0 0 25px rgba(0, 0, 0, 0.4)',
     },
     closeButton: {
-      position: "absolute",
-      top: "12px",
-      right: "12px",
-      background: "transparent",
-      border: "none",
-      cursor: "pointer",
+      position: 'absolute',
+      top: '12px',
+      right: '12px',
+      background: 'transparent',
+      border: 'none',
+      cursor: 'pointer',
       padding: 0,
     },
     closeIcon: {
-      width: "50px",
-      height: "50px",
-      objectFit: "contain",
-      transition: "transform 0.2s ease",
+      width: '50px',
+      height: '50px',
+      objectFit: 'contain',
+      transition: 'transform 0.2s ease',
     },
     modalContent: {
-      display: "flex",
-      flexDirection: "row",
-      gap: "3rem",
-      width: "100%",
-      alignItems: "flex-start",
+      display: 'flex',
+      flexDirection: 'row',
+      gap: '3rem',
+      width: '100%',
+      alignItems: 'flex-start',
     },
     qrSection: {
       flex: 1,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
     qrImage: {
-      width: "260px",
-      height: "260px",
-      objectFit: "contain",
-      marginBottom: "1rem",
+      width: '260px',
+      height: '260px',
+      objectFit: 'contain',
+      marginBottom: '1rem',
     },
     accountInfo: {
-      textAlign: "center",
-      fontSize: "15px",
-      color: "#333",
-      lineHeight: "1.4",
+      textAlign: 'center',
+      fontSize: '15px',
+      color: '#333',
+      lineHeight: '1.4',
     },
     infoSection: {
       flex: 1,
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "flex-start",
-      gap: "8px",
-      paddingTop: "10px",
-      paddingBottom: "10px",
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      gap: '8px',
+      paddingTop: '10px',
+      paddingBottom: '10px',
     },
     modalTitle: {
-      fontSize: "18px",
-      fontWeight: "bold",
-      marginBottom: "10px",
-      color: "#000",
+      fontSize: '18px',
+      fontWeight: 'bold',
+      marginBottom: '10px',
+      color: '#000',
     },
     modalInfoItem: {
-      fontSize: "15px",
-      margin: "2px 0",
-      color: "#333",
+      fontSize: '15px',
+      margin: '2px 0',
+      color: '#333',
     },
     input: {
-      marginTop: "1rem",
-      padding: "10px",
-      fontSize: "17px",
-      border: "1px solid #ccc",
-      borderRadius: "5px",
-      width: "100%",
+      marginTop: '1rem',
+      padding: '10px',
+      fontSize: '17px',
+      border: '1px solid #ccc',
+      borderRadius: '5px',
+      width: '100%',
     },
     submitBtn: {
-      marginTop: "1rem",
-      padding: "12px 20px",
-      backgroundColor: "orange",
-      color: "white",
-      border: "none",
-      borderRadius: "6px",
-      cursor: "pointer",
-      fontWeight: "bold",
-      fontSize: "16px",
+      marginTop: '1rem',
+      padding: '12px 20px',
+      backgroundColor: 'orange',
+      color: 'white',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontWeight: 'bold',
+      fontSize: '16px',
     },
   };
 
@@ -420,8 +451,8 @@ const CurrentPackage = ({ memberId }) => {
           </p>
           <p
             style={{
-              color: data.ptMeetingDaysLeft === 0 ? "red" : "inherit",
-              fontWeight: "bold",
+              color: data.ptMeetingDaysLeft === 0 ? 'red' : 'inherit',
+              fontWeight: 'bold',
             }}
           >
             <strong>Số buổi PT còn lại:</strong> {data.ptMeetingDaysLeft}
@@ -429,13 +460,13 @@ const CurrentPackage = ({ memberId }) => {
         </div>
 
         <div style={styles.right}>
-          {data.paymentStatus === "Paid" && (
+          {data.paymentStatus === 'Paid' && (
             <>
               <button
                 style={styles.renewButton}
                 onClick={handleExtend}
-                onMouseOver={(e) => (e.target.style.opacity = "0.9")}
-                onMouseOut={(e) => (e.target.style.opacity = "1")}
+                onMouseOver={(e) => (e.target.style.opacity = '0.9')}
+                onMouseOut={(e) => (e.target.style.opacity = '1')}
               >
                 Gia hạn gói tập
               </button>
@@ -443,36 +474,50 @@ const CurrentPackage = ({ memberId }) => {
                 style={{ ...styles.btn, ...styles.cancelBtn }}
                 onClick={() => setShowConfirm(true)}
                 onMouseOver={(e) =>
-                  (e.target.style.backgroundColor = "#dc2626")
+                  (e.target.style.backgroundColor = '#dc2626')
                 }
-                onMouseOut={(e) => (e.target.style.backgroundColor = "#ef4444")}
+                onMouseOut={(e) => (e.target.style.backgroundColor = '#ef4444')}
               >
                 Hủy gói tập
               </button>
             </>
           )}
 
-          {data.paymentStatus === "Unpaid" && (
+          {data.paymentStatus === 'Unpaid' && (
             <>
               <button
                 style={{ ...styles.btn, ...styles.payBtn }}
                 onClick={() => {
-                  setPaymentMode("pay");
+                  setPaymentMode('pay');
                   setShowPaymentModal(true);
                 }}
-                onMouseOver={(e) => (e.target.style.backgroundColor = "#d97706")}
-                onMouseOut={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+                onMouseOver={(e) =>
+                  (e.target.style.backgroundColor = '#d97706')
+                }
+                onMouseOut={(e) => (e.target.style.backgroundColor = '#f59e0b')}
               >
                 Thanh toán gói tập
               </button>
-              
+
               {paymentStatusInfo && paymentStatusInfo.rejectReason && (
                 <div style={styles.rejectReason}>
-                  <strong>❌ Lý do từ chối thanh toán:</strong><br />
+                  <strong>❌ Lý do từ chối thanh toán:</strong>
+                  <br />
                   {paymentStatusInfo.rejectReason}
                   {paymentStatusInfo.verifiedDate && (
-                    <div style={{ marginTop: "0.25rem", fontSize: "0.8rem", opacity: 0.8 }}>
-                      <em>Từ chối lúc: {new Date(paymentStatusInfo.verifiedDate).toLocaleString('vi-VN')}</em>
+                    <div
+                      style={{
+                        marginTop: '0.25rem',
+                        fontSize: '0.8rem',
+                        opacity: 0.8,
+                      }}
+                    >
+                      <em>
+                        Từ chối lúc:{' '}
+                        {new Date(
+                          paymentStatusInfo.verifiedDate
+                        ).toLocaleString('vi-VN')}
+                      </em>
                     </div>
                   )}
                 </div>
@@ -480,7 +525,7 @@ const CurrentPackage = ({ memberId }) => {
             </>
           )}
 
-          {data.paymentStatus === "Processing" && (
+          {data.paymentStatus === 'Processing' && (
             <div style={styles.processing}>
               Gói tập đang được xử lý, vui lòng đợi xác nhận từ lễ tân...
             </div>
@@ -491,7 +536,7 @@ const CurrentPackage = ({ memberId }) => {
       {showConfirm && (
         <div style={styles.overlay}>
           <div style={styles.confirmBox}>
-            <p style={{ marginBottom: "1rem", fontSize: "1.1rem" }}>
+            <p style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
               Bạn có chắc chắn muốn hủy gói tập?
             </p>
             <div style={styles.confirmButtons}>
@@ -519,15 +564,15 @@ const CurrentPackage = ({ memberId }) => {
               style={styles.closeButton}
               onClick={() => {
                 setShowPaymentModal(false);
-                setTransactionCode("");
+                setTransactionCode('');
               }}
             >
               <img
                 src="https://png.pngtree.com/png-vector/20230515/ourmid/pngtree-3d-cross-button-clipart-vector-png-image_7096963.png"
                 alt="Đóng"
                 style={styles.closeIcon}
-                onMouseOver={(e) => (e.target.style.transform = "scale(1.2)")}
-                onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
+                onMouseOver={(e) => (e.target.style.transform = 'scale(1.2)')}
+                onMouseOut={(e) => (e.target.style.transform = 'scale(1)')}
               />
             </button>
 
@@ -543,7 +588,10 @@ const CurrentPackage = ({ memberId }) => {
 
               <div style={styles.infoSection}>
                 <h3 style={styles.modalTitle}>
-                  {paymentMode === "extend" ? "Gia hạn gói tập" : "Thanh toán gói tập"} - {data.packageName}
+                  {paymentMode === 'extend'
+                    ? 'Gia hạn gói tập'
+                    : 'Thanh toán gói tập'}{' '}
+                  - {data.packageName}
                 </h3>
                 <p style={styles.modalInfoItem}>
                   <strong>Bắt đầu:</strong> {data.startDate}
@@ -552,8 +600,8 @@ const CurrentPackage = ({ memberId }) => {
                   <strong>Kết thúc:</strong> {data.endDate}
                 </p>
                 <p style={styles.modalInfoItem}>
-                  <strong>Giá tiền:</strong>{" "}
-                  {data.price?.toLocaleString("vi-VN")}₫
+                  <strong>Giá tiền:</strong>{' '}
+                  {data.price?.toLocaleString('vi-VN')}₫
                 </p>
                 <p style={styles.modalInfoItem}>
                   <strong>Trạng thái:</strong> {data.paymentStatus}

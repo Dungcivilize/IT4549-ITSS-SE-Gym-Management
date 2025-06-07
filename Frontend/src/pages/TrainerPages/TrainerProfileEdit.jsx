@@ -1,93 +1,197 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './TrainerProfileEdit.css';
 
 export default function TrainerProfileEdit() {
-  const [profile, setProfile] = useState({
-    userName: '',
-    email: '',
-    phone: '',
-    fullname: '',
-    address: '',
-    dateOfBirth: '',
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState(() => {
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    return { ...user };
   });
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+  const user = JSON.parse(localStorage.getItem('user')) || {};
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  const trainerId = user?.user_id;
+  const handleEdit = () => {
+    setIsEditing(true);
+    setFormData(user);
+    setSuccess('');
+    setError('');
+  };
 
-  useEffect(() => {
-    if (!user) {
-      setMessage("Không tìm thấy thông tin người dùng.");
-      setLoading(false);
-      return;
+  const handleCancel = () => {
+    setIsEditing(false);
+    setFormData(user);
+    setSuccess('');
+    setError('');
+  };
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSave = async () => {
+    setError('');
+    setSuccess('');
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/profile/update/${user.user_id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_name: formData.user_name,
+            fullname: formData.fullname,
+            email: formData.email,
+            phone: formData.phone,
+            date_of_birth: formData.date_of_birth,
+            address: formData.address,
+          }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error('Cập nhật thất bại!');
+      }
+      setIsEditing(false);
+      setSuccess('Cập nhật thành công!');
+      // Cập nhật lại localStorage
+      localStorage.setItem('user', JSON.stringify({ ...user, ...formData }));
+    } catch (err) {
+      setError(err.message);
     }
-
-    setProfile({
-      userName: user.user_name || '',
-      email: user.email || '',
-      phone: user.phone || '',
-      fullname: user.fullname || '',
-      address: user.address || '',
-      dateOfBirth: user.date_of_birth || '',
-    });
-    setLoading(false);
-  }, []);
-
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setProfile(prev => ({ ...prev, [name]: value }));
   };
-
-  const handleSubmit = e => {
-    e.preventDefault();
-    setMessage('');
-    fetch(`/api/trainer/profile/${trainerId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(profile),
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Lỗi khi cập nhật thông tin');
-        return res.json();
-      })
-      .then(() => setMessage('✅ Cập nhật thành công!'))
-      .catch(err => setMessage(`❌ ${err.message}`));
-  };
-
-  if (loading) return <div className="trainer-profile-edit-loading">Đang tải...</div>;
 
   return (
     <div className="trainer-profile-edit-container">
-      <h2 className="trainer-profile-edit-title">Chỉnh sửa thông tin cá nhân Trainer</h2>
-      {message && (
-        <div className={`trainer-profile-edit-message ${message.includes('✅') ? 'success' : 'error'}`}>
-          {message}
-        </div>
+      <h2 className="trainer-profile-edit-title">Thông tin huấn luyện viên</h2>
+      {success && (
+        <div className="trainer-profile-edit-message success">{success}</div>
       )}
-      <form onSubmit={handleSubmit} className="trainer-profile-edit-form">
-        {[
-          { label: 'User Name', name: 'userName' },
-          { label: 'Full Name', name: 'fullname' },
-          { label: 'Email', name: 'email', type: 'email' },
-          { label: 'Phone', name: 'phone' },
-          { label: 'Address', name: 'address' },
-          { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' }
-        ].map(({ label, name, type = 'text' }) => (
-          <div className="trainer-profile-edit-group" key={name}>
-            <label className="trainer-profile-edit-label">{label}</label>
+      {error && (
+        <div className="trainer-profile-edit-message error">{error}</div>
+      )}
+      <div className="trainer-profile-edit-form">
+        <div className="trainer-profile-edit-group">
+          <span className="profile-item-icon">👤</span>
+          <b>Tên đăng nhập:</b>
+          {isEditing ? (
             <input
-              type={type}
-              name={name}
-              value={profile[name]}
+              name="user_name"
+              value={formData.user_name || ''}
               onChange={handleChange}
-              required={name !== 'address'}
               className="trainer-profile-edit-input"
             />
-          </div>
-        ))}
-        <button type="submit" className="trainer-profile-edit-button">💾 Lưu thay đổi</button>
-      </form>
+          ) : (
+            <span>{user.user_name}</span>
+          )}
+        </div>
+
+        <div className="trainer-profile-edit-group">
+          <span className="profile-item-icon">📝</span>
+          <b>Họ tên:</b>
+          {isEditing ? (
+            <input
+              name="fullname"
+              value={formData.fullname || ''}
+              onChange={handleChange}
+              className="trainer-profile-edit-input"
+            />
+          ) : (
+            <span>{user.fullname}</span>
+          )}
+        </div>
+
+        <div className="trainer-profile-edit-group">
+          <span className="profile-item-icon">📧</span>
+          <b>Email:</b>
+          {isEditing ? (
+            <input
+              name="email"
+              type="email"
+              value={formData.email || ''}
+              onChange={handleChange}
+              className="trainer-profile-edit-input"
+            />
+          ) : (
+            <span>{user.email}</span>
+          )}
+        </div>
+
+        <div className="trainer-profile-edit-group">
+          <span className="profile-item-icon">📞</span>
+          <b>Số điện thoại:</b>
+          {isEditing ? (
+            <input
+              name="phone"
+              value={formData.phone || ''}
+              onChange={handleChange}
+              className="trainer-profile-edit-input"
+            />
+          ) : (
+            <span>{user.phone}</span>
+          )}
+        </div>
+
+        <div className="trainer-profile-edit-group">
+          <span className="profile-item-icon">🎂</span>
+          <b>Ngày sinh:</b>
+          {isEditing ? (
+            <input
+              name="date_of_birth"
+              type="date"
+              value={formData.date_of_birth || ''}
+              onChange={handleChange}
+              className="trainer-profile-edit-input"
+            />
+          ) : (
+            <span>{user.date_of_birth}</span>
+          )}
+        </div>
+
+        <div className="trainer-profile-edit-group">
+          <span className="profile-item-icon">🏠</span>
+          <b>Địa chỉ:</b>
+          {isEditing ? (
+            <input
+              name="address"
+              value={formData.address || ''}
+              onChange={handleChange}
+              className="trainer-profile-edit-input"
+            />
+          ) : (
+            <span>{user.address}</span>
+          )}
+        </div>
+
+        <div className="trainer-profile-edit-actions">
+          {isEditing ? (
+            <>
+              <button
+                className="trainer-profile-edit-button"
+                onClick={handleSave}
+                style={{ marginRight: '8px' }}
+              >
+                💾 Lưu
+              </button>
+              <button
+                className="trainer-profile-edit-button cancel"
+                onClick={handleCancel}
+              >
+                ❌ Hủy
+              </button>
+            </>
+          ) : (
+            <button
+              className="trainer-profile-edit-button"
+              onClick={handleEdit}
+            >
+              ✏️ Chỉnh sửa thông tin
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

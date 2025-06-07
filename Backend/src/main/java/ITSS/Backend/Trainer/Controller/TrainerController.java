@@ -1,15 +1,21 @@
 package ITSS.Backend.Trainer.Controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import ITSS.Backend.Trainer.DTO.FeedbackRequestDTO;
 import ITSS.Backend.Trainer.DTO.TrainerAttendanceDTO;
 import ITSS.Backend.Trainer.DTO.TrainerMemberDTO;
-import ITSS.Backend.Trainer.DTO.TrainerUpdateProfile;
 import ITSS.Backend.Trainer.Service.TrainerService;
-import ITSS.Backend.entity.User;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/trainer")
@@ -39,21 +45,6 @@ public class TrainerController {
         return trainerService.createAttendance(memberId);
     }
 
-    // Lấy thông tin profile trainer
-    @GetMapping("/profile/{trainerId}")
-    public ResponseEntity<User> getTrainerProfile(@PathVariable Long trainerId) {
-        User trainer = trainerService.getTrainerProfile(trainerId);
-        return ResponseEntity.ok(trainer);
-    }
-
-    // Cập nhật profile trainer
-    @PutMapping("/profile/{trainerId}")
-    public ResponseEntity<User> updateTrainerProfile(@PathVariable Long trainerId,
-                                                     @RequestBody TrainerUpdateProfile updateProfile) {
-        User updated = trainerService.updateTrainerProfile(trainerId, updateProfile);
-        return ResponseEntity.ok(updated);
-    }
-
     @PutMapping("/attendance/{attendanceId}/feedback")
     public ResponseEntity<?> updateFeedback(
             @PathVariable Long attendanceId,
@@ -66,5 +57,4 @@ public class TrainerController {
             return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
         }
     }
-
 }
