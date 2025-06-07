@@ -1,6 +1,6 @@
-package ITSS.Backend.Admin.Service;
+package ITSS.Backend.Service.Admin;
 
-import ITSS.Backend.Admin.DTO.RoomDTO;
+import ITSS.Backend.DTO.Admin.RoomDTO;
 import ITSS.Backend.entity.Room;
 import ITSS.Backend.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;

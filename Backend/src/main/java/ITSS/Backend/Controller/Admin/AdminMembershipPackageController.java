@@ -1,12 +1,12 @@
-package ITSS.Backend.Admin.Controller;
+package ITSS.Backend.Controller.Admin;
 
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import ITSS.Backend.Admin.DTO.MembershipPackageDTO;
-import ITSS.Backend.Admin.Service.AdminMembershipPackageService;
+import ITSS.Backend.DTO.Admin.MembershipPackageDTO;
+import ITSS.Backend.Service.Admin.AdminMembershipPackageService;
 
 @RestController
 @RequestMapping("/api/membership-packages")

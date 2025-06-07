@@ -1,4 +1,4 @@
-package ITSS.Backend.Admin.Controller;
+package ITSS.Backend.Controller.Admin;
 
 
 import org.springframework.beans.factory.annotation.Autowired;

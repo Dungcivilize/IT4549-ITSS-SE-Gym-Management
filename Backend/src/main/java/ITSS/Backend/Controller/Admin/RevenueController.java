@@ -1,7 +1,6 @@
-package ITSS.Backend.Admin.Controller;
+package ITSS.Backend.Controller.Admin;
 
-import ITSS.Backend.Admin.Service.AdminMembershipService;
-import ITSS.Backend.Admin.Service.*;
+import ITSS.Backend.Service.Admin.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

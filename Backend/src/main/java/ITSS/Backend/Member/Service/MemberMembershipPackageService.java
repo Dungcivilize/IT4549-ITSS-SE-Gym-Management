@@ -24,6 +24,7 @@ public class MemberMembershipPackageService {
             MembershipPackageDetailResponse dto = new MembershipPackageDetailResponse();
             dto.setPackageId(pkg.getPackageId());
             dto.setPackageName(pkg.getPackageName());
+            dto.setPackageType(pkg.getPackageType());
             dto.setDuration(pkg.getDuration());
             dto.setPrice(pkg.getPrice());
             dto.setPT(pkg.getPT());

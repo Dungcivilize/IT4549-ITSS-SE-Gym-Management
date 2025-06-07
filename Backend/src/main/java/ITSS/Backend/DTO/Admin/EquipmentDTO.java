@@ -1,4 +1,4 @@
-package ITSS.Backend.Admin.DTO;
+package ITSS.Backend.DTO.Admin;
 
 import lombok.Data;
 

@@ -1,7 +1,7 @@
-package ITSS.Backend.Admin.Service;
+package ITSS.Backend.Service.Admin;
 
-import ITSS.Backend.Admin.DTO.UserRequestDTO;
-import ITSS.Backend.Admin.DTO.UserResponseDTO;
+import ITSS.Backend.DTO.Admin.UserRequestDTO;
+import ITSS.Backend.DTO.Admin.UserResponseDTO;
 import ITSS.Backend.entity.User;
 import ITSS.Backend.repository.UserRepository;
 
