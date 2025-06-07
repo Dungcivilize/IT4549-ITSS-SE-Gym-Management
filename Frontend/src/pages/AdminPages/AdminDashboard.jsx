@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { removeUser } from '../../utils/auth';
 import Sidebar from '../../Components/Sidebar'; 
 import Dashboard from './Dashboard';
 import StaffManagement from './StaffManagement';
@@ -25,7 +24,7 @@ const AdminDashboard = () => {
       case 'Logout':
         const confirmed = window.confirm('Bạn có chắc chắn muốn đăng xuất?');
         if (confirmed) {
-          removeUser();
+          localStorage.removeItem('user');
           window.location.href = '/login';
         }
         return null;

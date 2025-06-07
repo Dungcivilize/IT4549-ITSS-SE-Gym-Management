@@ -1,27 +1,23 @@
-import React from 'react';
-import CurrentPackage from './CurrentPackage';
-import AttendanceChart from './AttendanceChart';
-import MemberNavbar from '../../Components/MemberNavbar';
-import { getUserId } from '../../utils/auth';
+import React from "react";
+import styles from "../../assets/css/MemberHomePage.module.css";
+import CurrentPackage from "./CurrentPackage";
+import AttendanceChart from "./AttendanceChart";
+import MemberNavbar from "../../Components/MemberNavbar";
 
 const MemberHomePage = () => {
-  const memberId = getUserId();
+  const user = JSON.parse(localStorage.getItem("user")); // hoặc sessionStorage
+  const memberId = user?.user_id;
 
-  const pageStyles = {
-    pageWrapper: {
-      maxWidth: '1200px',
-      margin: 'auto',
-      padding: '2rem 1rem',
-      fontFamily: 'Poppins, sans-serif'
-    }
-  };
+  // console.log("📦 user:", user);
+  // console.log("📦 memberId truyền vào:", memberId);
+  // console.log("👀 user object:", user);
 
   return (
     <>
       <MemberNavbar />
-      <div style={pageStyles.pageWrapper}>
+      <div className={styles.pageWrapper}>
         <CurrentPackage memberId={memberId} />
-        <AttendanceChart memberId={memberId} />
+        <AttendanceChart memberId={memberId} /> {/* ⬅️ chèn ở đây */}
       </div>
     </>
   );

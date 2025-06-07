@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { getUserName, removeUser } from '../utils/auth';
 
 const Sidebar = ({ selectedPage, onSelectPage }) => {
   const [hoveredItem, setHoveredItem] = useState(null);
-  const userName = getUserName();
 
   const menuItems = [
     'Dashboard',
@@ -12,6 +10,9 @@ const Sidebar = ({ selectedPage, onSelectPage }) => {
     'Equipment',
     'Package Management',
   ];
+
+  const user = JSON.parse(localStorage.getItem('user'));
+  const name = user?.fullname || 'bạn';
 
 
   return (
@@ -34,7 +35,7 @@ const Sidebar = ({ selectedPage, onSelectPage }) => {
     >
       <div>
         <h2 style={{ textAlign: 'center', color: '#fff', marginBottom: '30px' }}>
-          Chào {userName}
+          Chào {JSON.parse(localStorage.getItem('user'))?.fullname || 'bạn'}
         </h2>
 
         {menuItems.map((item) => {
