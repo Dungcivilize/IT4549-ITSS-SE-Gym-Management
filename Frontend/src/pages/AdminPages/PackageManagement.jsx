@@ -23,9 +23,8 @@ export default function PackageManagement() {
   const [formData, setFormData] = useState({
     packageName: '',
     duration: '',
-    maxPtMeetingDays: '',
     price: '',
-    discount: 0,
+    packageType: '',
     pt: false,
     trainerIds: []
   });
@@ -76,12 +75,13 @@ export default function PackageManagement() {
 
 
   const handleSubmit = async e => {
+    e.preventDefault();
     if (editingId) {
       await axios.put(`http://localhost:8080/api/membership-packages/${editingId}`, formData);
     } else {
       await axios.post('http://localhost:8080/api/membership-packages', formData);
     }
-    setFormData({ packageName: '', duration: '', price: '',maxPtMeetingDays: '', price: '', discount: '', pt: false, trainerIds: [] });
+    setFormData({ packageName: '', duration: '', price: '', packageType: '', pt: false, trainerIds: [] });
     setEditingId(null);
     fetchPackages();
   };
@@ -99,7 +99,6 @@ export default function PackageManagement() {
   };
 
   const handleDelete = async id => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa gói này?')) return;
     await axios.delete(`http://localhost:8080/api/membership-packages/${id}`);
     fetchPackages();
   };
@@ -115,11 +114,8 @@ export default function PackageManagement() {
       <form onSubmit={handleSubmit} style={styles.form}>
   <input style={styles.input} name="packageName" placeholder="Package Name" value={formData.packageName} onChange={handleChange} required />
   <input style={styles.input} name="duration" placeholder="Duration (days)" type="number" value={formData.duration} onChange={handleChange} required />
-  {( formData.pt && <input style={styles.input} name="maxPtMeetingDays" placeholder="Max PT Meeting Days" type="number" value={formData.maxPtMeetingDays} onChange={handleChange} required />)}
   <input style={styles.input} name="price" placeholder="Price" type="number" value={formData.price} onChange={handleChange} required />
-  <input style={styles.input} name="discount" step={0.01}
-  min={0} type="number"
-  placeholder="Discount (%)" value={formData.discount} onChange={handleChange} required/>
+  <input style={styles.input} name="packageType" placeholder="Package Type" value={formData.packageType} onChange={handleChange} required />
 
   {/* Checkbox chọn có PT hay không */}
   <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -193,7 +189,7 @@ export default function PackageManagement() {
             <th style={styles.th}>Package Name</th>
             <th style={styles.th}>Duration</th>
             <th style={styles.th}>Price</th>
-            <th style={styles.th}>Max PT Days</th>
+            <th style={styles.th}>Type</th>
             <th style={styles.th}>PT</th>
             <th style={styles.th}>Trainers</th>
             <th style={styles.th}>Actions</th>
@@ -205,7 +201,7 @@ export default function PackageManagement() {
               <td style={styles.td}>{pkg.packageName}</td>
               <td style={styles.td}>{pkg.duration}</td>
               <td style={styles.td}>{pkg.price}</td>
-              <td style={styles.td}>{pkg.maxPtMeetingDays}</td>
+              <td style={styles.td}>{pkg.packageType}</td>
               <td style={styles.td}>{pkg.pt ? 'Yes' : 'No'}</td>
               <td style={styles.td}>{pkg.trainerIds.map(id => trainers.find(t => t.id === id)?.fullname || '').join(', ')}</td>
               <td style={styles.actionButtons}>
