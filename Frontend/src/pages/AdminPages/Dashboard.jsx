@@ -10,6 +10,7 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
+import './Dashboard.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -18,24 +19,18 @@ const StarRating = ({ rating }) => {
   const stars = [];
   for (let i = 1; i <= 5; i++) {
     stars.push(
-      <span key={i} style={{ color: i <= rating ? '#FFD700' : '#ccc', fontSize: '20px' }}>
+      <span 
+        key={i} 
+        className={`star ${i <= rating ? 'filled' : 'empty'}`}
+      >
         ★
       </span>
     );
   }
-  return <>{stars}</>;
+  return <div className="rating-stars">{stars}</div>;
 };
 
-const styles = {
-  container: { maxWidth: '900px', margin: '0 auto', padding: '20px', fontFamily: 'Arial' },
-  title: { textAlign: 'center', color: '#1e40af', fontSize: '2rem', fontWeight: 'bold', marginBottom: '30px' },
-  chartContainer: { marginBottom: '40px', backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
-  feedbackCard: { padding: '1rem', borderRadius: '10px', backgroundColor: '#f9f9f9', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginBottom: '1rem' },
-  feedbackHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' },
-  feedbackDate: { fontSize: '0.8rem', color: 'gray' },
-};
-
-function RevenuePage() {
+function Dashboard() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [monthlyRevenue, setMonthlyRevenue] = useState(Array(12).fill(0));
   const [ageGroupData, setAgeGroupData] = useState([]);
@@ -121,7 +116,9 @@ function RevenuePage() {
     datasets: [{
       label: `Doanh thu năm ${year} (VNĐ)`,
       data: monthlyRevenue,
-      backgroundColor: 'rgba(75,192,192,0.6)',
+      backgroundColor: 'rgba(249, 115, 22, 0.7)',
+      borderColor: '#f97316',
+      borderWidth: 1,
     }]
   };
 
@@ -130,7 +127,9 @@ function RevenuePage() {
     datasets: [{
       label: 'Số lượng người',
       data: ageGroupData.map(item => item.count),
-      backgroundColor: 'rgba(153, 102, 255, 0.6)',
+      backgroundColor: 'rgba(245, 158, 11, 0.7)',
+      borderColor: '#f59e0b',
+      borderWidth: 1,
     }]
   };
 
@@ -139,72 +138,87 @@ function RevenuePage() {
     datasets: [{
       label: 'Thiết bị',
       data: Object.values(equipmentStatusData),
-      backgroundColor: ['#4caf50', '#f44336', '#ff9800'],
+      backgroundColor: [
+        'rgba(34, 197, 94, 0.8)',   // green
+        'rgba(239, 68, 68, 0.8)',   // red  
+        'rgba(249, 115, 22, 0.8)'   // orange
+      ],
+      borderColor: [
+        '#22c55e',
+        '#ef4444', 
+        '#f97316'
+      ],
+      borderWidth: 2,
     }]
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Thống Kê Phòng Gym</h1>
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">GYM Dashboard</h1>
 
       {/* Doanh thu theo tháng */}
-      <div style={styles.chartContainer}>
+      <div className="chart-container">
         <h2>Doanh thu theo tháng</h2>
-        <label>
-          Chọn năm:
-          <input
-            type="number"
-            value={year}
-            onChange={e => setYear(Number(e.target.value))}
-            min="2000"
-            max={new Date().getFullYear()}
-            style={{ marginLeft: 10, width: 100, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
-          />
-        </label>
+        <div className="year-selector">
+          <label>
+            Chọn năm:
+            <input
+              type="number"
+              value={year}
+              onChange={e => setYear(Number(e.target.value))}
+              min="2000"
+              max={new Date().getFullYear()}
+              className="year-input"
+            />
+          </label>
+        </div>
         <Bar data={revenueData} />
       </div>
 
-      {/* Thống kê lứa tuổi */}
-      <div style={styles.chartContainer}>
-        <h2>Thống kê lứa tuổi người dùng</h2>
-        <Bar data={ageGroupChartData} />
-      </div>
+      <div className="charts-row">
+        {/* Thống kê lứa tuổi */}
+        <div className="chart-container">
+          <h2>Thống kê lứa tuổi người dùng</h2>
+          <Bar data={ageGroupChartData} />
+        </div>
 
-      {/* Trạng thái thiết bị */}
-      <div style={styles.chartContainer}>
-        <h2>Trạng thái thiết bị</h2>
-        <Pie data={equipmentStatusChartData} />
+        {/* Trạng thái thiết bị */}
+        <div className="chart-container">
+          <h2>Trạng thái thiết bị</h2>
+          <Pie data={equipmentStatusChartData} />
+        </div>
       </div>
 
       {/* Đánh giá trung bình */}
-      <div style={styles.chartContainer}>
+      <div className="chart-container">
         <h2>Đánh giá trung bình</h2>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ fontSize: '2rem', fontWeight: 'bold' }}>{averageRating.toFixed(1)}</span>
-          <div style={{ marginLeft: 10 }}>
-            <StarRating rating={Math.round(averageRating)} />
-          </div>
-          <span style={{ marginLeft: 10, color: 'gray' }}>{totalFeedbacks} đánh giá</span>
+        <div className="rating-display">
+          <span className="rating-score">{averageRating.toFixed(1)}</span>
+          <StarRating rating={Math.round(averageRating)} />
+          <span className="rating-count">{totalFeedbacks} đánh giá</span>
         </div>
       </div>
 
       {/* Feedback tiêu biểu */}
-      <div style={styles.chartContainer}>
+      <div className="chart-container">
         <h2>Phản hồi tiêu biểu</h2>
-        {highlightFeedbacks.length === 0 && <p>Chưa có phản hồi nào.</p>}
-        {highlightFeedbacks.map(fb => (
-          <div key={fb.feedbackId} style={styles.feedbackCard}>
-            <div style={styles.feedbackHeader}>
-              <strong>{fb.memberName || 'Người dùng'}</strong>
-              <StarRating rating={fb.rating} />
+        {highlightFeedbacks.length === 0 ? (
+          <p className="no-feedback">Chưa có phản hồi nào.</p>
+        ) : (
+          highlightFeedbacks.map(fb => (
+            <div key={fb.feedbackId} className="feedback-card">
+              <div className="feedback-header">
+                <strong className="feedback-author">{fb.memberName || 'Người dùng'}</strong>
+                <StarRating rating={fb.rating} />
+              </div>
+              <p className="feedback-text">{fb.feedbackText}</p>
+              <span className="feedback-date">{new Date(fb.feedbackDate).toLocaleDateString()}</span>
             </div>
-            <p>"{fb.feedbackText}"</p>
-            <span style={styles.feedbackDate}>{new Date(fb.feedbackDate).toLocaleDateString()}</span>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
 }
 
-export default RevenuePage;
+export default Dashboard;

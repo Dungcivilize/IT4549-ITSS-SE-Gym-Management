@@ -5,67 +5,60 @@ import './TrainerMembersList.css';
 function TrainerMembersList() {
   const [members, setMembers] = useState([]);
   const [selectedMemberId, setSelectedMemberId] = useState(null);
+  const [ptDaysLeft, setPtDaysLeft] = useState(null);
   const [attendances, setAttendances] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
 
   const user = JSON.parse(localStorage.getItem('user'));
   const trainerId = user?.user_id;
 
-  // Hàm tính lại ptMeetingDaysLeft và ptMeetingDaysUsed cho từng attendance
-function computePtSessions(attendances) {
-  if (!attendances.length) return [];
+  // Hàm đơn giản chỉ để sort attendances
+  function sortAttendances(attendances) {
+    if (!attendances.length) return [];
+    return [...attendances].sort((a, b) => new Date(a.checkinDate) - new Date(b.checkinDate));
+  }
 
-  // Sort theo checkinDate
-  const sorted = [...attendances].sort((a, b) => new Date(a.checkinDate) - new Date(b.checkinDate));
+  useEffect(() => {
+  const fetchMembersWithPTDays = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/trainer/members?trainerId=${trainerId}`);
+      const memberList = res.data;
 
-  // Lấy ptMeetingDaysLeft ban đầu từ buổi đầu tiên
-  const initialPtLeft = sorted[0].ptMeetingDaysLeft ?? 0;
+      const updatedMembers = await Promise.all(
+        memberList.map(async (member) => {
+          try {
+            const membershipRes = await axios.get(`http://localhost:8080/api/memberships/current/${member.userId}`);
+            return {
+              ...member,
+              ptMeetingDaysLeft: membershipRes.data.ptMeetingDaysLeft || 'N/A',
+            };
+          } catch (error) {
+            console.error(`Lỗi khi lấy PT days của member ${member.userId}:`, error);
+            return { ...member, ptMeetingDaysLeft: 'N/A' };
+          }
+        })
+      );
 
-  let ptUsedCount = 0;
-
-  return sorted.map((att) => {
-    // Nếu attendance có feedback (khác null và khác rỗng) thì tính là đã dùng 1 buổi PT
-    if (att.feedback && att.feedback.trim() !== '') {
-      ptUsedCount++;
+      setMembers(updatedMembers);
+    } catch (err) {
+      console.error('Lỗi khi lấy danh sách members:', err);
     }
+  };
 
-    const ptLeft = initialPtLeft - ptUsedCount;
-    return {
-      ...att,
-      ptMeetingDaysLeft: ptLeft < 0 ? 0 : ptLeft,
-      ptMeetingDaysUsed: ptUsedCount,
-    };
-  });
-}
+  if (trainerId) {
+    fetchMembersWithPTDays();
+  }
+}, [trainerId]);
 
-
-  useEffect(() => {
-    if (!trainerId) return;
-    axios
-      .get(`http://localhost:8080/api/trainer/members?trainerId=${trainerId}`)
-      .then((res) => setMembers(res.data))
-      .catch((err) => console.error(err));
-  }, [trainerId]);
-
-  useEffect(() => {
-    if (!selectedMemberId) return;
-    axios
-      .get(`http://localhost:8080/api/trainer/members/${selectedMemberId}/attendances`)
-      .then((res) => {
-        const computed = computePtSessions(res.data);
-        setAttendances(computed);
-      })
-      .catch((err) => console.error(err));
-  }, [selectedMemberId]);
 
   const handleCreateAttendance = (memberId) => {
     axios
       .post(`http://localhost:8080/api/trainer/members/${memberId}/attendances`)
       .then((res) => {
-        // Thêm attendance mới rồi tính lại
+        // Thêm attendance mới rồi sort lại
         const newAttendances = [...attendances, res.data];
-        const computed = computePtSessions(newAttendances);
-        setAttendances(computed);
+        const sorted = sortAttendances(newAttendances);
+        setAttendances(sorted);
       })
       .catch((err) => console.error(err));
   };
@@ -94,6 +87,7 @@ function computePtSessions(attendances) {
             <th>User ID</th>
             <th>Full Name</th>
             <th>Package Name</th>
+            <th>PT Days Left</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -103,6 +97,7 @@ function computePtSessions(attendances) {
               <td>{m.userId}</td>
               <td>{m.fullname}</td>
               <td>{m.packageName}</td>
+              <td>{m.ptMeetingDaysLeft !== undefined ? m.ptMeetingDaysLeft : 'N/A'}</td>
               <td>
                 <button
                   className="trainer-members-button"
@@ -126,8 +121,6 @@ function computePtSessions(attendances) {
               <tr>
                 <th>Check-in Date</th>
                 <th>Feedback</th>
-                <th>PT Days Left</th>
-                <th>PT Days Used</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -147,8 +140,6 @@ function computePtSessions(attendances) {
                       }}
                     />
                   </td>
-                  <td>{att.ptMeetingDaysLeft}</td>
-                  <td>{att.ptMeetingDaysUsed}</td>
                   <td>
                     <button
                       className="trainer-update-button"
@@ -160,7 +151,7 @@ function computePtSessions(attendances) {
                 </tr>
               ))}
               <tr>
-                <td colSpan={5}>
+                <td colSpan={3}>
                   <button
                     className="trainer-members-button"
                     onClick={() => handleCreateAttendance(selectedMemberId)}

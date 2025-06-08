@@ -1,21 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
-const styles = {
-  container: { maxWidth: '900px', margin: '0 auto', padding: '20px' },
-  title: { textAlign: 'center', color: '#1e40af', fontSize: '2rem', fontWeight: 'bold', marginBottom: '30px' },
-  button: { padding: '10px 15px', marginBottom: '20px', cursor: 'pointer', borderRadius: '5px', border: 'none', backgroundColor: '#3b82f6', color: '#fff' },
-  form: { display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)', gap: '15px', marginBottom: '40px', backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
-  input: { padding: '10px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '1rem', width: '100%' },
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', border: '1px solid #ccc' },
-  th: { border: '1px solid #ddd', padding: '10px', backgroundColor: '#f3f4f6', textAlign: 'center' },
-  td: { border: '1px solid #ddd', padding: '8px', textAlign: 'center' },
-  actionButtons: { display: 'flex', gap: '8px', justifyContent: 'center' },
-  editButton: { backgroundColor: '#fbbf24', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-  deleteButton: { backgroundColor: '#ef4444', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-  cancelButton: { backgroundColor: '#9ca3af', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-  submitButton: { backgroundColor: '#10b981', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-};
+import './PackageManagement.css';
 
 export default function PackageManagement() {
   const [packages, setPackages] = useState([]);
@@ -66,7 +51,6 @@ export default function PackageManagement() {
     }
   };
 
-
   const handleTrainerSelect = e => {
     const id = Number(e.target.value);
     if (id && !formData.trainerIds.includes(id)) {
@@ -74,16 +58,15 @@ export default function PackageManagement() {
     }
   };
 
-
   const handleSubmit = async e => {
+    e.preventDefault();
     if (editingId) {
       await axios.put(`http://localhost:8080/api/membership-packages/${editingId}`, formData);
     } else {
       await axios.post('http://localhost:8080/api/membership-packages', formData);
     }
 
-    setFormData({ packageName: '', duration: '', price: '', maxPtMeetingDays: '', discount: '', pt: false, trainerIds: [] });
-
+    setFormData({ packageName: '', duration: '', price: '', maxPtMeetingDays: '', discount: 0, pt: false, trainerIds: [] });
     setEditingId(null);
     fetchPackages();
   };
@@ -93,7 +76,8 @@ export default function PackageManagement() {
       packageName: pkg.packageName,
       duration: pkg.duration,
       price: pkg.price,
-      packageType: pkg.packageType,
+      maxPtMeetingDays: pkg.maxPtMeetingDays,
+      discount: pkg.discount,
       pt: pkg.pt,
       trainerIds: pkg.trainerIds,
     });
@@ -107,117 +91,178 @@ export default function PackageManagement() {
   };
 
   const handleCancel = () => {
-    setFormData({ packageName: '', duration: '', price: '', packageType: '', pt: false, trainerIds: [] });
+    setFormData({ packageName: '', duration: '', price: '', maxPtMeetingDays: '', discount: 0, pt: false, trainerIds: [] });
     setEditingId(null);
   };
 
+  const removeTrainer = (trainerId) => {
+    setFormData({
+      ...formData,
+      trainerIds: formData.trainerIds.filter(tid => tid !== trainerId),
+    });
+  };
+
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Package Management</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-  <input style={styles.input} name="packageName" placeholder="Package Name" value={formData.packageName} onChange={handleChange} required />
-  <input style={styles.input} name="duration" placeholder="Duration (days)" type="number" value={formData.duration} onChange={handleChange} required />
-  {( formData.pt && <input style={styles.input} name="maxPtMeetingDays" placeholder="Max PT Meeting Days" type="number" value={formData.maxPtMeetingDays} onChange={handleChange} required />)}
-  <input style={styles.input} name="price" placeholder="Price" type="number" value={formData.price} onChange={handleChange} required />
-  <input style={styles.input} name="discount" step={0.01}
-  min={0} type="number"
-  placeholder="Discount (%)" value={formData.discount} onChange={handleChange} required/>
+    <div className="package-management">
+      <div className="package-container">
+        <h2 className="package-title">Package Management</h2>
+        
+        <form onSubmit={handleSubmit} className="package-form">
+          <div className="form-grid">
+            <input 
+              className="form-input" 
+              name="packageName" 
+              placeholder="Package Name" 
+              value={formData.packageName} 
+              onChange={handleChange} 
+              required 
+            />
+            <input 
+              className="form-input" 
+              name="duration" 
+              placeholder="Duration (days)" 
+              type="number" 
+              value={formData.duration} 
+              onChange={handleChange} 
+              required 
+            />
+            <input 
+              className="form-input" 
+              name="price" 
+              placeholder="Price" 
+              type="number" 
+              value={formData.price} 
+              onChange={handleChange} 
+              required 
+            />
+            <input 
+              className="form-input" 
+              name="discount" 
+              step={0.01}
+              min={0} 
+              type="number"
+              placeholder="Discount (%)" 
+              value={formData.discount} 
+              onChange={handleChange} 
+              required
+            />
+            {formData.pt && (
+              <input 
+                className="form-input" 
+                name="maxPtMeetingDays" 
+                placeholder="Max PT Meeting Days" 
+                type="number" 
+                value={formData.maxPtMeetingDays} 
+                onChange={handleChange} 
+                required 
+              />
+            )}
+          </div>
 
-  {/* Checkbox chọn có PT hay không */}
-  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-    <input
-      type="checkbox"
-      name="pt"
-      checked={formData.pt}
-      onChange={handleChange}
-    />
-    Personal Trainer (PT)
-  </label>
+          <label className="checkbox-label">
+            <input
+              className="checkbox-input"
+              type="checkbox"
+              name="pt"
+              checked={formData.pt}
+              onChange={handleChange}
+            />
+            Personal Trainer (PT)
+          </label>
 
-  {/* Hiển thị phần chọn Trainer nếu pt === true */}
-  {formData.pt && (
-    <>
-      <label>Choose Trainers:</label>
-      <select style={styles.input} onChange={handleTrainerSelect}>
-        <option value="">-- Select Trainer --</option>
-        {trainers
-          .filter(t => !formData.trainerIds.includes(t.id))
-          .map(t => (
-            <option key={t.id} value={t.id}>
-              {t.fullname}
-            </option>
-          ))}
-      </select>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-        {formData.trainerIds.map(id => {
-          const trainer = trainers.find(t => t.id === id);
-          return (
-            <div
-              key={id}
-              style={{
-                background: '#e0f2fe',
-                padding: '5px 10px',
-                borderRadius: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              <span>{trainer?.fullname}</span>
-              <span
-                onClick={() =>
-                  setFormData({
-                    ...formData,
-                    trainerIds: formData.trainerIds.filter(tid => tid !== id),
-                  })
-                }
-                style={{ color: 'red', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                x
-              </span>
+          {formData.pt && (
+            <div className="trainer-section">
+              <div className="trainer-section-label">Choose Trainers:</div>
+              <select className="trainer-select" onChange={handleTrainerSelect}>
+                <option value="">-- Select Trainer --</option>
+                {trainers
+                  .filter(t => !formData.trainerIds.includes(t.id))
+                  .map(t => (
+                    <option key={t.id} value={t.id}>
+                      {t.fullname}
+                    </option>
+                  ))}
+              </select>
+              <div className="trainer-tags">
+                {formData.trainerIds.map(id => {
+                  const trainer = trainers.find(t => t.id === id);
+                  return (
+                    <div key={id} className="trainer-tag">
+                      <span>{trainer?.fullname}</span>
+                      <span
+                        className="trainer-tag-remove"
+                        onClick={() => removeTrainer(id)}
+                      >
+                        ×
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          );
-        })}
+          )}
+
+          <div className="form-buttons">
+            <button type="submit" className="btn btn-submit">
+              {editingId ? 'Update' : 'Add'} Package
+            </button>
+            {editingId && (
+              <button type="button" className="btn btn-cancel" onClick={handleCancel}>
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+
+        <div className="package-table-container">
+          <table className="package-table">
+            <thead className="table-header">
+              <tr>
+                <th className="table-th">Package Name</th>
+                <th className="table-th">Duration</th>
+                <th className="table-th">Price</th>
+                <th className="table-th">Discount</th>
+                <th className="table-th">Max PT Days</th>
+                <th className="table-th">PT</th>
+                <th className="table-th">Trainers</th>
+                <th className="table-th">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {packages.map(pkg => (
+                <tr key={pkg.packageId}>
+                  <td className="table-td">{pkg.packageName}</td>
+                  <td className="table-td">{pkg.duration} days</td>
+                  <td className="table-td">${pkg.price}</td>
+                  <td className="table-td">{pkg.discount}%</td>
+                  <td className="table-td">{pkg.maxPtMeetingDays || 'N/A'}</td>
+                  <td className="table-td">
+                    <span className={`pt-badge ${pkg.pt ? 'pt-badge-yes' : 'pt-badge-no'}`}>
+                      {pkg.pt ? 'Yes' : 'No'}
+                    </span>
+                  </td>
+                  <td className="table-td trainer-list">
+                    {pkg.trainerIds
+                      .map(id => trainers.find(t => t.id === id)?.fullname || '')
+                      .filter(name => name)
+                      .join(', ') || 'None'}
+                  </td>
+                  <td className="table-td">
+                    <div className="action-buttons">
+                      <button className="btn-edit" onClick={() => handleEdit(pkg)}>
+                        Edit
+                      </button>
+                      <button className="btn-delete" onClick={() => handleDelete(pkg.packageId)}>
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </>
-  )}
-
-  <div style={{ display: 'flex', gap: '10px' }}>
-    <button type="submit" style={styles.submitButton}>{editingId ? 'Update' : 'Add'} Package</button>
-    {editingId && <button type="button" style={styles.cancelButton} onClick={handleCancel}>Cancel</button>}
-  </div>
-</form>
-
-
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>Package Name</th>
-            <th style={styles.th}>Duration</th>
-            <th style={styles.th}>Price</th>
-            <th style={styles.th}>Max PT Days</th>
-            <th style={styles.th}>PT</th>
-            <th style={styles.th}>Trainers</th>
-            <th style={styles.th}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {packages.map(pkg => (
-            <tr key={pkg.packageId}>
-              <td style={styles.td}>{pkg.packageName}</td>
-              <td style={styles.td}>{pkg.duration}</td>
-              <td style={styles.td}>{pkg.price}</td>
-              <td style={styles.td}>{pkg.maxPtMeetingDays}</td>
-              <td style={styles.td}>{pkg.pt ? 'Yes' : 'No'}</td>
-              <td style={styles.td}>{pkg.trainerIds.map(id => trainers.find(t => t.id === id)?.fullname || '').join(', ')}</td>
-              <td style={styles.actionButtons}>
-                <button style={styles.editButton} onClick={() => handleEdit(pkg)}>Edit</button>
-                <button style={styles.deleteButton} onClick={() => handleDelete(pkg.packageId)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }

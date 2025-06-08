@@ -1,23 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./GymRooms.css";
 
 const emptyRoom = { roomName: "", roomType: "", status: "" };
-
-const styles = {
-  container: { maxWidth: '900px', margin: '0 auto', padding: '20px' },
-  title: { textAlign: 'center', color: '#1e40af', fontSize: '2rem', fontWeight: 'bold', marginBottom: '30px' },
-  button: { padding: '10px 15px', marginBottom: '20px', cursor: 'pointer', borderRadius: '5px', border: 'none', backgroundColor: '#3b82f6', color: '#fff' },
-  form: { display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)', gap: '15px', marginBottom: '40px', backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
-  input: { padding: '10px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '1rem', width: '100%' },
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', border: '1px solid #ccc' },
-  th: { border: '1px solid #ddd', padding: '10px', backgroundColor: '#f3f4f6', textAlign: 'center' },
-  td: { border: '1px solid #ddd', padding: '8px', textAlign: 'center' },
-  actionButtons: { display: 'flex', gap: '8px', justifyContent: 'center' },
-  editButton: { backgroundColor: '#fbbf24', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-  deleteButton: { backgroundColor: '#ef4444', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-  cancelButton: { backgroundColor: '#9ca3af', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-  submitButton: { backgroundColor: '#10b981', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-};
 
 export default function GymRooms() {
   const [rooms, setRooms] = useState([]);
@@ -30,8 +15,12 @@ export default function GymRooms() {
   }, []);
 
   const fetchRooms = async () => {
-    const res = await axios.get("http://localhost:8080/api/admin/rooms");
-    setRooms(res.data);
+    try {
+      const res = await axios.get("http://localhost:8080/api/admin/rooms");
+      setRooms(res.data);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+    }
   };
 
   const isRoomNameDuplicate = (name) => {
@@ -79,106 +68,147 @@ export default function GymRooms() {
     }
   };
 
-  return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Gym Rooms</h1>
+  const handleCancel = () => {
+    setShowForm(false);
+    setForm(emptyRoom);
+    setEditingId(null);
+  };
 
-      <button
-        style={styles.button}
-        onClick={() => {
-          setForm(emptyRoom);
-          setEditingId(null);
-          setShowForm(true);
-        }}
-      >
-        ➕ Add Room
-      </button>
+  return (
+    <div className="gym-rooms-container">
+      <div className="gym-rooms-header">
+        <h1 className="gym-rooms-title">Gym Rooms Management</h1>
+        <button
+          className="btn btn-primary add-room-btn"
+          onClick={() => {
+            setForm(emptyRoom);
+            setEditingId(null);
+            setShowForm(true);
+          }}
+        >
+          <span className="btn-icon">➕</span>
+          Add New Room
+        </button>
+      </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <input
-            name="roomName"
-            value={form.roomName}
-            onChange={(e) => setForm({ ...form, roomName: e.target.value })}
-            placeholder="Room Name"
-            required
-            style={styles.input}
-          />
-          <input
-            name="roomType"
-            value={form.roomType}
-            onChange={(e) => setForm({ ...form, roomType: e.target.value })}
-            placeholder="Room Type"
-            required
-            style={styles.input}
-          />
-          <input
-            name="status"
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-            placeholder="Status"
-            required
-            style={styles.input}
-          />
-          <div style={styles.actionButtons}>
-            <button type="submit" style={styles.submitButton}>
-              {editingId ? "Save Changes" : "Create Room"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setShowForm(false);
-                setForm(emptyRoom);
-                setEditingId(null);
-                window.alert("Operation cancelled.");
-              }}
-              style={styles.cancelButton}
-            >
-              Cancel
-            </button>
+        <div className="form-container">
+          <div className="form-header">
+            <h2>{editingId ? "Edit Room" : "Create New Room"}</h2>
           </div>
-        </form>
+          <form onSubmit={handleSubmit} className="room-form">
+            <div className="form-group">
+              <label htmlFor="roomName">Room Name</label>
+              <input
+                id="roomName"
+                name="roomName"
+                type="text"
+                value={form.roomName}
+                onChange={(e) => setForm({ ...form, roomName: e.target.value })}
+                placeholder="Enter room name"
+                required
+                className="form-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="roomType">Room Type</label>
+              <input
+                id="roomType"
+                name="roomType"
+                type="text"
+                value={form.roomType}
+                onChange={(e) => setForm({ ...form, roomType: e.target.value })}
+                placeholder="Enter room type (e.g., Cardio, Weights, Yoga)"
+                required
+                className="form-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="status">Status</label>
+              <select
+                id="status"
+                name="status"
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+                required
+                className="form-select"
+              >
+                <option value="" disabled>-- Select Status --</option>
+                <option value="Available">Available</option>
+                <option value="Unavailable">Unavailable</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+            </div>
+
+            <div className="form-actions">
+              <button type="submit" className="btn btn-success">
+                {editingId ? "Save Changes" : "Create Room"}
+              </button>
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="btn btn-cancel"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>Name</th>
-            <th style={styles.th}>Type</th>
-            <th style={styles.th}>Status</th>
-            <th style={styles.th}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rooms.map((room) => (
-            <tr key={room.roomId}>
-              <td style={styles.td}>{room.roomName}</td>
-              <td style={styles.td}>{room.roomType}</td>
-              <td style={styles.td}>{room.status}</td>
-              <td style={styles.td}>
-                <div style={styles.actionButtons}>
-                  <button
-                    style={styles.editButton}
-                    onClick={() => {
-                      setForm(room);
-                      setEditingId(room.roomId);
-                      setShowForm(true);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    style={styles.deleteButton}
-                    onClick={() => handleDelete(room.roomId)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
+      <div className="table-container">
+        <table className="rooms-table">
+          <thead>
+            <tr>
+              <th>Room Name</th>
+              <th>Room Type</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rooms.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="no-data">
+                  No rooms available. Click "Add New Room" to get started.
+                </td>
+              </tr>
+            ) : (
+              rooms.map((room) => (
+                <tr key={room.roomId}>
+                  <td className="room-name">{room.roomName}</td>
+                  <td className="room-type">{room.roomType}</td>
+                  <td className={`room-status status-${room.status.toLowerCase()}`}>
+                    <span className="status-badge">{room.status}</span>
+                  </td>
+                  <td className="room-actions">
+                    <button
+                      className="btn btn-edit"
+                      onClick={() => {
+                        setForm(room);
+                        setEditingId(room.roomId);
+                        setShowForm(true);
+                      }}
+                      title="Edit room"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-delete"
+                      onClick={() => handleDelete(room.roomId)}
+                      title="Delete room"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
