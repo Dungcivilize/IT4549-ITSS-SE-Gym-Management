@@ -24,9 +24,10 @@ public interface AcceptedBillRepository extends JpaRepository<AcceptedBill, Long
 
     @Query(value = "SELECT YEAR(payment_date) AS year, MONTH(payment_date) AS month, SUM(amount) AS totalAmount " +
                "FROM accepted_bill " +
-               "WHERE YEAR(payment_date) = :year " +
+               "WHERE YEAR(payment_date) = :year AND reject_reason IS NULL " +
                "GROUP BY YEAR(payment_date), MONTH(payment_date)", nativeQuery = true)
     List<Object[]> getMonthlyRevenueByYear(@Param("year") int year);
+
 
     @Query("SELECT SUM(b.amount) FROM AcceptedBill b WHERE YEAR(b.paymentDate) = :year AND MONTH(b.paymentDate) = :month")
     Long getTotalAmountByYearAndMonth(@Param("year") int year, @Param("month") int month);

@@ -521,6 +521,11 @@ INSERT INTO Membership (member_id, trainer_id, package_id, start_date, end_date,
 (50, 58, 8, '2024-09-02', '2025-08-28', 'Processing', 2);
 
 -- Dữ liệu test cho member chờ verify payment
+
+
+
+-- Đữ liệu test cho Accepted_bill
+-- Chỉ chèn những bản ghi có payment_status là 'Paid' từ Membership
 INSERT INTO Accepted_bill (member_id, package_id, amount, payment_date, transaction_code, verified_date, reject_reason)
 SELECT 
     m.member_id,
@@ -533,5 +538,4 @@ SELECT
 FROM Membership m
 JOIN MembershipPackage p ON m.package_id = p.package_id
 LEFT JOIN Accepted_bill ab ON m.member_id = ab.member_id AND m.package_id = ab.package_id
-WHERE m.payment_status = 'Processing'
-AND ab.bill_id IS NULL;
+WHERE m.payment_status = 'Paid'

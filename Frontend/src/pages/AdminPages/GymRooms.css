@@ -1,0 +1,352 @@
+/* GymRooms.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #0f0f0f;
+  --highlight-color: #f97316;
+  --text-color: #f3f4f6;
+  --text-highlight: #f59e0b;
+  --background-glass: rgba(0, 0, 0, 0.4);
+  --border-glass: rgba(249, 115, 22, 0.3);
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --cancel-color: #6b7280;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.gym-rooms-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background: radial-gradient(circle, var(--highlight-color) 0%, rgba(15,15,15,0.95) 70%, var(--primary-color) 100%);
+  font-family: "Poppins", sans-serif;
+  color: var(--text-color);
+}
+
+.gym-rooms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.gym-rooms-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+  text-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+  background: linear-gradient(135deg, var(--text-color), var(--highlight-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.add-room-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+}
+
+.add-room-btn:hover {
+  box-shadow: 0 6px 25px rgba(249, 115, 22, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+/* Form Styles */
+.form-container {
+  background: var(--background-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-glass);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.form-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+.room-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.form-input,
+.form-select {
+  padding: 0.75rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.form-input::placeholder {
+  color: rgba(243, 244, 246, 0.6);
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.form-select option {
+  background: var(--primary-color);
+  color: var(--text-color);
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* Button Styles */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--highlight-color), #ea580c);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #ea580c, var(--highlight-color));
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success-color), #059669);
+  color: white;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #059669, var(--success-color));
+}
+
+.btn-cancel {
+  background: linear-gradient(135deg, var(--cancel-color), #4b5563);
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: linear-gradient(135deg, #4b5563, var(--cancel-color));
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, var(--warning-color), #d97706);
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  min-width: 80px;
+}
+
+.btn-edit:hover {
+  background: linear-gradient(135deg, #d97706, var(--warning-color));
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, var(--danger-color), #dc2626);
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  min-width: 80px;
+}
+
+.btn-delete:hover {
+  background: linear-gradient(135deg, #dc2626, var(--danger-color));
+}
+
+/* Table Styles */
+.table-container {
+  background: var(--background-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-glass);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.rooms-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.rooms-table thead {
+  background: rgba(249, 115, 22, 0.2);
+}
+
+.rooms-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.rooms-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(249, 115, 22, 0.1);
+  color: var(--text-color);
+}
+
+.rooms-table tbody tr:hover {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.room-name {
+  font-weight: 500;
+}
+
+.room-type {
+  color: var(--text-highlight);
+}
+
+.room-status {
+  text-align: center;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-available .status-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-unavailable .status-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-maintenance .status-badge {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.room-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(243, 244, 246, 0.6);
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .gym-rooms-container {
+    padding: 1rem;
+  }
+  
+  .gym-rooms-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .gym-rooms-title {
+    font-size: 2rem;
+  }
+  
+  .room-form {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .rooms-table {
+    min-width: 600px;
+  }
+  
+  .room-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .gym-rooms-title {
+    font-size: 1.5rem;
+  }
+  
+  .form-container {
+    padding: 1rem;
+  }
+  
+  .rooms-table th,
+  .rooms-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+}

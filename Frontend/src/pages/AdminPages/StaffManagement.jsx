@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './StaffManagement.css';
 
 const emptyUserForm = {
   userName: '',
@@ -11,20 +12,6 @@ const emptyUserForm = {
   fullname: '',
   address: '',
   dateOfBirth: ''
-};
-
-const styles = {
-  container: { maxWidth: '900px', margin: '0 auto', padding: '20px' },
-  title: { textAlign: 'center', color: '#1e40af', fontSize: '2rem', fontWeight: 'bold', marginBottom: '30px' },
-  button: { padding: '10px 15px', marginBottom: '20px', cursor: 'pointer', borderRadius: '5px', border: 'none', backgroundColor: '#3b82f6', color: '#fff' },
-  form: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px', marginBottom: '40px' },
-  input: { padding: '10px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '1rem' },
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' },
-  th: { border: '1px solid #ddd', padding: '10px', backgroundColor: '#f3f4f6' },
-  td: { border: '1px solid #ddd', padding: '8px', textAlign: 'left', verticalAlign: 'middle' },
-  actionButtons: { display: 'flex', gap: '8px', justifyContent: 'center' },
-  editButton: { backgroundColor: '#fbbf24', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' },
-  deleteButton: { backgroundColor: '#ef4444', border: 'none', borderRadius: '4px', padding: '6px 12px', color: 'white', cursor: 'pointer' }
 };
 
 const StaffManagement = () => {
@@ -88,27 +75,20 @@ const StaffManagement = () => {
 
   // Handle edit submit
   const handleEditSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    // Kiểm tra xem email đã tồn tại chưa
-    const emailExists = await checkEmailExists(editingUser.email);
+    e.preventDefault();
+    try {
+      // Kiểm tra xem email đã tồn tại chưa
+      const emailExists = await checkEmailExists(editingUser.email);
 
-    if (emailExists && emailExists.id !== editingUser.id) {
-      // Nếu email đã tồn tại và không phải của chính người đang sửa
-      window.alert("❌ Email đã tồn tại!");
-      return;
+      // Gửi request cập nhật
+      await axios.put(`http://localhost:8080/api/users/${editingUser.id}`, editingUser);
+      setEditingUser(null);
+      fetchUsers();
+      window.alert('✅ Cập nhật người dùng thành công!');
+    } catch (err) {
+      console.error('Error updating user:', err);
     }
-
-    // Gửi request cập nhật
-    await axios.put(`http://localhost:8080/api/users/${editingUser.id}`, editingUser);
-    setEditingUser(null);
-    fetchUsers();
-    window.alert('✅ Cập nhật người dùng thành công!');
-  } catch (err) {
-    console.error('Error updating user:', err);
-  }
-};
-
+  };
 
   // Handle delete user
   const handleDelete = async (id) => {
@@ -122,234 +102,257 @@ const StaffManagement = () => {
       }
     }
   };
+
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Staff Management</h1>
+    <div className="staff-management">
+      <div className="staff-container">
+        <h1 className="staff-title">Staff Management</h1>
 
-      {/* Button to show add form */}
-      <button style={styles.button} onClick={() => setAddingNewUser(!addingNewUser)}>
-        {addingNewUser ? 'Cancel Add New User' : 'Add New User'}
-      </button>
+        {/* Button to show add form */}
+        <button className="staff-button" onClick={() => setAddingNewUser(!addingNewUser)}>
+          {addingNewUser ? 'Cancel Add New User' : 'Add New User'}
+        </button>
 
-      {/* Add New User Form */}
-      {addingNewUser && (
-        <form onSubmit={handleAddSubmit} style={styles.form}>
-          <input
-            style={styles.input}
-            name="userName"
-            value={addForm.userName}
-            onChange={handleAddFormChange}
-            placeholder="Username"
-            required
-          />
-          <input
-            style={styles.input}
-            type="password"
-            name="password"
-            value={addForm.password}
-            onChange={handleAddFormChange}
-            placeholder="Password"
-            required
-          />
-          <input
-            style={styles.input}
-            name="email"
-            type="email"
-            value={addForm.email}
-            onChange={handleAddFormChange}
-            placeholder="Email"
-            required
-          />
-          <input
-            style={styles.input}
-            name="phone"
-            value={addForm.phone}
-            onChange={handleAddFormChange}
-            placeholder="Phone"
-            required
-          />
-          <input
-            style={styles.input}
-            name="role"
-            value={addForm.role}
-            onChange={handleAddFormChange}
-            placeholder="Role (admin, trainer...)"
-            required
-          />
-          <input
-            style={styles.input}
-            name="createdAt"
-            type="datetime-local"
-            value={addForm.createdAt}
-            onChange={handleAddFormChange}
-            placeholder="Created At"
-            required
-          />
-          <input
-            style={styles.input}
-            name="fullname"
-            value={addForm.fullname}
-            onChange={handleAddFormChange}
-            placeholder="Full Name"
-            required
-          />
-          <input
-            style={styles.input}
-            name="address"
-            value={addForm.address}
-            onChange={handleAddFormChange}
-            placeholder="Address"
-            required
-          />
-          <input
-            style={styles.input}
-            name="dateOfBirth"
-            type="date"
-            value={addForm.dateOfBirth}
-            onChange={handleAddFormChange}
-            placeholder="Date of Birth"
-            required
-          />
-          <button
-            type="submit"
-            style={{ ...styles.button, gridColumn: 'span 2', backgroundColor: '#10b981' }} // green
-          >
-            Add User
-          </button>
-        </form>
-      )}
-
-      {/* Edit User Form */}
-      {editingUser && (
-        <>
-          <h2>Edit User</h2>
-          <form onSubmit={handleEditSubmit} style={styles.form}>
+        {/* Add New User Form */}
+        {addingNewUser && (
+          <form onSubmit={handleAddSubmit} className="staff-form">
             <input
-              style={styles.input}
+              className="staff-input"
               name="userName"
-              value={editingUser.userName || ''}
-              onChange={handleEditChange}
+              value={addForm.userName}
+              onChange={handleAddFormChange}
               placeholder="Username"
               required
-              disabled
             />
             <input
-              style={styles.input}
+              className="staff-input"
               type="password"
               name="password"
-              value={editingUser.password || ''}
-              onChange={handleEditChange}
+              value={addForm.password}
+              onChange={handleAddFormChange}
               placeholder="Password"
+              required
             />
             <input
-              style={styles.input}
+              className="staff-input"
               name="email"
               type="email"
-              value={editingUser.email || ''}
-              onChange={handleEditChange}
+              value={addForm.email}
+              onChange={handleAddFormChange}
               placeholder="Email"
               required
             />
             <input
-              style={styles.input}
+              className="staff-input"
               name="phone"
-              value={editingUser.phone || ''}
-              onChange={handleEditChange}
+              value={addForm.phone}
+              onChange={handleAddFormChange}
               placeholder="Phone"
               required
             />
-            <input
-              style={styles.input}
+            <select
+              className="staff-select"
               name="role"
-              value={editingUser.role || ''}
-              onChange={handleEditChange}
-              placeholder="Role (admin, trainer...)"
+              value={addForm.role}
+              onChange={handleAddFormChange}
               required
-            />
+            >
+              <option value="">-- Select Role --</option>
+              <option value="member">Member</option>
+              <option value="trainer">Trainer</option>
+              <option value="receptionist">Receptionist</option>
+              <option value="admin">Admin</option>
+            </select>
             <input
-              style={styles.input}
+              className="staff-input"
               name="createdAt"
               type="datetime-local"
-              value={editingUser.createdAt ? new Date(editingUser.createdAt).toISOString().slice(0, 16) : ''}
-              onChange={handleEditChange}
+              value={addForm.createdAt}
+              onChange={handleAddFormChange}
               placeholder="Created At"
               required
-              disabled
             />
             <input
-              style={styles.input}
+              className="staff-input"
               name="fullname"
-              value={editingUser.fullname || ''}
-              onChange={handleEditChange}
+              value={addForm.fullname}
+              onChange={handleAddFormChange}
               placeholder="Full Name"
               required
             />
             <input
-              style={styles.input}
+              className="staff-input"
               name="address"
-              value={editingUser.address || ''}
-              onChange={handleEditChange}
+              value={addForm.address}
+              onChange={handleAddFormChange}
               placeholder="Address"
               required
             />
             <input
-              style={styles.input}
+              className="staff-input"
               name="dateOfBirth"
               type="date"
-              value={editingUser.dateOfBirth || ''}
-              onChange={handleEditChange}
+              value={addForm.dateOfBirth}
+              onChange={handleAddFormChange}
               placeholder="Date of Birth"
               required
             />
             <button
               type="submit"
-              style={{ ...styles.button, gridColumn: 'span 2', backgroundColor: '#f59e0b' }} // yellow
+              className="staff-submit-button staff-submit-success"
             >
-              Update User
-            </button>
-            <button
-              type="button"
-              onClick={() => setEditingUser(null)}
-              style={{ ...styles.button, gridColumn: 'span 2', backgroundColor: '#6b7280', marginTop: '10px' }} // gray
-            >
-              Cancel
+              Add User
             </button>
           </form>
-        </>
-      )}
+        )}
 
-      {/* User List */}
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>Full Name</th>
-            <th style={styles.th}>Email</th>
-            <th style={styles.th}>Phone</th>
-            <th style={styles.th}>Role</th>
-            <th style={styles.th}>Full Name</th>
-            <th style={styles.th}>Address</th>
-            <th style={styles.th}>Date of Birth</th>
-            <th style={styles.th}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.id}>
-              <td style={styles.td}>{u.fullname}</td>
-              <td style={styles.td}>{u.email}</td>
-              <td style={styles.td}>{u.phone}</td>
-              <td style={styles.td}>{u.role}</td>
-              <td style={styles.td}>{u.fullname}</td>
-              <td style={styles.td}>{u.address}</td>
-              <td style={styles.td}>{u.dateOfBirth}</td>
-              <td style={styles.actionButtons}>
-                <button style={styles.editButton} onClick={() => setEditingUser(u)}>Edit</button>
-                <button style={styles.deleteButton} onClick={() => handleDelete(u.id)}>Delete</button>
-              </td>
+        {/* Edit User Form */}
+        {editingUser && (
+          <>
+            <h2 className="staff-section-header">Edit User</h2>
+            <form onSubmit={handleEditSubmit} className="staff-form">
+              <input
+                className="staff-input"
+                name="userName"
+                value={editingUser.userName || ''}
+                onChange={handleEditChange}
+                placeholder="Username"
+                required
+                disabled
+              />
+              <input
+                className="staff-input"
+                type="password"
+                name="password"
+                value={editingUser.password || ''}
+                onChange={handleEditChange}
+                placeholder="Password"
+              />
+              <input
+                className="staff-input"
+                name="email"
+                type="email"
+                value={editingUser.email || ''}
+                onChange={handleEditChange}
+                placeholder="Email"
+                required
+              />
+              <input
+                className="staff-input"
+                name="phone"
+                value={editingUser.phone || ''}
+                onChange={handleEditChange}
+                placeholder="Phone"
+                required
+              />
+              <select
+                className="staff-select"
+                name="role"
+                value={editingUser.role || ''}
+                onChange={handleEditChange}
+                required
+              >
+                <option value="">-- Select Role --</option>
+                <option value="member">Member</option>
+                <option value="trainer">Trainer</option>
+                <option value="receptionist">Receptionist</option>
+                <option value="admin">Admin</option>
+              </select>
+              <input
+                className="staff-input"
+                name="createdAt"
+                type="datetime-local"
+                value={editingUser.createdAt ? new Date(editingUser.createdAt).toISOString().slice(0, 16) : ''}
+                onChange={handleEditChange}
+                placeholder="Created At"
+                required
+                disabled
+              />
+              <input
+                className="staff-input"
+                name="fullname"
+                value={editingUser.fullname || ''}
+                onChange={handleEditChange}
+                placeholder="Full Name"
+                required
+              />
+              <input
+                className="staff-input"
+                name="address"
+                value={editingUser.address || ''}
+                onChange={handleEditChange}
+                placeholder="Address"
+                required
+              />
+              <input
+                className="staff-input"
+                name="dateOfBirth"
+                type="date"
+                value={editingUser.dateOfBirth || ''}
+                onChange={handleEditChange}
+                placeholder="Date of Birth"
+                required
+              />
+              <button
+                type="submit"
+                className="staff-submit-button staff-submit-warning"
+              >
+                Update User
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingUser(null)}
+                className="staff-submit-button staff-submit-neutral"
+              >
+                Cancel
+              </button>
+            </form>
+          </>
+        )}
+
+        {/* User List */}
+        <table className="staff-table">
+          <thead className="staff-table-header">
+            <tr>
+              <th className="staff-th">Email</th>
+              <th className="staff-th">Phone</th>
+              <th className="staff-th">Role</th>
+              <th className="staff-th">Full Name</th>
+              <th className="staff-th">Address</th>
+              <th className="staff-th">Date of Birth</th>
+              <th className="staff-th">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((u) => (
+              <tr key={u.id}>
+                <td className="staff-td">{u.email}</td>
+                <td className="staff-td">{u.phone}</td>
+                <td className="staff-td">{u.role}</td>
+                <td className="staff-td">{u.fullname}</td>
+                <td className="staff-td">{u.address}</td>
+                <td className="staff-td">{u.dateOfBirth}</td>
+                <td className="staff-td">
+                  <div className="staff-action-buttons">
+                    <button
+                      className="staff-action-button staff-edit-button"
+                      onClick={() => setEditingUser(u)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="staff-action-button staff-delete-button"
+                      onClick={() => handleDelete(u.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

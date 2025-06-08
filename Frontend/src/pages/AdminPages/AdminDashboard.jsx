@@ -5,6 +5,7 @@ import StaffManagement from './StaffManagement';
 import GymRooms from './GymRooms';
 import Equipment from './Equipment';
 import PackageManagement from './PackageManagement';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [selectedPage, setSelectedPage] = useState('Dashboard');
@@ -34,23 +35,13 @@ const AdminDashboard = () => {
   };
 
   return (
-  <div style={{ display: 'flex', minHeight: '100vh' }}>
-    <Sidebar selectedPage={selectedPage} onSelectPage={setSelectedPage} />
-    <div
-      style={{
-        flex: 1,
-        padding: '30px',
-        background: 'linear-gradient(to bottom right, #e0f7fa, #80deea)',
-        color: '#333',
-        minHeight: '100vh',
-      }}
-    >
-      {renderContent()}
+    <div className="admin-dashboard">
+      <Sidebar selectedPage={selectedPage} onSelectPage={setSelectedPage} />
+      <div className="admin-dashboard-content">
+        {renderContent()}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
-
-
-}
 export default AdminDashboard;

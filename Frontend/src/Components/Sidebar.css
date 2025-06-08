@@ -1,0 +1,78 @@
+/* Sidebar.css */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: var(--background-glass);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 20px 10px;
+  border-radius: 0 12px 12px 0;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    0 0 12px var(--highlight-color);
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+  justify-content: space-between;
+  position: fixed;
+  left: 0;
+  top: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+.sidebar-header {
+  text-align: center;
+  color: var(--text-highlight);
+  margin-bottom: 30px;
+  text-shadow: 
+    0 0 8px rgba(249, 115, 22, 0.7),
+    0 0 15px rgba(249, 115, 22, 0.5);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.sidebar-menu {
+  flex: 1;
+}
+
+.sidebar-menu-item {
+  padding: 12px 15px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--text-color);
+  font-weight: normal;
+  user-select: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-menu-item:hover {
+  background-color: rgba(249, 115, 22, 0.2);
+  color: var(--text-highlight);
+}
+
+.sidebar-menu-item.active {
+  background-color: var(--highlight-color);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 8px var(--highlight-color);
+}
+
+.sidebar-logout {
+  padding: 12px 15px;
+  cursor: pointer;
+  border-radius: 8px;
+  background-color: rgba(220, 38, 38, 0.6);
+  color: #fff;
+  font-weight: bold;
+  user-select: none;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
+}
+
+.sidebar-logout:hover {
+  background-color: rgba(220, 38, 38, 0.8);
+}
