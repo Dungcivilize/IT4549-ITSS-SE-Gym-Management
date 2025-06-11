@@ -1,3 +1,16 @@
+/* CSS Variables - Add these to your root CSS if not already defined */
+:root {
+  --text-light: #e0e0e0;
+  --background-color: #1a1a1a;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --secondary-color: #f9ac54;
+  --secondary-color-dark: #e89b3f;
+  --input-border-color: #35373b;
+  --primary-color-light: #2a2a2a;
+  --transition-3s: 0.3s;
+  --black-color: #000000;
+}
+
 .attendance-calendar {
   max-width: 480px;
   margin: 20px auto;
@@ -44,11 +57,14 @@
   font-weight: 700;
   text-align: center;
   color: var(--secondary-color-dark);
+  padding: 8px 0;
+  margin-bottom: 4px;
 }
 
 .attendance-calendar .calendar-grid > .empty-cell {
   background-color: transparent;
   border: none;
+  padding: 10px 0;
 }
 
 .attendance-calendar .calendar-grid > .day-cell {
@@ -61,6 +77,11 @@
   transition: background-color var(--transition-3s), border-color var(--transition-3s);
   color: var(--text-light);
   background-color: var(--primary-color-light);
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
 }
 
 /* Có tập với PT + feedback (cam đậm) */
@@ -69,26 +90,33 @@
   border-color: #cc7000;     /* cam đậm hơn */
   color: #fff;               /* chữ trắng cho tương phản */
   font-weight: 700;
+  box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
 }
 
-/* Có tập với PT nhưng không có feedback (màu vàng nhạt hoặc cam nhạt hơn, dễ phân biệt) */
+/* Xóa bỏ class không dùng */
 .attendance-calendar .calendar-grid > .day-cell.pt-session-no-feedback {
-  background-color: #ffd59e; /* cam nhạt */
-  border-color: #ffbb33;     /* cam nhạt hơn */
-  color: #5a3e00;            /* nâu đậm, dễ nhìn */
+  background-color: #ffd59e;
+  border-color: #ffbb33;
+  color: #5a3e00;
   font-weight: 600;
-  box-shadow: none;          /* không shadow để nhẹ nhàng */
+  box-shadow: none;
 }
 
-/* Không tập */
+/* Chưa chấm công - màu xám */
 .attendance-calendar .calendar-grid > .day-cell.normal-session {
   background-color: var(--primary-color-light);
   color: var(--text-light);
+  opacity: 0.7;
 }
-
 
 .attendance-calendar .calendar-grid > .day-cell:hover {
   border-color: var(--secondary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(249, 172, 84, 0.2);
+}
+
+.attendance-calendar .calendar-grid > .day-cell.pt-session:hover {
+  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4);
 }
 
 /* Tooltip ẩn mặc định */
@@ -138,4 +166,63 @@
   font-size: 1.1rem;
   color: var(--secondary-color); /* màu chủ đạo */
   font-weight: 600;
+}
+
+/* Error message styling */
+.attendance-calendar .error-message {
+  background-color: #ff4444;
+  color: white;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* Loading container */
+.attendance-calendar .loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Responsive design */
+@media (max-width: 520px) {
+  .attendance-calendar {
+    margin: 10px;
+    padding: 15px;
+    max-width: none;
+  }
+  
+  .attendance-calendar .calendar-grid {
+    gap: 6px;
+  }
+  
+  .attendance-calendar .calendar-grid > .day-cell {
+    padding: 8px 0;
+    min-height: 30px;
+    font-size: 0.9rem;
+  }
+  
+  .attendance-calendar .calendar-grid > .day-name {
+    font-size: 0.85rem;
+    padding: 6px 0;
+  }
+}
+
+/* Animation for calendar appearance */
+.attendance-calendar .calendar-grid {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

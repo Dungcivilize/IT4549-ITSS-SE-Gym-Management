@@ -16,11 +16,14 @@ import ITSS.Backend.entity.AcceptedBill;
 public interface AcceptedBillRepository extends JpaRepository<AcceptedBill, Long> {
 
     @Query("SELECT new ITSS.Backend.Member.DTO.TransactionHistoryResponse(p.packageName, b.amount, b.paymentDate) " +
-            "FROM AcceptedBill b " +
-            "JOIN MembershipPackage p ON p.packageId = b.packageId " +
-            "WHERE b.memberId = :memberId AND b.verifiedDate IS NOT NULL " +
-            "ORDER BY b.paymentDate DESC")
-    List<TransactionHistoryResponse> getHistoryByMemberId(@Param("memberId") Long memberId);
+       "FROM AcceptedBill b " +
+       "JOIN MembershipPackage p ON p.packageId = b.packageId " +
+       "WHERE b.memberId = :memberId " +
+       "AND b.verifiedDate IS NOT NULL " +
+       "AND b.rejectReason IS NULL " +
+       "ORDER BY b.paymentDate DESC")
+List<TransactionHistoryResponse> getHistoryByMemberId(@Param("memberId") Long memberId);
+
 
     @Query(value = "SELECT YEAR(payment_date) AS year, MONTH(payment_date) AS month, SUM(amount) AS totalAmount " +
                "FROM accepted_bill " +
@@ -29,8 +32,11 @@ public interface AcceptedBillRepository extends JpaRepository<AcceptedBill, Long
     List<Object[]> getMonthlyRevenueByYear(@Param("year") int year);
 
 
-    @Query("SELECT SUM(b.amount) FROM AcceptedBill b WHERE YEAR(b.paymentDate) = :year AND MONTH(b.paymentDate) = :month")
-    Long getTotalAmountByYearAndMonth(@Param("year") int year, @Param("month") int month);
+    @Query("SELECT SUM(b.amount) FROM AcceptedBill b " +
+       "WHERE YEAR(b.paymentDate) = :year " +
+       "AND MONTH(b.paymentDate) = :month " +
+       "AND b.rejectReason IS NULL")
+Long getTotalAmountByYearAndMonth(@Param("year") int year, @Param("month") int month);
 
     // Lấy bill mới nhất theo member và package
     @Query("SELECT b FROM AcceptedBill b WHERE b.memberId = :memberId AND b.packageId = :packageId ORDER BY b.paymentDate DESC")
